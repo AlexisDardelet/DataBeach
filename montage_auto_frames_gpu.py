@@ -1,8 +1,12 @@
 """
-Extraction frame-accurate optimisée NVIDIA NVENC (GTX 1060+)
+##### (à reprendre une fois toutes les fonctions MAJ) #####
+
+Modules pour l’extraction de segments vidéo via GPU NVIDIA NVENC.
+Adapté pour un GPU GTX 1060
 
 Fonctions exposées :
     - extract_segments_gpu(input_video, ranges_file, output_dir)
+    - pregame_cutting(video_path, play_speed=1.0)
 
 Format du fichier ranges :
     startFrame-endFrame
@@ -13,7 +17,7 @@ Format du fichier ranges :
 
 import os
 import subprocess
-
+import cv2
 
 # -------------------------------------------------------------------
 # Utils
@@ -76,7 +80,7 @@ def extract_gpu_segment(
 
 
 # -------------------------------------------------------------------
-# Script principal exportable
+# Script pour extraction de segments via GPU, à partir d'un fichier de ranges
 # -------------------------------------------------------------------
 
 def extract_segments_gpu(
@@ -108,3 +112,108 @@ def extract_segments_gpu(
 
     print("[FIN] Tous les extraits GPU sont générés.")
     return True
+
+# -------------------------------------------------------------------
+# Découpage pré-match (pour éviter les longues vidéos)
+# -------------------------------------------------------------------
+
+def pregame_cutting(video_path:str,
+                    play_speed:float=1.0):
+    """ Découpe le début de la vidéo avant le début du match, en utilisant cv2 et ffmpeg.
+
+    Le script utilise OpenCV pour afficher la vidéo et détecter la touche pressée.
+    L'utilisateur appuie sur '0' pour indiquer le début du match, et la vidéo est ensuite découpée à partir de ce point en utilisant ffmpeg.
+
+
+    Args:
+        video_path (str): Chemin de la vidéo à découper.
+        play_speed (float): Vitesse de lecture de la vidéo.
+    """
+
+
+    # Ouvrir la vidéo
+    cap = cv2.VideoCapture(video_path)
+
+    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    last_game_frame = frame_count - 1 if frame_count > 0 else None
+    print(f"Index du dernier frame : {last_game_frame}")
+
+    def _waitKey_fast(ms):
+        # réduire le délai proportionnellement à la vitesse (au moins 1 ms)
+        adj = max(1, int(ms / play_speed))
+        return cv2.waitKey(adj)
+
+    if not cap.isOpened():
+        print("Erreur : impossible d’ouvrir la vidéo.")
+        exit()
+
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    frame_number = 0
+
+    paused = False
+
+    try:
+        while cap.isOpened():
+            
+            if not paused:
+                ret, frame = cap.read()
+                cv2.putText(frame,
+                        f"Vitesse de lecture : x{play_speed:.1f}",
+                        (30, 50),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        1,
+                        (0, 255, 0),
+                        2,
+                        cv2.LINE_AA)
+            
+                if not ret:
+                    print("Fin de la vidéo ou erreur de lecture.")
+                    break
+                frame_number += 1
+
+
+            # Indiquer mode pause
+            if paused and ret:
+                cv2.putText(frame,
+                            "|| PAUSE ||",
+                            (30, 80),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            1,
+                            (0, 0, 255),
+                            2,
+                            cv2.LINE_AA)
+
+            if ret:
+                cv2.imshow(f'{video_path}', frame)
+
+            key = _waitKey_fast(30) & 0xFF
+            if key == ord('q'):  # touche 'q' pour quitter
+                break
+            elif key == ord(' '):  # barre espace
+                paused = not paused
+            elif key == ord('0'):  # touche '0' pour marquer le début du match
+                starting_game_frame = frame_number
+                start_time = starting_game_frame / fps # peut être supprimé une fois débuggé
+                print(f"Début du match marqué au frame {starting_game_frame}, soit {start_time:.2f} secondes")
+                break
+            elif key == ord('+'):
+                play_speed += 0.5
+                # print(f"Vitesse de lecture augmentée à x{play_speed:.1f}")
+                continue
+            elif key == ord('-'):
+                play_speed = max(0.5, play_speed - 0.5)
+                # print(f"Vitesse de lecture diminuée à x{play_speed:.1f}")
+                continue
+
+    finally:
+        # Libérer les ressources
+        cap.release()
+        cv2.destroyAllWindows()
+
+    extract_gpu_segment(
+        input_video=video_path,
+        start_frame=starting_game_frame,
+        end_frame=last_game_frame,
+        output_video=f'{os.path.splitext(video_path)[0]}_started.mp4'
+        )
+    
