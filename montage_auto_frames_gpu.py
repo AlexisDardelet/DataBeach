@@ -18,6 +18,7 @@ Format du fichier ranges :
 import os
 import subprocess
 import cv2
+import pandas as pd
 
 # -------------------------------------------------------------------
 # Utils
@@ -43,10 +44,10 @@ def load_ranges(path: str):
 
 
 # -------------------------------------------------------------------
-# Core GPU extraction
+# Core GPU extraction pour un point unitaire joué (start-end frames)
 # -------------------------------------------------------------------
 
-def extract_gpu_segment(
+def cut_point_gpu(
     input_video: str,
     start_frame: int,
     end_frame: int,
@@ -80,7 +81,9 @@ def extract_gpu_segment(
 
 
 # -------------------------------------------------------------------
-# Script pour extraction de segments via GPU, à partir d'un fichier de ranges
+# Script pour extraction de segments via GPU, à partir d'un fichier .txt de ranges et du chemin de la vidéo source
+# Utilisé initialement pour l'entrainement du modèle de reconnaissances des 'Points' vs. 'Temps hors-jeu'
+# Pour le pipeline manuel de montage, on utilisera plutôt la fonction extract_segments_from_df_gpu() qui prend en entrée un DataFrame 
 # -------------------------------------------------------------------
 
 def extract_segments_gpu(
@@ -89,16 +92,17 @@ def extract_segments_gpu(
     output_dir: str
 ):
     """
-    Fonction principale à utiliser dans ton autre script Python.
+    Script pour extraction de segments via GPU, à partir d'un fichier .txt de ranges et du chemin de la vidéo source
+    Utilisé initialement pour l'entrainement du modèle de reconnaissances des 'Points' vs. 'Temps hors-jeu'
+    Pour le pipeline manuel de montage, on utilisera plutôt la fonction extract_segments_from_df_gpu() qui prend en entrée un DataFrame 
 
-    input_video : chemin de la vidéo source
-    ranges_file : fichier contenant des start-end frames
-    output_dir  : dossier où stocker les extraits
+    Découpe la vidéo source en segments définis par les start-end frames du fichier .txt de ranges, en utilisant le GPU pour accélérer l'extraction.
 
-    Exemple usage dans un autre fichier :
-        import montage_auto_gpu_gtx1060 as m
+    Args:
+        input_video : chemin de la vidéo source
+        ranges_file : fichier .txt contenant des start-end frames
+        output_dir  : dossier où stocker les extraits
 
-        m.extract_segments_gpu("video.mp4", "ranges.txt", "extraits")
     """
 
     ensure_dir(output_dir)
@@ -108,10 +112,11 @@ def extract_segments_gpu(
 
     for idx, (start, end) in enumerate(ranges, start=1):
         output_path = os.path.join(output_dir, f"extrait_{idx:03d}.mp4")
-        extract_gpu_segment(input_video, start, end, output_path)
+        cut_point_gpu(input_video, start, end, output_path)
 
     print("[FIN] Tous les extraits GPU sont générés.")
     return True
+
 
 # -------------------------------------------------------------------
 # Découpage pré-match (pour éviter les longues vidéos)
@@ -210,10 +215,31 @@ def pregame_cutting(video_path:str,
         cap.release()
         cv2.destroyAllWindows()
 
-    extract_gpu_segment(
+    cut_point_gpu(
         input_video=video_path,
         start_frame=starting_game_frame,
         end_frame=last_game_frame,
         output_video=f'{os.path.splitext(video_path)[0]}_started.mp4'
+        )
+    
+
+
+# -------------------------------------------------------------------
+# Découpage Core GPU, à partir d'un fichier .csv contenant les start-end frames
+# -------------------------------------------------------------------
+
+def extract_segments_from_df_gpu(
+    input_video: str,
+    actions_df: pd.DataFrame,
+    output_dir: str
+    ) -> None:
+
+    # Construire les intervalles : 1 ligne = time(Point) - time(Temps hors-jeu) suivant
+    for _, row in actions_df.iterrows():
+        cut_point_gpu(
+            input_video=input_video,
+            start_frame=int(row["Start_frame"]),
+            end_frame=int(row["End_frame"]),
+            output_video=os.path.join(output_dir, f"extrait_{_+1:03d}.mp4")
         )
     
