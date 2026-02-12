@@ -50,7 +50,7 @@ def load_ranges(path: str):
 # -------------------------------------------------------------------
 
 def cut_point_gpu(
-    input_video: str,
+    video_path: str,
     start_frame: int,
     end_frame: int,
     output_video: str
@@ -60,7 +60,7 @@ def cut_point_gpu(
     start_frame et end_frame sont inclusifs.
 
     Args:
-        input_video : chemin de la vidéo source
+        video_path : chemin de la vidéo source
         start_frame : frame de début du segment à extraire
         end_frame : frame de fin du segment à extraire
         output_video : chemin de la vidéo segmentée à générer
@@ -68,11 +68,12 @@ def cut_point_gpu(
 
     vf = f"select='between(n,{start_frame},{end_frame})',setpts=PTS-STARTPTS"
 
+    ffmpeg_path = r"C:\ffmpeg\bin\ffmpeg.exe"
+
     cmd = [
-        "ffmpeg", "-y",
+        ffmpeg_path, "-y",
         "-hwaccel", "cuda",
-        "-hwaccel_output_format", "cuda",
-        "-i", input_video,
+        "-i", video_path,
         "-vf", vf,
         "-an",
         "-c:v", "h264_nvenc",
@@ -301,9 +302,9 @@ def cv2_actions_to_operate(
         cv2.destroyAllWindows()
 
     montage_actions = {
-        'Start_frame': starting_game_frame,
-        'Last_frame': last_game_frame,
-        'Rotation_state': rotation_state
+        'start_frame': starting_game_frame,
+        'last_frame': last_game_frame,
+        'rotation_state': rotation_state
     }
 
     return montage_actions
@@ -348,9 +349,9 @@ def pre_match_editing(video_dir: str,
 
         # Récupérer les actions de montage à effectuer pour la vidéo
         montage_actions = cv2_actions_to_operate(video_path, play_speed)
-        starting_game_frame = montage_actions.get('Start_frame', 0)
-        last_game_frame = montage_actions.get('Last_frame', None)
-        rotation_state = montage_actions.get('Rotation_state', 0)
+        starting_game_frame = montage_actions.get('start_frame', 0)
+        last_game_frame = montage_actions.get('last_frame', None)
+        rotation_state = montage_actions.get('rotation_state', 0)
 
 
         # Stocker le frame de début du match et la rotation dans un df pandas temporaire pour les étapes suivantes du pipeline
@@ -365,7 +366,7 @@ def pre_match_editing(video_dir: str,
     # Appliquer cut_point_gpu() à chaque ligne de match_info_df
     for _, row in match_info_df.iterrows():
         cut_point_gpu(
-            input_video=row["video_path"],
+            video_path=row["video_path"],
             start_frame=int(row["starting_game_frame"]),
             end_frame=int(row["last_game_frame"]),
             output_video=os.path.join(row["output_dir"], f'{os.path.splitext(os.path.basename(row["video_path"]))[0]}_started.mp4')
@@ -399,9 +400,9 @@ def extract_segments_from_df_gpu(
     # Construire les intervalles : 1 ligne = time(Point) - time(Temps hors-jeu) suivant
     for _, row in actions_df.iterrows():
         cut_point_gpu(
-            input_video=input_video,
-            start_frame=int(row["Start_frame"]),
-            end_frame=int(row["End_frame"]),
+            video_path=input_video,
+            start_frame=int(row["start_frame"]),
+            end_frame=int(row["end_frame"]),
             output_video=os.path.join(output_dir, f"extrait_{_+1:03d}.mp4")
         )
     
