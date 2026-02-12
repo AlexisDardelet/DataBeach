@@ -1,7 +1,3 @@
 Service_side,Start_frame,End_frame,Score_J&M,Score_adversaire
-Début de set,179,521,0,0
-Service adversaire,988,1204,0,1
-Service J&M,1601,1839,1,1
-Service adversaire,2285,2573,1,2
-Service J&M,3109,3463,2,2
-Service J&M,3860,4058,3,2
+Service adversaire,1334,1529,0,1
+Service J&M,1793,2015,1,1
