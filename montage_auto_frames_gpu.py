@@ -66,10 +66,13 @@ def cut_point_gpu(
         output_video : chemin de la vidéo segmentée à générer
     """
 
+    # Filtre vidéo pour sélectionner les frames entre start_frame et end_frame, et réinitialiser les timestamps à partir de 0
     vf = f"select='between(n,{start_frame},{end_frame})',setpts=PTS-STARTPTS"
 
+    # Chemin vers la version de ffmpeg compilée avec support NVENC pour accélérer l'extraction via GPU
     ffmpeg_path = r"C:\ffmpeg\bin\ffmpeg.exe"
 
+    # Commande ffmpeg pour extraire le segment en utilisant le GPU
     cmd = [
         ffmpeg_path, "-y",
         "-hwaccel", "cuda",
@@ -84,8 +87,9 @@ def cut_point_gpu(
     ]
 
     print(f"[GPU] Extraction frames {start_frame} → {end_frame}")
-    print("      Command:", " ".join(cmd))
+    # print("      Command:", " ".join(cmd))
 
+    # Exécuter la commande ffmpeg pour extraire le segment en utilisant le GPU
     subprocess.run(cmd, check=True)
 
 # -------------------------------------------------------------------
@@ -120,21 +124,16 @@ def video_rotation (video_path: str,
     else:
         base_name = os.path.splitext(os.path.basename(video_path))[0]
         output_path = os.path.join(output_dir, f'{base_name}_rotated_{rotation_state}.mp4')
-    print(f"Vidéo pivotée enregistrée : {output_path}")
+    # print(f"Vidéo pivotée enregistrée : {output_path}")
 
     # Commande ffmpeg pour appliquer la rotation
-    if filter_str is None:
+    if filter_str is not None:
+
+        # Path pour diriger vers la version de ffmpeg compilée avec support NVENC pour accélérer la rotation via GPU
+        ffmpeg_path = r"C:\ffmpeg\bin\ffmpeg.exe"
+
         command = [
-            'ffmpeg',
-            '-y',
-            '-i', video_path,
-            '-c:v', 'copy',
-            '-c:a', 'copy',
-            output_path
-        ]
-    else:
-        command = [
-            'ffmpeg',
+            ffmpeg_path,
             '-y',
             '-i', video_path,
             '-vf', filter_str,
@@ -142,8 +141,11 @@ def video_rotation (video_path: str,
             output_path
         ]
 
-    # print(f"Appliquer la rotation : {rotation_state} degrés")
-    subprocess.run(command, check=True)
+        # print(f"Appliquer la rotation : {rotation_state} degrés")
+
+        # Exécuter la commande ffmpeg pour appliquer la rotation
+        subprocess.run(command, check=True)
+
 
 
 # -------------------------------------------------------------------
@@ -311,16 +313,16 @@ def cv2_actions_to_operate(
 
 
 
-
-
-
 # -------------------------------------------------------------------
-# Découpage pré-match (pour éviter les longues vidéos)
+# Découpage pré-match (rotation + retirer le temps d'avant match)
 # -------------------------------------------------------------------
 
-def pre_match_editing(video_dir: str,
-                      play_speed: float = 1.0,
-                      output_dir: str = None) -> None:
+def pre_match_editing(
+    video_dir: str,
+    play_speed: float = 1.0,
+    output_dir: str = None
+    ) -> None:
+    
     """ Réalise le découpage pré-match des vidéos d'un dossier.
     Le script utilise OpenCV pour afficher la vidéo et détecter la touche pressée.
 
@@ -388,7 +390,7 @@ def pre_match_editing(video_dir: str,
 
 
 # -------------------------------------------------------------------
-# Découpage Core GPU, à partir d'un dataframe contenant les start-end frames
+# Découpage de chaque point joué en 1 vidéo segmentée, à partir des start-end frames d'un DataFrame, en utilisant le GPU pour accélérer l'extraction
 # -------------------------------------------------------------------
 
 def extract_segments_from_df_gpu(
@@ -396,6 +398,16 @@ def extract_segments_from_df_gpu(
     actions_df: pd.DataFrame,
     output_dir: str
     ) -> None:
+
+    """
+    Découpe la vidéo source en segments définis par les start-end frames d'un DataFrame
+    
+    Args:
+        input_video(str) : chemin de la vidéo source
+        actions_df(pandas.DataFrame) : DataFrame contenant les start-end frames des segments à extraire, avec au moins les colonnes 'start_frame' et 'end_frame'
+        output_dir(str)  : dossier où stocker les extraits
+
+    """
 
     # Construire les intervalles : 1 ligne = time(Point) - time(Temps hors-jeu) suivant
     for _, row in actions_df.iterrows():
