@@ -147,7 +147,6 @@ def video_rotation (video_path: str,
         subprocess.run(command, check=True)
 
 
-
 # -------------------------------------------------------------------
 #  Enregistrement des actions de montage à effectuer pour un pre process de video, via cv2 et interaction clavier, sur 1 vidéo
 # -------------------------------------------------------------------
@@ -322,7 +321,7 @@ def pre_match_editing(
     play_speed: float = 1.0,
     output_dir: str = None
     ) -> None:
-    
+
     """ Réalise le découpage pré-match des vidéos d'un dossier.
     Le script utilise OpenCV pour afficher la vidéo et détecter la touche pressée.
 
@@ -386,15 +385,15 @@ def pre_match_editing(
             os.remove(os.path.join(row["output_dir"], f'{os.path.splitext(os.path.basename(row["video_path"]))[0]}_started.mp4'))
 
 
-    return match_info_df
+    # return match_info_df
 
 
 # -------------------------------------------------------------------
-# Découpage de chaque point joué en 1 vidéo segmentée, à partir des start-end frames d'un DataFrame, en utilisant le GPU pour accélérer l'extraction
+# Découpage de chaque point joué en 1 vidéo segmentée, à partir des start-end frames d'un DataFrame
 # -------------------------------------------------------------------
 
 def extract_segments_from_df_gpu(
-    input_video: str,
+    video_path: str,
     actions_df: pd.DataFrame,
     output_dir: str
     ) -> None:
@@ -412,11 +411,43 @@ def extract_segments_from_df_gpu(
     # Construire les intervalles : 1 ligne = time(Point) - time(Temps hors-jeu) suivant
     for _, row in actions_df.iterrows():
         cut_point_gpu(
-            video_path=input_video,
+            video_path=video_path,
             start_frame=int(row["start_frame"]),
             end_frame=int(row["end_frame"]),
             output_video=os.path.join(output_dir, f"extrait_{_+1:03d}.mp4")
         )
+
+# -------------------------------------------------------------------------------------------------
+# Création du Dataframe pour découpage d'un match en segments de points joués (prise en compte du score)
+# -------------------------------------------------------------------------------------------------
+
+# def cv2_point_segment_cut(
+#         video_path: str,
+#         play_speed: float = 1.0,
+#         team1_name: str = "JOMR",
+#         team2_name: str = "adversaire",
+#         output_dir: str 
+#     ) -> pd.DataFrame:
+    
+#     """
+#     Permet de découper un match en segments de points joués, en prenant en compte le score pour différencier les points gagnés par chaque équipe.
+
+#     L'utilisateur doit :
+#         - Appuyer sur '1' pour marquer un point gagné par l'équipe 1 (team1_name)
+#         - Appuyer sur '2' pour marquer un point gagné par l'équipe 2 (team2_name)
+    
+#     Args :
+#         video_path (str) : chemin de la vidéo à traiter
+#         play_speed (float) : vitesse de lecture de la vidéo
+#         team1_name (str) : nom de l'équipe 1 pour le marquage des points
+#         team2_name (str) : nom de l'équipe 2 pour le marquage des points
+#         output_dir (str) : dossier de sortie pour les vidéos segmentées
+#     Returns :
+#         score_df (pd.DataFrame) : DataFrame contenant les start-end frames de chaque point joué, avec le suivi du score par équipe    
+#     """
+
+
+
     
 
 # -------------------------------------------------------------------
