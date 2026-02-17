@@ -1,0 +1,57 @@
+Service_side,Start_frame,End_frame,JOMR_score,adversaire_score,JOMR_sets,adversaire_sets,point_index
+debut du set,33,195,0,0,0,0,1
+service JOMR,441,700,1,0,0,0,2
+service adversaire,1185,1393,1,1,0,0,3
+service JOMR,1782,2012,2,1,0,0,4
+service adversaire,2462,2769,2,2,0,0,5
+*SWITCH*,2887,3153,2,2,0,0,
+service JOMR,3264,3652,3,2,0,0,6
+service JOMR,4015,4224,4,2,0,0,7
+service JOMR,4523,4787,5,2,0,0,8
+service JOMR,5094,5630,6,2,0,0,9
+service JOMR,6249,6485,7,2,0,0,10
+*SWITCH*,6636,6924,7,2,0,0,
+service JOMR,7053,7211,8,2,0,0,11
+service adversaire,7631,7864,8,3,0,0,12
+service JOMR,8319,8709,9,3,0,0,13
+service JOMR,9076,9411,10,3,0,0,14
+service adversaire,9799,10082,10,4,0,0,15
+*SWITCH*,10302,10485,10,4,0,0,
+service adversaire,10747,11480,10,5,0,0,16
+service JOMR,11826,12137,11,5,0,0,17
+service adversaire,12502,12668,11,6,0,0,18
+service adversaire,12959,13180,11,7,0,0,19
+service adversaire,13392,13653,11,8,0,0,20
+*SWITCH*,13835,13967,11,8,0,0,
+Temps mort,14297,15709,11,8,0,0,
+service JOMR,15972,16128,12,8,0,0,21
+service adversaire,16400,16593,12,9,0,0,22
+service JOMR,16844,17109,13,9,0,0,23
+service JOMR,17355,17866,14,9,0,0,24
+debut du set,20428,20774,0,0,1,0,25
+service JOMR,21057,21500,1,0,1,0,26
+service JOMR,21898,22156,2,0,1,0,27
+service JOMR,22481,22699,3,0,1,0,28
+service adversaire,23100,23408,3,1,1,0,29
+*SWITCH*,23615,23835,3,1,1,0,
+service JOMR,23983,24070,4,1,1,0,30
+service adversaire,24475,24708,4,2,1,0,31
+service JOMR,25273,25604,5,2,1,0,32
+service adversaire,26160,26342,5,3,1,0,33
+service adversaire,26702,26992,5,4,1,0,34
+*SWITCH*,27221,27520,5,4,1,0,
+service JOMR,27640,28049,6,4,1,0,35
+service JOMR,28406,28754,7,4,1,0,36
+service adversaire,29139,29302,7,5,1,0,37
+service JOMR,29607,29814,8,5,1,0,38
+service JOMR,30127,30433,9,5,1,0,39
+*SWITCH*,30706,30926,9,5,1,0,
+service adversaire,31126,31387,9,6,1,0,40
+service JOMR,31831,32049,10,6,1,0,41
+service JOMR,32298,32503,11,6,1,0,42
+Temps mort,32750,33865,11,6,1,0,
+service JOMR,34125,34468,12,6,1,0,43
+service adversaire,34919,35227,12,7,1,0,44
+*SWITCH*,35461,35756,12,7,1,0,
+service JOMR,35831,36414,13,7,1,0,45
+service JOMR,36898,37165,14,7,1,0,46

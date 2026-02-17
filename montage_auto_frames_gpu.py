@@ -421,17 +421,11 @@ def extract_segments_from_df_gpu(
 # Création du Dataframe pour découpage d'un match en segments de points joués (prise en compte du score)
 # -------------------------------------------------------------------------------------------------
 
-# from montage_auto_frames_gpu import cv2_temp_list_to_operate
-import pandas as pd
-import cv2
-import sys
-
 def cv2_point_segment_cut(
         video_path : str,
         play_speed : float = 1.0,
         team1_name: str = "JOMR",
-        team2_name: str = "adversaire",
-        output_dir: str = None
+        team2_name: str = "adversaire"
     ) -> pd.DataFrame:
 
     """
@@ -447,7 +441,6 @@ def cv2_point_segment_cut(
         output_dir (str, optional): Dossier de sortie pour les segments extraits. Si None, les segments seront extraits dans le même dossier que la vidéo source.
     Returns:
         DataFrame contenant les informations sur les segments de points extraits, avec les colonnes : 
-        'point_index',
         'action',
         'start_frame',
         'end_frame',
@@ -465,16 +458,23 @@ def cv2_point_segment_cut(
         ord('0'): 'debut du set',
         ord('1'): f'service {team1_name}',
         ord('3'): f'service {team2_name}',
-        ord('2'): 'fin point'
+        ord('2'): 'fin point',
+        ord('5'): '*SWITCH*',
+        ord('8'): 'Temps mort',
         }
+
 
     # Afficher les touches disponibles en overlay sur la vidéo
     help_lines = [
         "0 : debut du set",
         f"1 : service {team1_name}",
         f"3 : service {team2_name}",
-        "2 : fin du point"
+        "2 : fin du point",
+        "5 : switch",
+        "8 : temps mort"
     ]
+
+
 
     _orig_imshow = cv2.imshow
 
@@ -572,11 +572,26 @@ def cv2_point_segment_cut(
             elif key in key_action_map: # enregistrer l'action associée à la touche, avec le numéro de frame
                 action_name = key_action_map[key]
                 last_action = action_name
-
                 temp_list.append({
                     'Frame': frame_number,
                     'Action': action_name
                 })
+            elif key == ord('7'): # erreur de codage, revenir en arrière
+                if temp_list:
+                    removed_action = temp_list.pop()
+                    print(f"Action supprimée : {removed_action}")
+                    last_action = temp_list[-1]['Action'] if temp_list else None
+                else:
+                    print("Aucune action à supprimer.")
+                # Revenir à la frame de l'action supprimée et mettre la lecture en pause
+                if temp_list:
+                    cap.set(cv2.CAP_PROP_POS_FRAMES, temp_list[-1]['Frame'])
+                    frame_number = temp_list[-1]['Frame']
+                    paused = True
+                else:
+                    cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                    frame_number = 0
+
 
 
     finally:
@@ -630,23 +645,23 @@ def cv2_point_segment_cut(
 
     # Mettre à jour les scores en fonction du service_side
     for idx, row in df_points.iterrows():
-            if df_points['Service_side'].iloc[idx] == 'debut du set':
-                # Première ligne : initialiser selon le service
-                if row['Service_side'] == f'service {team1_name}':
-                    df_points.at[idx, f'{team1_name}_score'] = 1
-                    df_points.at[idx, f'{team2_name}_score'] = 0
-                elif row['Service_side'] == f'service {team2_name}':
-                    df_points.at[idx, f'{team1_name}_score'] = 0
-                    df_points.at[idx, f'{team2_name}_score'] = 1
-            else:
-                # Lignes suivantes : reprendre le score précédent et incrémenter selon le service
-                df_points.at[idx, f'{team1_name}_score'] = df_points.at[idx - 1, f'{team1_name}_score']
-                df_points.at[idx, f'{team2_name}_score'] = df_points.at[idx - 1, f'{team2_name}_score']
-                
-                if row['Service_side'] == f'service {team1_name}':
-                    df_points.at[idx, f'{team1_name}_score'] += 1
-                elif row['Service_side'] == f'service {team2_name}':
-                    df_points.at[idx, f'{team2_name}_score'] += 1
+        if df_points['Service_side'].iloc[idx] == 'debut du set':
+            # Première ligne : initialiser selon le service
+            if row['Service_side'] == f'service {team1_name}':
+                df_points.at[idx, f'{team1_name}_score'] = 1
+                df_points.at[idx, f'{team2_name}_score'] = 0
+            elif row['Service_side'] == f'service {team2_name}':
+                df_points.at[idx, f'{team1_name}_score'] = 0
+                df_points.at[idx, f'{team2_name}_score'] = 1
+        else:
+            # Lignes suivantes : reprendre le score précédent et incrémenter selon le service
+            df_points.at[idx, f'{team1_name}_score'] = df_points.at[idx - 1, f'{team1_name}_score']
+            df_points.at[idx, f'{team2_name}_score'] = df_points.at[idx - 1, f'{team2_name}_score']
+            
+            if row['Service_side'] == f'service {team1_name}':
+                df_points.at[idx, f'{team1_name}_score'] += 1
+            elif row['Service_side'] == f'service {team2_name}':
+                df_points.at[idx, f'{team2_name}_score'] += 1
 
     # Mettre à jour les scores de sets au début de chaque nouveau set
     for idx, row in df_points.iterrows():
@@ -669,9 +684,132 @@ def cv2_point_segment_cut(
             df_points.at[idx, f'{team1_name}_sets'] = df_points.at[idx - 1, f'{team1_name}_sets']
             df_points.at[idx, f'{team2_name}_sets'] = df_points.at[idx - 1, f'{team2_name}_sets']
 
-    return df_points
+    return list_actions, df_points
 
+# -----------------------------------------------------------------------------------------------
+# Point indexeer
+# -----------------------------------------------------------------------------------------------
+def point_indexeer(df: pd.DataFrame
+                   ) -> pd.DataFrame:
+    """ 
+    Ajoute une colonne 'point_index' au dataframe des points, qui attribue un numéro de point unique à chaque point joué 
+    (en ignorant les actions de switch et temps mort).
+    
+    Arg :
+        df (pd.DataFrame) : DataFrame contenant les segments de points extraits, avec les colonnes : 
+            'Service_side',
+            'Start_frame',
+            'End_frame',
+            'score_team1',
+            'score_team2',
+            'set_team1',
+            'set_team2'
+    Returns :
+        pd.DataFrame : DataFrame avec une colonne supplémentaire 'point_index' qui attribue un numéro de point unique à chaque point joué
+    """
+    if 'point_index' in df.columns:
+        print("La colonne 'point_index' existe déjà dans le DataFrame. Veuillez supprimer ou renommer la colonne existante avant d'exécuter cette fonction.")
+        return df
+    
+    elif not all(col in df.columns for col in ['Service_side']):
+        print("Erreur : le DataFrame ne contient pas la colonne 'Service_side'. Veuillez vérifier les colonnes du DataFrame.")
+        return df
 
+    point_idx = 0
+    point_indices = []
+    for _, row in df.iterrows():
+        if row['Service_side'] not in ('*SWITCH*', 'Temps mort'):
+            point_idx += 1
+        point_indices.append(point_idx if row['Service_side'] not in ('*SWITCH*', 'Temps mort') else None)
+    df['point_index'] = pd.array(point_indices, dtype=pd.Int64Dtype())
+    
+    return df
+
+# -----------------------------------------------------------------------------------------------
+# Score checker
+# -----------------------------------------------------------------------------------------------
+def score_checker(df_points:pd.DataFrame) -> dict:
+    
+    """
+    Fonction pour vérifier la cohérence des score par rapport aux side switch.
+    Après un *SWITCH*, la somme des colonnes '_score' doit être égale à un multiple de 5 ou 7 (selon le nombre de points par set)
+    Elle indique le format du match (15 ou 21 points par set) selon le multiple trouvé.
+    Elle indique également le score final, avec le détail par set, pour les deux équipes.
+    Si une incohérence est détectée, elle retourne un message d'erreur indiquant le problème.
+
+    Arg :
+        df_points: DataFrame contenant les segments de points extraits, avec les colonnes : 'point_index','action','start_frame','end_frame','score_team1','score_team2','set_team1','set_team2'
+    Returns:
+        dict : Dictionnaire contenant les informations sur le format du match et le score final
+    """
+    recap_dict = dict({
+        'match_format': None,
+        'victoire': None,
+        'final_score': None,
+        'score_by_set': [],
+    })
+    
+    # Retirer les lignes correspondant aux temps morts
+    temp_df = df_points[df_points['Service_side'] != 'Temps mort'].reset_index(drop=True)
+
+    # Récupérer les noms des équipes à partir des colonnes du DataFrame
+    team1_name = temp_df.columns[3].replace('_score', '')
+    team2_name = temp_df.columns[4].replace('_score', '')
+    # Initialiser les variables pour le score et le format du match
+    score_switch_points = []
+    for idx, row in temp_df.iterrows():
+        if row['Service_side'] == '*SWITCH*':
+            if idx + 1 < len(temp_df):
+                score_sum = temp_df.at[idx + 1, f'{team1_name}_score'] + temp_df.at[idx + 1, f'{team2_name}_score']
+            else:
+                score_sum = row[f'{team1_name}_score'] + row[f'{team2_name}_score']
+            score_switch_points.append(score_sum)
+
+    # print("Scores au moment des switchs :", score_switch_points)
+
+    # Vérifier les multiples de 5 ou 7
+    multiples_of_5 = all(score % 5 == 0 for score in score_switch_points)
+    multiples_of_7 = all(score % 7 == 0 for score in score_switch_points)
+    if multiples_of_5:
+        match_format = "15 points par set"
+    elif multiples_of_7:
+        match_format = "21 points par set"
+    else:
+        return {"message": "Incohérence détectée : les scores au moment des switch ne sont pas des multiples de 5 ou 7."}
+    
+    # Récupérer le score final et le détail par set
+    recap_dict['match_format'] = match_format
+    final_score_team1 = temp_df[f'{team1_name}_sets'].iloc[-1]
+    final_score_team2 = temp_df[f'{team2_name}_sets'].iloc[-1]
+    recap_dict['final_score'] = f"{final_score_team1} - {final_score_team2}"
+    
+    # Déterminer le gagnant
+    if final_score_team1 > final_score_team2:
+        recap_dict['victoire'] = team1_name
+    elif final_score_team2 > final_score_team1:
+        recap_dict['victoire'] = team2_name
+    else:
+        recap_dict['victoire'] = "Égalité"
+
+    # Détail par set
+    set_count = 0
+    current_set_scores = []
+    for idx, row in temp_df.iterrows():
+        if row['Service_side'] == 'debut du set' and idx > 0:
+            current_set_scores.append({
+                'set': set_count + 1,
+                'score': f"{row[f'{team1_name}_score']} - {row[f'{team2_name}_score']}"
+            })
+            set_count += 1
+        elif idx == len(temp_df) - 1:  # Dernière ligne du DataFrame
+            current_set_scores.append({
+                'set': set_count + 1,
+                'score': f"{row[f'{team1_name}_score']} - {row[f'{team2_name}_score']}"
+            })
+
+    recap_dict['score_by_set'] = current_set_scores
+
+    return recap_dict
 
 
 # -------------------------------------------------------------------
