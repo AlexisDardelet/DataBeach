@@ -1,0 +1,51 @@
+Service_side,Start_frame,End_frame,JOMR_score,KaE_EmD_score,JOMR_sets,KaE_EmD_sets
+debut du match,190,441,0,0,0,0
+service KaE_EmD,874,1231,0,1,0,0
+service JOMR,1564,1766,1,1,0,0
+service JOMR,2050,2279,2,1,0,0
+service JOMR,2558,2929,3,1,0,0
+*SWITCH*,3061,3180,3,1,0,0
+service KaE_EmD,3492,3661,3,2,0,0
+service JOMR,3940,4093,4,2,0,0
+service JOMR,4560,4699,5,2,0,0
+service JOMR,4990,5233,6,2,0,0
+service KaE_EmD,5557,5779,6,3,0,0
+*SWITCH*,5900,5911,6,3,0,0
+service JOMR,6204,6352,7,3,0,0
+service JOMR,6612,6944,8,3,0,0
+service JOMR,7361,7505,9,3,0,0
+service JOMR,7795,7946,10,3,0,0
+service KaE_EmD,8271,8663,10,4,0,0
+*SWITCH*,8840,8868,10,4,0,0
+service JOMR,9239,9463,11,4,0,0
+service KaE_EmD,9796,10065,11,5,0,0
+service JOMR,10423,10665,12,5,0,0
+service JOMR,10912,11047,13,5,0,0
+fin du set,0,0,14,5,1,0
+debut du set,12546,12884,0,0,1,0
+service KaE_EmD,13080,13288,0,1,1,0
+service JOMR,13778,14256,1,1,1,0
+service KaE_EmD,14851,15197,1,2,1,0
+service JOMR,15747,16011,2,2,1,0
+*SWITCH*,16169,16194,2,2,1,0
+service KaE_EmD,16483,16769,2,3,1,0
+service KaE_EmD,17090,17414,2,4,1,0
+service JOMR,17705,17882,3,4,1,0
+service JOMR,18369,18550,4,4,1,0
+service JOMR,18908,19063,5,4,1,0
+*SWITCH*,19208,19218,5,4,1,0
+service JOMR,19659,19900,6,4,1,0
+service JOMR,20311,20536,7,4,1,0
+service KaE_EmD,21003,21243,7,5,1,0
+service JOMR,21641,21829,8,5,1,0
+service JOMR,22136,22544,9,5,1,0
+*SWITCH*,22761,22769,9,5,1,0
+service JOMR,23079,23262,10,5,1,0
+service JOMR,23534,23748,11,5,1,0
+service JOMR,24037,24202,12,5,1,0
+service JOMR,24552,24706,13,5,1,0
+service JOMR,25128,25542,14,5,1,0
+*SWITCH*,25685,25699,14,5,1,0
+service KaE_EmD,25967,26150,14,6,1,0
+service KaE_EmD,26365,26722,14,7,1,0
+fin du set,0,0,15,7,2,0

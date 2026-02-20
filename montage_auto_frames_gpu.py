@@ -422,10 +422,11 @@ def extract_segments_from_df_gpu(
 # -------------------------------------------------------------------------------------------------
 
 def cv2_point_segment_cut(
-        video_path : str,
-        play_speed : float = 1.0,
-        team1_name: str = "JOMR",
-        team2_name: str = "adversaire"
+    video_path : str,
+    play_speed : float = 1.0,
+    team1_name: str = "JOMR",
+    team2_name: str = "adversaire",
+    output_dir: str = None
     ) -> pd.DataFrame:
 
     """
@@ -441,6 +442,7 @@ def cv2_point_segment_cut(
         output_dir (str, optional): Dossier de sortie pour les segments extraits. Si None, les segments seront extraits dans le même dossier que la vidéo source.
     Returns:
         DataFrame contenant les informations sur les segments de points extraits, avec les colonnes : 
+        'point_index',
         'action',
         'start_frame',
         'end_frame',
@@ -462,8 +464,7 @@ def cv2_point_segment_cut(
         ord('5'): '*SWITCH*',
         ord('8'): 'Temps mort',
         }
-
-
+    
     # Afficher les touches disponibles en overlay sur la vidéo
     help_lines = [
         "0 : debut du set",
@@ -474,8 +475,7 @@ def cv2_point_segment_cut(
         "8 : temps mort"
     ]
 
-
-
+    # Redéfinir cv2.imshow pour ajouter l'overlay d'aide
     _orig_imshow = cv2.imshow
 
     def _imshow_with_help(winname, frame):
@@ -503,7 +503,6 @@ def cv2_point_segment_cut(
         adj = max(1, int(ms / play_speed))
         return cv2.waitKey(adj)
 
-    # Vérifier que la vidéo est bien ouverte
     if not cap.isOpened():
         print("Erreur : impossible d’ouvrir la vidéo.")
         sys.exit()
@@ -515,7 +514,7 @@ def cv2_point_segment_cut(
     # État de pause et rotation
     paused = False
 
-
+    # Boucle de lecture de la vidéo
     try:
         while cap.isOpened():
 
@@ -570,7 +569,10 @@ def cv2_point_segment_cut(
                 play_speed = max(0.5, play_speed - 0.5)
                 continue
             elif key in key_action_map: # enregistrer l'action associée à la touche, avec le numéro de frame
-                action_name = key_action_map[key]
+                if key == ord('0') and len(temp_list) == 0: # début du set est en fait début du match
+                    action_name = str('debut du match')
+                else:
+                    action_name = key_action_map[key]
                 last_action = action_name
                 temp_list.append({
                     'Frame': frame_number,
@@ -591,8 +593,7 @@ def cv2_point_segment_cut(
                 else:
                     cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
                     frame_number = 0
-
-
+                    paused = True
 
     finally:
         # Libérer les ressources OpenCV
@@ -600,18 +601,24 @@ def cv2_point_segment_cut(
         cv2.destroyAllWindows()
 
 
-    # print(temp_list)
-
     # Initialiser une liste pour stocker les segments de points
     list_actions = list()
 
+    # Traiter la temp_list pour créer les segments de points avec les informations de score et de set
     i = 0
     while i < len(temp_list):
         action = temp_list[i]
         
-
         # Si l'action n'est pas 'fin point', on la traite
         if action['Action'] != 'fin point':
+            # Si c'est un début de set, création d'un item 'fin du set' dans la list_action pour traitement ultérieur
+            if action['Action'] == 'debut du set':
+                list_actions.append({
+                    'Service_side': 'fin du set',
+                    'Start_frame': int(0),
+                    'End_frame': int(0)
+                })
+            # Puis on traite l'action normalement
             start_frame = action['Frame']
             service_side = action['Action']
             # Chercher le prochain 'fin point'
@@ -630,22 +637,21 @@ def cv2_point_segment_cut(
                     'Start_frame': start_frame,
                     'End_frame': end_frame
                 })
-        
+
         i += 1
 
-    # Convertir en DataFrame pandas
+    # Convertir la list_actions en DataFrame 
     df_points = pd.DataFrame(list_actions)
 
-    # Ajouter les colonnes de score
+    # Ajouter des colonnes pour les scores et les sets, initialisées à 0
     df_points[f'{team1_name}_score'] = 0
     df_points[f'{team2_name}_score'] = 0
     df_points[f'{team1_name}_sets'] = 0
     df_points[f'{team2_name}_sets'] = 0
 
-
     # Mettre à jour les scores en fonction du service_side
     for idx, row in df_points.iterrows():
-        if df_points['Service_side'].iloc[idx] == 'debut du set':
+        if df_points['Service_side'].iloc[idx] == 'debut du set' or df_points['Service_side'].iloc[idx] == 'debut du match':
             # Première ligne : initialiser selon le service
             if row['Service_side'] == f'service {team1_name}':
                 df_points.at[idx, f'{team1_name}_score'] = 1
@@ -661,7 +667,7 @@ def cv2_point_segment_cut(
             if row['Service_side'] == f'service {team1_name}':
                 df_points.at[idx, f'{team1_name}_score'] += 1
             elif row['Service_side'] == f'service {team2_name}':
-                df_points.at[idx, f'{team2_name}_score'] += 1
+                df_points.at[idx, f'{team2_name}_score'] += 1    
 
     # Mettre à jour les scores de sets au début de chaque nouveau set
     for idx, row in df_points.iterrows():
@@ -683,8 +689,36 @@ def cv2_point_segment_cut(
             # Pour les autres lignes, conserver le nombre de sets
             df_points.at[idx, f'{team1_name}_sets'] = df_points.at[idx - 1, f'{team1_name}_sets']
             df_points.at[idx, f'{team2_name}_sets'] = df_points.at[idx - 1, f'{team2_name}_sets']
+  
 
-    return list_actions, df_points
+    # Ajout d'une ligne de 'fin de set' à la fin de df_points pour faciliter le traitement ultérieur
+    df_points.loc[len(df_points)] = {
+        'Service_side': 'fin du set',
+        'Start_frame': int(0),
+        'End_frame': int(0),
+        f'{team1_name}_score': df_points.at[len(df_points) - 1, f'{team1_name}_score'],
+        f'{team2_name}_score': df_points.at[len(df_points) - 1, f'{team2_name}_score'],
+        f'{team1_name}_sets': df_points.at[len(df_points) - 1, f'{team1_name}_sets'],
+        f'{team2_name}_sets': df_points.at[len(df_points) - 1, f'{team2_name}_sets']
+    }
+
+    # Pour les lignes de 'fin du set', mettre à jour les scores de sets en fonction du score du set précédent
+    for idx, row in df_points.iterrows():
+        if row['Service_side'] == 'fin du set' and idx > 0:
+            # Le gagnant du point précédent et du set précédent est celui qui avait le score le plus élevé au point précédent
+            prev_score_team1 = df_points.at[idx - 1, f'{team1_name}_score']
+            prev_score_team2 = df_points.at[idx - 1, f'{team2_name}_score']
+            df_points.at[idx, f'{team1_name}_sets'] = df_points.at[idx - 1, f'{team1_name}_sets']
+            df_points.at[idx, f'{team2_name}_sets'] = df_points.at[idx - 1, f'{team2_name}_sets']
+            if prev_score_team1 > prev_score_team2:
+                df_points.at[idx, f'{team1_name}_sets'] += 1
+                df_points.at[idx, f'{team1_name}_score'] += 1
+            elif prev_score_team2 > prev_score_team1:
+                df_points.at[idx, f'{team2_name}_sets'] += 1
+                df_points.at[idx, f'{team2_name}_score'] += 1
+            
+
+    return df_points
 
 # -----------------------------------------------------------------------------------------------
 # Point indexeer
@@ -718,9 +752,9 @@ def point_indexeer(df: pd.DataFrame
     point_idx = 0
     point_indices = []
     for _, row in df.iterrows():
-        if row['Service_side'] not in ('*SWITCH*', 'Temps mort'):
+        if row['Service_side'] not in ('*SWITCH*', 'Temps mort','fin du set','debut du set','debut du match'):
             point_idx += 1
-        point_indices.append(point_idx if row['Service_side'] not in ('*SWITCH*', 'Temps mort') else None)
+        point_indices.append(point_idx if row['Service_side'] not in ('*SWITCH*', 'Temps mort','fin du set','debut du set','debut du match') else None)
     df['point_index'] = pd.array(point_indices, dtype=pd.Int64Dtype())
     
     return df
