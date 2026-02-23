@@ -1,0 +1,19 @@
+{
+    "\u00e9quipes": [
+        "JOMR",
+        "MyH_HeR"
+    ],
+    "match_format": "15 points par set",
+    "victoire": "JOMR",
+    "final_score": "2 - 0",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "15 - 9"
+        },
+        {
+            "set": 2,
+            "score": "15 - 7"
+        }
+    ]
+}

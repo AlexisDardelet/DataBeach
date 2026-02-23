@@ -854,6 +854,66 @@ def score_checker(df_points:pd.DataFrame) -> dict:
 
     return recap_dict
 
+# ----------------------------------------------------------------------------------------------------------------------------------
+# Pipeline découpage manuel de montage : de la vidéo source à la vidéo segmentée par point joué, avec les informations de score associées
+# -------------------------------------------------------------------------------------------------------------------------------------
+
+def pipeline_point_editor_gpu(
+    video_path:str,
+    team1_name:str,
+    team2_name:str,
+    output_dir:str
+) -> pd.DataFrame, dict:
+    """
+    Pipeline from the preprocessed video to segemented points videos, with the associated score information.
+    Args:
+        video_path (str): absolut path to the source video to segment.
+        team1_name (str): name of team 1.
+        team2_name (str): name of team 2.
+        output_dir (str): absolut path to the output directory where the segmented points videos will be stored.
+    Returns:
+        indexed_df_points (pd.DataFrame): DataFrame containing the segments of points extracted
+        recap_dict_score (dict): Dictionnary containing the information on the match format and the final score, to be used for the recap of the match.
+    """
+
+    # Vérification des répertoires 'indexed_df_points' et 'recap_dict_score'
+    if not os.path.exists('indexed_df_points') and not os.path.exists('recap_dict_score'):
+        os.makedirs('indexed_df_points')
+        os.makedirs('recap_dict_score')
+
+    # Récupération des informations de la vidéo à partir du nom du fichier
+    game_ID = os.path.splitext(os.path.basename(video_path))[0]
+
+    # Lecture de la vidéo et extraction des start_frame et end_frame
+    df_points = pd.DataFrame()  # Initialisation d'un DataFrame vide
+    df_points = cv2_point_segment_cut(
+        video_path=video_path,
+        team1_name=team1_name,
+        team2_name=team2_name
+        )
+    # Indexation des points
+    indexed_df_points = pd.DataFrame()  # Initialisation d'un DataFrame vide
+    indexed_df_points = point_indexeer(df_points)
+    # Score checking
+    recap_dict_score = dict()  # Initialisation d'un dictionnaire vide
+    recap_dict_score = score_checker(indexed_df_points)
+
+    # Sauvegarde de l'indexation et du score dans des fichiers CSV et JSON
+    indexed_df_points.to_csv(
+        path_or_buf=os.path.join('indexed_df_points', f'indexed_df_points_{game_ID}.csv'),
+        index=False)
+    with open(os.path.join('recap_dict_score', f'recap_dict_score_{game_ID}.json'), 'w') as json_file:
+        json.dump(recap_dict_score, json_file, indent=4)
+
+    # Extraction des segments
+    extract_segments_from_df_gpu(
+        video_path=video_path,
+        actions_df=indexed_df_points,
+        output_dir=output_dir
+    )
+
+    return indexed_df_points, recap_dict_score
+
 
 # -------------------------------------------------------------------
 # OLD PACKAGE : TO BE REPLACED BY extract_segments_from_df_gpu() which takes a DataFrame as input
