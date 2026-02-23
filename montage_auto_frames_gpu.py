@@ -407,16 +407,23 @@ def extract_segments_from_df_gpu(
         output_dir(str)  : dossier où stocker les extraits
 
     """
+    # Créer le dossier de sortie s'il n'existe pas déjà
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Insérer le game ID dans le nom de chaque extrait/point joué
+    game_ID = os.path.splitext(os.path.basename(video_path))[0]
 
     # Construire les intervalles : 1 ligne = time(Point) - time(Temps hors-jeu) suivant
-    for _, row in actions_df.iterrows():
-        cut_point_gpu(
-            video_path=video_path,
-            start_frame=int(row["start_frame"]),
-            end_frame=int(row["end_frame"]),
-            output_video=os.path.join(output_dir, f"extrait_{_+1:03d}.mp4")
-        )
+    for row in actions_df.iterrows():
+        if not pd.isna(row[1]['point_index']): # ne découper que les lignes correspondant à des points joués (et pas les temps morts ou autres actions)
+            print(f"Découpage du point {row[1]['point_index']} : frames {row[1]['Start_frame']} - {row[1]['End_frame']}")
 
+            cut_point_gpu(
+                video_path=video_path,
+                start_frame=int(row[1]["Start_frame"]),
+                end_frame=int(row[1]["End_frame"]),
+                output_video=os.path.join(output_dir, f"{game_ID}_{row[1]['point_index']}.mp4")
+            )
 # -------------------------------------------------------------------------------------------------
 # Création du Dataframe pour découpage d'un match en segments de points joués (prise en compte du score)
 # -------------------------------------------------------------------------------------------------
@@ -752,9 +759,9 @@ def point_indexeer(df: pd.DataFrame
     point_idx = 0
     point_indices = []
     for _, row in df.iterrows():
-        if row['Service_side'] not in ('*SWITCH*', 'Temps mort','fin du set','debut du set','debut du match'):
+        if row['Service_side'] not in ('*SWITCH*', 'Temps mort','fin du set'):
             point_idx += 1
-        point_indices.append(point_idx if row['Service_side'] not in ('*SWITCH*', 'Temps mort','fin du set','debut du set','debut du match') else None)
+        point_indices.append(point_idx if row['Service_side'] not in ('*SWITCH*', 'Temps mort','fin du set') else None)
     df['point_index'] = pd.array(point_indices, dtype=pd.Int64Dtype())
     
     return df
@@ -777,30 +784,29 @@ def score_checker(df_points:pd.DataFrame) -> dict:
         dict : Dictionnaire contenant les informations sur le format du match et le score final
     """
     recap_dict = dict({
+        'équipes': (df_points.columns[3].replace('_score', ''), df_points.columns[4].replace('_score', '')),
         'match_format': None,
         'victoire': None,
         'final_score': None,
         'score_by_set': [],
     })
     
-    # Retirer les lignes correspondant aux temps morts
-    temp_df = df_points[df_points['Service_side'] != 'Temps mort'].reset_index(drop=True)
+    # Retier les lignes 'Temps mort' pour ne pas fausser les calculs
+    df_points = df_points[df_points['Service_side'] != 'Temps mort'].reset_index(drop=True)
 
     # Récupérer les noms des équipes à partir des colonnes du DataFrame
-    team1_name = temp_df.columns[3].replace('_score', '')
-    team2_name = temp_df.columns[4].replace('_score', '')
+    team1_name = df_points.columns[3].replace('_score', '')
+    team2_name = df_points.columns[4].replace('_score', '')
     # Initialiser les variables pour le score et le format du match
     score_switch_points = []
-    for idx, row in temp_df.iterrows():
+    for idx, row in df_points.iterrows():
         if row['Service_side'] == '*SWITCH*':
-            if idx + 1 < len(temp_df):
-                score_sum = temp_df.at[idx + 1, f'{team1_name}_score'] + temp_df.at[idx + 1, f'{team2_name}_score']
+            if idx + 1 < len(df_points):
+                score_sum = df_points.at[idx + 1, f'{team1_name}_score'] + df_points.at[idx + 1, f'{team2_name}_score']
             else:
                 score_sum = row[f'{team1_name}_score'] + row[f'{team2_name}_score']
             score_switch_points.append(score_sum)
-
-    # print("Scores au moment des switchs :", score_switch_points)
-
+    
     # Vérifier les multiples de 5 ou 7
     multiples_of_5 = all(score % 5 == 0 for score in score_switch_points)
     multiples_of_7 = all(score % 7 == 0 for score in score_switch_points)
@@ -809,14 +815,17 @@ def score_checker(df_points:pd.DataFrame) -> dict:
     elif multiples_of_7:
         match_format = "21 points par set"
     else:
-        return {"message": "Incohérence détectée : les scores au moment des switch ne sont pas des multiples de 5 ou 7."}
-    
+        # Indiquer l'incohérence détectée et les scores au moment des switchs
+        print("Incohérence possible détectée : les scores au moment des switch ne sont pas des multiples de 5 ou 7.")
+        print("Scores au moment des switchs :", score_switch_points)
+        match_format = "(à vérifier manuellement)"
+
     # Récupérer le score final et le détail par set
     recap_dict['match_format'] = match_format
-    final_score_team1 = temp_df[f'{team1_name}_sets'].iloc[-1]
-    final_score_team2 = temp_df[f'{team2_name}_sets'].iloc[-1]
+    final_score_team1 = df_points[f'{team1_name}_sets'].iloc[-1]
+    final_score_team2 = df_points[f'{team2_name}_sets'].iloc[-1]
     recap_dict['final_score'] = f"{final_score_team1} - {final_score_team2}"
-    
+
     # Déterminer le gagnant
     if final_score_team1 > final_score_team2:
         recap_dict['victoire'] = team1_name
@@ -828,20 +837,21 @@ def score_checker(df_points:pd.DataFrame) -> dict:
     # Détail par set
     set_count = 0
     current_set_scores = []
-    for idx, row in temp_df.iterrows():
-        if row['Service_side'] == 'debut du set' and idx > 0:
+    for idx, row in df_points.iterrows():
+        if row['Service_side'] == 'fin du set':
             current_set_scores.append({
                 'set': set_count + 1,
                 'score': f"{row[f'{team1_name}_score']} - {row[f'{team2_name}_score']}"
             })
             set_count += 1
-        elif idx == len(temp_df) - 1:  # Dernière ligne du DataFrame
+        elif idx == len(df_points) - 1:  # Dernière ligne du DataFrame
             current_set_scores.append({
                 'set': set_count + 1,
                 'score': f"{row[f'{team1_name}_score']} - {row[f'{team2_name}_score']}"
             })
 
     recap_dict['score_by_set'] = current_set_scores
+
 
     return recap_dict
 
