@@ -21,6 +21,7 @@ import sys
 import cv2
 import pandas as pd
 import sys
+import json
 
 # -------------------------------------------------------------------
 # Utils
@@ -432,8 +433,7 @@ def cv2_point_segment_cut(
     video_path : str,
     play_speed : float = 1.0,
     team1_name: str = "JOMR",
-    team2_name: str = "adversaire",
-    output_dir: str = None
+    team2_name: str = "adversaire"
     ) -> pd.DataFrame:
 
     """
