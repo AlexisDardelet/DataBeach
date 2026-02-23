@@ -829,10 +829,9 @@ def score_checker(df_points:pd.DataFrame) -> dict:
     # Déterminer le gagnant
     if final_score_team1 > final_score_team2:
         recap_dict['victoire'] = team1_name
-    elif final_score_team2 > final_score_team1:
+    else :
         recap_dict['victoire'] = team2_name
-    else:
-        recap_dict['victoire'] = "Égalité"
+
 
     # Détail par set
     set_count = 0
