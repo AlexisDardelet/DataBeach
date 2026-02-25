@@ -1,0 +1,23 @@
+{
+    "\u00e9quipes": [
+        "JOMR",
+        "PauG_NeCH"
+    ],
+    "match_format": "(\u00e0 v\u00e9rifier manuellement)",
+    "victoire": "JOMR",
+    "final_score": "2 - 1",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "9 - 15"
+        },
+        {
+            "set": 2,
+            "score": "15 - 12"
+        },
+        {
+            "set": 3,
+            "score": "11 - 9"
+        }
+    ]
+}

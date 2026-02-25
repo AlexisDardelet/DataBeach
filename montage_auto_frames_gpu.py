@@ -87,7 +87,7 @@ def cut_point_gpu(
         output_video
     ]
 
-    print(f"[GPU] Extraction frames {start_frame} → {end_frame}")
+    # print(f"[GPU] Extraction frames {start_frame} → {end_frame}")
     # print("      Command:", " ".join(cmd))
 
     # Exécuter la commande ffmpeg pour extraire le segment en utilisant le GPU
@@ -482,21 +482,41 @@ def cv2_point_segment_cut(
         "8 : temps mort"
     ]
 
-    # Redéfinir cv2.imshow pour ajouter l'overlay d'aide
+    # Initialiser les scores pour affichage en overlay
+    score_team1 = 0
+    score_team2 = 0
+
+    # Redéfinir cv2.imshow pour ajouter l'overlay d'aide et les scores
     _orig_imshow = cv2.imshow
 
     def _imshow_with_help(winname, frame):
         if frame is not None:
+            # Afficher l'aide en haut à gauche
             x, y = 30, 120
             for i, line in enumerate(help_lines):
                 cv2.putText(frame,
                             line,
-                            (x, y + i * 25),
+                            (x, y + i * 15),
                             cv2.FONT_HERSHEY_SIMPLEX,
-                            0.7,
+                            0.3,
                             (255, 255, 255),
-                            2,
+                            1,
                             cv2.LINE_AA)
+            
+            # Afficher les scores en bas à droite
+            h, w = frame.shape[:2]
+            score_text = f"{team1_name}: {score_team1}  {team2_name}: {score_team2}"
+            text_size = cv2.getTextSize(score_text, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)[0]
+            score_x = w - text_size[0] - 20
+            score_y = h - 20
+            cv2.putText(frame,
+                        score_text,
+                        (score_x, score_y),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.7,
+                        (0, 255, 0),
+                        2,
+                        cv2.LINE_AA)
         _orig_imshow(winname, frame)
 
     cv2.imshow = _imshow_with_help
@@ -565,33 +585,58 @@ def cv2_point_segment_cut(
 
             # Gestion des entrées clavier
             key = _waitKey_fast(30) & 0xFF
-            if key == ord('q'):  # quitter
+            if key == ord('q'):  
+                # quitter
                 break
-            elif key == ord(' '):  # pause/reprise
+            elif key == ord(' '):
+                # pause/reprise
                 paused = not paused
-            elif key == ord('+'):  # augmenter la vitesse
+            elif key == ord('+'):  
+                # augmenter la vitesse
                 play_speed += 0.5
                 continue
-            elif key == ord('-'):  # diminuer la vitesse
+            elif key == ord('-'):  
+                # diminuer la vitesse
                 play_speed = max(0.5, play_speed - 0.5)
                 continue
-            elif key in key_action_map: # enregistrer l'action associée à la touche, avec le numéro de frame
-                if key == ord('0') and len(temp_list) == 0: # début du set est en fait début du match
-                    action_name = str('debut du match')
+            elif key in key_action_map: 
+                # enregistrer l'action associée à la touche, avec le numéro de frame
+                if key == ord('0'): 
+                    # reset des scores en début de set
+                    score_team1 = 0
+                    score_team2 = 0
+                    if len(temp_list) == 0:                 
+                        # début du set est en fait début du match si c'est la première action enregistrée
+                        action_name = str('debut du match')
                 else:
                     action_name = key_action_map[key]
+   
                 last_action = action_name
                 temp_list.append({
                     'Frame': frame_number,
                     'Action': action_name
                 })
-            elif key == ord('7'): # erreur de codage, revenir en arrière
-                if temp_list:
+                # Refresh de l'affichage pour mettre à jour les scores en overlay
+                if ret:
+                    cv2.imshow(f'{video_path}', frame)
+                # Ajout d'un point aux scores en fonction de l'action
+                if action_name == f'service {team1_name}':
+                    score_team1 += 1
+                elif action_name == f'service {team2_name}':
+                    score_team2 += 1
+
+            elif key == ord('7'): 
+            # erreur de codage, revenir en arrière
+                if temp_list:                  
                     removed_action = temp_list.pop()
                     print(f"Action supprimée : {removed_action}")
                     last_action = temp_list[-1]['Action'] if temp_list else None
                 else:
                     print("Aucune action à supprimer.")
+                # Refresh de l'affichage
+                if ret:
+                    cv2.imshow(f'{video_path}', frame)                  
+                
                 # Revenir à la frame de l'action supprimée et mettre la lecture en pause
                 if temp_list:
                     cap.set(cv2.CAP_PROP_POS_FRAMES, temp_list[-1]['Frame'])
@@ -863,7 +908,7 @@ def pipeline_point_editor_gpu(
     team1_name:str,
     team2_name:str,
     output_dir:str
-) -> pd.DataFrame, dict:
+    ):
     """
     Pipeline from the preprocessed video to segemented points videos, with the associated score information.
     Args:
@@ -911,9 +956,6 @@ def pipeline_point_editor_gpu(
         actions_df=indexed_df_points,
         output_dir=output_dir
     )
-
-    return indexed_df_points, recap_dict_score
-
 
 # -------------------------------------------------------------------
 # OLD PACKAGE : TO BE REPLACED BY extract_segments_from_df_gpu() which takes a DataFrame as input
