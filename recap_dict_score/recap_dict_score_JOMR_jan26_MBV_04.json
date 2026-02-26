@@ -1,0 +1,19 @@
+{
+    "\u00e9quipes": [
+        "JOMR",
+        "AleM_LauA"
+    ],
+    "match_format": "15 points par set",
+    "victoire": "AleM_LauA",
+    "final_score": "0 - 2",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "6 - 15"
+        },
+        {
+            "set": 2,
+            "score": "7 - 15"
+        }
+    ]
+}

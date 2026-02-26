@@ -608,6 +608,8 @@ def cv2_point_segment_cut(
                     if len(temp_list) == 0:                 
                         # début du set est en fait début du match si c'est la première action enregistrée
                         action_name = str('debut du match')
+                    else:
+                        action_name = key_action_map[key]
                 else:
                     action_name = key_action_map[key]
    
@@ -801,12 +803,14 @@ def point_indexeer(df: pd.DataFrame
         print("Erreur : le DataFrame ne contient pas la colonne 'Service_side'. Veuillez vérifier les colonnes du DataFrame.")
         return df
 
-    point_idx = 0
+    point_idx = int(0)
     point_indices = []
     for _, row in df.iterrows():
         if row['Service_side'] not in ('*SWITCH*', 'Temps mort','fin du set'):
-            point_idx += 1
+            
+            point_idx += int(1)
         point_indices.append(point_idx if row['Service_side'] not in ('*SWITCH*', 'Temps mort','fin du set') else None)
+
     df['point_index'] = pd.array(point_indices, dtype=pd.Int64Dtype())
     
     return df
