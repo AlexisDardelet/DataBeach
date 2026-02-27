@@ -1,0 +1,19 @@
+{
+    "\u00e9quipes": [
+        "JOMR",
+        "ClaM_MaMeB"
+    ],
+    "match_format": "15 points par set",
+    "victoire": "ClaM_MaMeB",
+    "final_score": "0 - 2",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "16 - 18"
+        },
+        {
+            "set": 2,
+            "score": "14 - 16"
+        }
+    ]
+}

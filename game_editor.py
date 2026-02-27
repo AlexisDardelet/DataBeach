@@ -1,6 +1,20 @@
-"""Module for editing beach volleyball game videos."""
+# Packages imports
+import os
 import sys
-import cv2
+import pandas as pd
+import json
+
+# Local imports
+sys.path.append(os.path.join(os.path.dirname(__file__), "video_edit_utils"))
+from video_edit_utils import (
+    montage_operations,
+    cut_point_gpu,
+    video_rotation,
+    cv2_point_segment_cut,
+    point_indexeer,
+    score_checker,
+    extract_segments_from_df_gpu,
+)
 
 
 class GameEditor:
@@ -10,6 +24,8 @@ class GameEditor:
     It also returns dictionaries with information about the score.
     """
 
+    # Initialisation of the class with the path to the video(s)
+    # and the output directory for the edited videos
     def __init__(
         self,
         video_dir: str = None,
@@ -26,185 +42,181 @@ class GameEditor:
             output_dir (str, optional): Path to the output directory.
         """
         self.video_dir = video_dir
-        self.output_dir = output_dir
-        self.montage_actions = {}
         self.video_path = video_path
+        self.output_dir = output_dir if output_dir else video_dir
 
-    def montage_operation(
-        self, play_speed: float = 1.0
-    ) -> dict:
-        """
-        Records the montage actions for video pre-processing.
+    # Method for pre-match editing of the videos
+    # in a directory (rotation and pre-match cutting)
+    def pre_match_editing(
+        self,
+        play_speed: float = 1.0,
+    ) -> None:
+        """Performs pre-match editing of videos in a directory.
+        The script uses OpenCV to display the video
+        and detect key presses.
+
+        The user must:
+            - Indicate the correct video rotation
+              (if necessary) using the 'r' and 'l' keys
+            - Press '0' to indicate the start of the match,
+              and the video is then cut from this point
+              using ffmpeg.
 
         Args:
-            play_speed (float): Video playback speed. Defaults to 1.0.
-
-        Returns:
-            dict: Dictionary with keys 'start_frame',
-                'last_frame', 'rotation_state'.
+            video_dir (str): Directory containing
+                the video(s) to cut.
+            play_speed (float): Video playback speed.
+            output_dir (str, optional): Output directory
+                for cut videos. If None, cut videos will
+                be saved in the same folder as the
+                original videos.
         """
-        # Ensure a video path has been provided before proceeding
-        if self.video_path is None:
-            raise ValueError(
-                "video_path must be set before calling "
-                "montage_operation()."
+        # Initialize a pandas DataFrame to store cutting
+        # information for each video
+        # (start frame, last frame, rotation)
+        columns = [
+            "video_path",
+            "starting_game_frame",
+            "last_game_frame",
+            "output_dir",
+            "rotation_state",
+        ]
+        match_info_df = pd.DataFrame(columns=columns)
+
+        # List video files in the directory
+        valid_ext = (".mp4", ".avi", ".mov", ".mkv")
+        video_files = [
+            f for f in os.listdir(self.video_dir) if f.lower().endswith(valid_ext)
+        ]
+        if not video_files:
+            print("No videos found in the " "specified directory.")
+            return
+
+        # Apply cv2_actions_to_operate() to each video
+        # to retrieve editing actions
+        # (start frame, last frame, rotation)
+        for video_file in video_files:
+            video_path = os.path.join(self.video_dir, video_file)
+            print(f"Processing video: {video_path}")
+
+            # Retrieve the editing actions for the video
+            montage_actions = dict()
+            montage_actions = montage_operations(video_path, play_speed)
+            starting_game_frame = montage_actions.get("start_frame", 0)
+            last_game_frame = montage_actions.get("last_frame", None)
+            rotation_state = montage_actions.get("rotation_state", 0)
+
+            # Store the match start frame and rotation
+            # in a temporary pandas DataFrame
+            # for subsequent pipeline steps
+            out_dir = (
+                self.output_dir if self.output_dir else os.path.dirname(video_path)
+            )
+            match_info_df.loc[len(match_info_df)] = {
+                "video_path": video_path,
+                "starting_game_frame": starting_game_frame,
+                "last_game_frame": last_game_frame,
+                "output_dir": out_dir,
+                "rotation_state": rotation_state,
+            }
+
+        # Apply cut_point_gpu() to each row of match_info_df
+        for _, row in match_info_df.iterrows():
+            base_name = os.path.splitext(os.path.basename(row["video_path"]))[0]
+            output_video = os.path.join(row["output_dir"], f"{base_name}_started.mp4")
+            cut_point_gpu(
+                video_path=row["video_path"],
+                start_frame=int(row["starting_game_frame"]),
+                end_frame=int(row["last_game_frame"]),
+                output_video=output_video,
             )
 
-        montage_actions = {}
-        starting_game_frame = 0
+        # Apply video_rotation() to each row of
+        # match_info_df if rotation_state != 0
+        for _, row in match_info_df.iterrows():
+            if row["rotation_state"] != 0:
+                base_name = os.path.splitext(os.path.basename(row["video_path"]))[0]
+                started_path = os.path.join(
+                    row["output_dir"], f"{base_name}_started.mp4"
+                )
+                video_rotation(
+                    video_path=started_path,
+                    rotation_state=int(row["rotation_state"]),
+                    output_dir=row["output_dir"],
+                )
+                # Delete the intermediate unrotated video
+                os.remove(started_path)
 
-        # Define the help overlay text shown on each frame
-        help_lines = [
-            "Keys:",
-            "q : quit",
-            "space : pause/resume",
-            "0 : start of match",
-            "+ : speed up",
-            "- : speed down",
-            "r : rotate right",
-            "l : rotate left",
-        ]
+    # -----------------------------------------------------------------------------------
 
-        # Monkey-patch cv2.imshow to overlay help text on every displayed frame
-        _orig_imshow = cv2.imshow
+    def game_to_segmented_points(
+        self,
+        team1_name: str,
+        team2_name: str,
+    ):
+        """
+        Pipeline from the preprocessed video to
+        segmented points videos, with the associated
+        score information.
 
-        def _imshow_with_help(winname, frame):
-            if frame is not None:
-                x, y = 30, 120
-                for i, line in enumerate(help_lines):
-                    cv2.putText(
-                        frame, line,
-                        (x, y + i * 25),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        0.7, (255, 255, 255), 2,
-                        cv2.LINE_AA,
-                    )
-                _orig_imshow(winname, frame)
+        It creates a csv file with the segments of points extracted,
+        and a json file with the suppary of the match
 
-        cv2.imshow = _imshow_with_help
+        Args:
+            video_path (str): Absolute path to the
+                source video to segment.
+            team1_name (str): Name of team 1.
+            team2_name (str): Name of team 2.
+            output_dir (str): Absolute path to the
+                output directory where the segmented
+                points videos will be stored.
+        """
 
-        # Open the video and retrieve total frame count for last-frame default
-        cap = cv2.VideoCapture(self.video_path)
-        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        last_game_frame = (
-            frame_count - 1 if frame_count > 0 else None
+        # Validate that video_path is set
+        if self.video_path is None:
+            raise ValueError(
+                "video_path is not set. Please provide a valid video_path "
+                "when initializing GameEditor."
+            )
+
+        # Check if 'indexed_df_points' and 'recap_dict_score' directories exist
+        if not os.path.exists("indexed_df_points"):
+            os.makedirs("indexed_df_points")
+        if not os.path.exists("recap_dict_score"):
+            os.makedirs("recap_dict_score")
+
+        # Retrieve video information from the file name
+        game_id = os.path.splitext(os.path.basename(self.video_path))[0]
+
+        # Read the video and extract start_frame and end_frame
+        df_points = pd.DataFrame()  # Initialize an empty DataFrame
+        df_points = cv2_point_segment_cut(
+            video_path=self.video_path, team1_name=team1_name, team2_name=team2_name
         )
-        print(f"Last frame index: {last_game_frame}")
+        # Index the points
+        indexed_df_points = pd.DataFrame()  # Initialize an empty DataFrame
+        indexed_df_points = point_indexeer(df_points)
+        # Score checking
+        recap_dict_score = dict()  # Initialize an empty dictionary
+        recap_dict_score = score_checker(indexed_df_points)
 
-        # Helper to adjust waitKey delay based on current playback speed
-        def _wait_key_fast(ms):
-            adj = max(1, int(ms / play_speed))
-            return cv2.waitKey(adj)
+        # Save the indexing and score to CSV and JSON files
+        indexed_df_points.to_csv(
+            path_or_buf=os.path.join(
+                "indexed_df_points", f"indexed_df_points_{game_id}.csv"
+            ),
+            index=False,
+        )
+        with open(
+            os.path.join("recap_dict_score", f"recap_dict_score_{game_id}.json"),
+            "w",
+            encoding="utf-8",
+        ) as json_file:
+            json.dump(recap_dict_score, json_file, indent=4)
 
-        # Validate that the video was opened successfully
-        if not cap.isOpened():
-            print("Error: unable to open the video.")
-            sys.exit()
-
-        # Initialize playback state variables
-        fps = cap.get(cv2.CAP_PROP_FPS)
-        frame_number = 0
-        paused = False
-        rotation_state = 0
-        ret = False
-
-        try:
-            # Main playback loop: read, transform, display, and handle input
-            while cap.isOpened():
-                # Read the next frame only when not paused
-                if not paused:
-                    ret, frame = cap.read()
-
-                    if not ret:
-                        print("End of video or read error.")
-                        break
-
-                    # Apply rotation based on the current rotation state
-                    if rotation_state == 90:
-                        frame = cv2.rotate(
-                            frame, cv2.ROTATE_90_CLOCKWISE
-                        )
-                    elif rotation_state == 180:
-                        frame = cv2.rotate(
-                            frame, cv2.ROTATE_180
-                        )
-                    elif rotation_state == 270:
-                        frame = cv2.rotate(
-                            frame,
-                            cv2.ROTATE_90_COUNTERCLOCKWISE,
-                        )
-
-                    # Overlay playback speed indicator on the frame
-                    cv2.putText(
-                        frame,
-                        f"Playback speed: x{play_speed:.1f}",
-                        (30, 50),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        1, (0, 255, 0), 2, cv2.LINE_AA,
-                    )
-
-                    frame_number += 1
-
-                # Show a pause indicator when the video is paused
-                if paused and ret:
-                    cv2.putText(
-                        frame, "|| PAUSE ||",
-                        (30, 80),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        1, (0, 0, 255), 2, cv2.LINE_AA,
-                    )
-
-                # Display the current frame (with help overlay via patch)
-                if ret:
-                    cv2.imshow(
-                        f'{self.video_path}', frame
-                    )
-
-                # Handle keyboard input for playback control
-                key = _wait_key_fast(30) & 0xFF
-                if key == ord('q'):
-                    # Quit the playback loop
-                    break
-                if key == ord(' '):
-                    # Toggle pause/resume
-                    paused = not paused
-                elif key == ord('0'):
-                    # Mark the current frame as the start of the match
-                    starting_game_frame = frame_number
-                    start_time = starting_game_frame / fps
-                    print(
-                        f"Match start marked at frame "
-                        f"{starting_game_frame}, "
-                        f"i.e. {start_time:.2f} seconds"
-                    )
-                    break
-                elif key == ord('+'):
-                    # Increase playback speed
-                    play_speed += 0.5
-                elif key == ord('-'):
-                    # Decrease playback speed (minimum 0.5x)
-                    play_speed = max(0.5, play_speed - 0.5)
-                elif key == ord('r'):
-                    # Rotate the video 90° clockwise
-                    rotation_state = (
-                        rotation_state + 90
-                    ) % 360
-                elif key == ord('l'):
-                    # Rotate the video 90° counter-clockwise
-                    rotation_state = (
-                        rotation_state - 90
-                    ) % 360
-
-        finally:
-            # Release resources and restore the original cv2.imshow
-            cap.release()
-            cv2.destroyAllWindows()
-            cv2.imshow = _orig_imshow
-
-        # Store and return the collected montage metadata
-        montage_actions = {
-            'start_frame': starting_game_frame,
-            'last_frame': last_game_frame,
-            'rotation_state': rotation_state,
-        }
-        self.montage_actions = montage_actions
+        # Extract the segments
+        extract_segments_from_df_gpu(
+            video_path=self.video_path,
+            actions_df=indexed_df_points,
+            output_dir=self.output_dir,
+        )
