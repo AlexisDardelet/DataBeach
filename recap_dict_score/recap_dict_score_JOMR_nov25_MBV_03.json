@@ -1,0 +1,15 @@
+{
+    "teams": [
+        "JOMR",
+        "VerF_FloA"
+    ],
+    "match_format": "21 points per set",
+    "winner": "JOMR",
+    "final_score": "1 - 0",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "22 - 11"
+        }
+    ]
+}

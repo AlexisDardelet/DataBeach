@@ -1,0 +1,23 @@
+{
+    "teams": [
+        "JOMR",
+        "MaMeB_MarS"
+    ],
+    "match_format": "(to be checked manually)",
+    "winner": "JOMR",
+    "final_score": "2 - 1",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "21 - 17"
+        },
+        {
+            "set": 2,
+            "score": "14 - 21"
+        },
+        {
+            "set": 3,
+            "score": "15 - 12"
+        }
+    ]
+}

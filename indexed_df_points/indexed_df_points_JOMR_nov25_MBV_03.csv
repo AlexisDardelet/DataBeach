@@ -1,0 +1,40 @@
+Service_side,Start_frame,End_frame,JOMR_score,VerF_FloA_score,JOMR_sets,VerF_FloA_sets,point_index
+match start,35,430,0,0,0,0,1
+service JOMR,848,1157,1,0,0,0,2
+service JOMR,1547,1872,2,0,0,0,3
+service VerF_FloA,2173,2438,2,1,0,0,4
+service VerF_FloA,2683,2884,2,2,0,0,5
+service JOMR,3018,3313,3,2,0,0,6
+service JOMR,3616,3945,4,2,0,0,7
+*SWITCH*,4035,4111,4,2,0,0,
+service JOMR,4252,4484,5,2,0,0,8
+service JOMR,4735,4873,6,2,0,0,9
+service JOMR,4941,5166,7,2,0,0,10
+service JOMR,5374,5539,8,2,0,0,11
+service JOMR,5664,5816,9,2,0,0,12
+Timeout,5926,6827,9,2,0,0,
+service JOMR,6918,7065,10,2,0,0,13
+service VerF_FloA,7359,7836,10,3,0,0,14
+*SWITCH*,7993,8187,10,3,0,0,
+service JOMR,8210,8425,11,3,0,0,15
+service VerF_FloA,8583,8686,11,4,0,0,16
+service JOMR,8880,8977,12,4,0,0,17
+service JOMR,9105,9259,13,4,0,0,18
+service VerF_FloA,9468,9665,13,5,0,0,19
+service JOMR,9876,10103,14,5,0,0,20
+service VerF_FloA,10517,10728,14,6,0,0,21
+*SWITCH*,10829,10845,14,6,0,0,
+service VerF_FloA,10900,11076,14,7,0,0,22
+service JOMR,11438,11649,15,7,0,0,23
+service JOMR,11856,12000,16,7,0,0,24
+service JOMR,12158,12485,17,7,0,0,25
+service VerF_FloA,12708,12863,17,8,0,0,26
+service JOMR,13018,13255,18,8,0,0,27
+service JOMR,13494,13599,19,8,0,0,28
+*SWITCH*,13771,13785,19,8,0,0,
+service VerF_FloA,13803,14071,19,9,0,0,29
+service VerF_FloA,14193,14415,19,10,0,0,30
+service JOMR,14639,14849,20,10,0,0,31
+service JOMR,14941,15195,21,10,0,0,32
+service VerF_FloA,15381,15554,21,11,0,0,33
+end of set,0,0,22,11,1,0,
