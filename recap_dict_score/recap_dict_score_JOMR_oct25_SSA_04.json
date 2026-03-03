@@ -1,0 +1,19 @@
+{
+    "teams": [
+        "JOMR",
+        "AlyO_AgR"
+    ],
+    "match_format": "21 points per set",
+    "winner": "AlyO_AgR",
+    "final_score": "0 - 2",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "9 - 21"
+        },
+        {
+            "set": 2,
+            "score": "16 - 21"
+        }
+    ]
+}

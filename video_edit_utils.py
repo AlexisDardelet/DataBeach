@@ -420,14 +420,16 @@ def cv2_point_segment_cut(
         "0 : set start",
         f"1 : service {team1_name}",
         f"3 : service {team2_name}",
-        "2 : end of point",
         "5 : switch",
-        "8 : timeout"
+        "8 : timeout",
+        "4 : back to previous *SWITCH*"
     ]
 
     # Initialize scores for overlay display
     score_team1 = 0
     score_team2 = 0
+    switch_scores_team1 = 0
+    switch_scores_team2 = 0
 
     # Override cv2.imshow to add help overlay and scores
     _orig_imshow = cv2.imshow
@@ -557,6 +559,31 @@ def cv2_point_segment_cut(
                 # Decrease speed
                 play_speed = max(0.5, play_speed - 0.5)
                 continue
+            elif key == ord('4') and len(temp_list) > 0:
+                # Find the last "switch" action
+                last_switch_index = int(-1)
+                for i in range(len(temp_list) - 1, -1, -1):
+                    if temp_list[i]['Action'] == '*SWITCH*':
+                        last_switch_index = i
+                        break
+                if last_switch_index != -1:
+                    # Remove all actions after the last switch from temp_list
+                    temp_list = temp_list[:last_switch_index + 1]
+                    # Reset scores at last *SWITCH* and last action
+                    score_team1 = switch_scores_team1
+                    score_team2 = switch_scores_team2
+                    last_action = (
+                        temp_list[-1]['Action']
+                        if temp_list else None
+                    )
+                    # Go back to the frame of the last switch action and pause playback
+                    cap.set(
+                        cv2.CAP_PROP_POS_FRAMES,
+                        temp_list[-1]['Frame'],
+                    )
+                    frame_number = temp_list[-1]['Frame']
+                    paused = True
+
             elif key in key_action_map:
                 # Record the action associated with the key,
                 # along with the frame number
@@ -573,11 +600,18 @@ def cv2_point_segment_cut(
                 else:
                     action_name = key_action_map[key]
 
+                if key == ord('5'):
+                    # Save the current scores at the time of the *SWITCH* action
+                    # to be able to restore them if we go back to this switch with key '4'
+                    switch_scores_team1 = int(score_team1)
+                    switch_scores_team2 = int(score_team2)
+
                 last_action = action_name
                 temp_list.append({
                     'Frame': frame_number,
                     'Action': action_name
                 })
+
                 # Refresh display to update the score overlay
                 if ret:
                     cv2.imshow(f'{video_path}', frame)
@@ -587,36 +621,6 @@ def cv2_point_segment_cut(
                 elif action_name == f'service {team2_name}':
                     score_team2 += 1
 
-            elif key == ord('7'):
-                # Coding error, go back
-                if temp_list:
-                    removed_action = temp_list.pop()
-                    print(
-                        f"Action removed: {removed_action}"
-                    )
-                    last_action = (
-                        temp_list[-1]['Action']
-                        if temp_list else None
-                    )
-                else:
-                    print("No action to remove.")
-                # Refresh the display
-                if ret:
-                    cv2.imshow(f'{video_path}', frame)
-
-                # Go back to the frame of the removed action
-                # and pause playback
-                if temp_list:
-                    cap.set(
-                        cv2.CAP_PROP_POS_FRAMES,
-                        temp_list[-1]['Frame'],
-                    )
-                    frame_number = temp_list[-1]['Frame']
-                    paused = True
-                else:
-                    cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-                    frame_number = 0
-                    paused = True
 
     finally:
         # Release OpenCV resources

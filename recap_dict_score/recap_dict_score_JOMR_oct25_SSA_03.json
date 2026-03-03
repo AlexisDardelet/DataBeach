@@ -1,0 +1,19 @@
+{
+    "teams": [
+        "JOMR",
+        "PauG_AleF"
+    ],
+    "match_format": "15 points per set",
+    "winner": "JOMR",
+    "final_score": "2 - 0",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "15 - 11"
+        },
+        {
+            "set": 2,
+            "score": "15 - 7"
+        }
+    ]
+}
