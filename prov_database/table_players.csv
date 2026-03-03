@@ -1,18 +1,19 @@
-﻿#PAIRE;Name_joueurA;Name_joueurB;Genre
-JO_MR;OFFREDI Jade;RANC Mathilde;Feminin
-MaMeB_MarS;BARALLE Marie-melodie;SASUNKEVICH Maryna;Feminin
-MyH_HeR;HILLION Myriam;ROZE Helen;Feminin
-KaE_EmD;EZZAKI Kawtar;DEBIT Emna;Feminin
-AleM_LauA;MERLE Alex;ARTEIL Laura;Feminin
-AleN_EmP;NEEL Alexandra;PANAGET Emeraude;Feminin
-PauG_NeCH;GIORDANO Pauline;CHAROTTE BERNARD Neis;Feminin
-NoG_AliP;GADRI Nora;PEARCE Alice;Feminin
-MaDK_LuDK;DEKEUKELAIRE Marion;DEKEUKELAIRE Lucie;Feminin
-PauG_AleF;GIORDANO Pauline;FERREIRA Alexandra;Feminin
-AlyO_AgR;OZANNE PIAN Ally;ROLLAND Agathe;Feminin
-ClaM_MaMeB;MARTINEZ Clara;BARALLE Marie-melodie;Feminin
-CloD_CirM;DURUPT Cloe;MESQUITA Circe;Feminin
-VerF_FloA;FILIPOVICH Vera;AUGIER Florence;Feminin
+﻿PAIRE_ID,Name_joueurA,Name_joueurB,Genre
+JOMR,OFFREDI Jade,RANC Mathilde,Feminin
+MaMeB_MarS,BARALLE Marie-melodie,SASUNKEVICH Maryna,Feminin
+MyH_HeR,HILLION Myriam,ROZE Helen,Feminin
+KaE_EmD,EZZAKI Kawtar,DEBIT Emna,Feminin
+AleM_LauA,MERLE Alex,ARTEIL Laura,Feminin
+AleN_EmP,NEEL Alexandra,PANAGET Emeraude,Feminin
+PauG_NeCH,GIORDANO Pauline,CHAROTTE BERNARD Neis,Feminin
+NoG_AliP,GADRI Nora,PEARCE Alice,Feminin
+MaDK_LuDK,DEKEUKELAIRE Marion,DEKEUKELAIRE Lucie,Feminin
+PauG_AleF,GIORDANO Pauline,FERREIRA Alexandra,Feminin
+AlyO_AgR,OZANNE PIAN Ally,ROLLAND Agathe,Feminin
+ClaM_MaMeB,MARTINEZ Clara,BARALLE Marie-melodie,Feminin
+CloD_CirM,DURUPT Cloe,MESQUITA Circe,Feminin
+VerF_FloA,FILIPOVICH Vera,AUGIER Florence,Feminin
+(adv),Inconnu,Inconnu,Feminin
 
 
 
