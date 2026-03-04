@@ -1,0 +1,39 @@
+Service_side,Start_frame,End_frame,JOMR_score,MaMeB_MarS_score,JOMR_sets,MaMeB_MarS_sets,point_index
+match start - service JOMR,82,254,0,0,0,0,1
+service JOMR,608,929,1,0,0,0,2
+service MaMeB_MarS,1498,1783,1,1,0,0,3
+service JOMR,2164,2643,2,1,0,0,4
+service JOMR,3037,3288,3,1,0,0,5
+service MaMeB_MarS,3752,4042,3,2,0,0,6
+service MaMeB_MarS,4417,4714,3,3,0,0,7
+*SWITCH*,4844,5189,3,3,0,0,
+service JOMR,5252,5644,4,3,0,0,8
+service JOMR,5999,6272,5,3,0,0,9
+service JOMR,6600,6957,6,3,0,0,10
+Timeout,7449,8363,6,3,0,0,
+service JOMR,9320,9612,7,3,0,0,11
+service JOMR,9959,10372,8,3,0,0,12
+service JOMR,10756,11045,9,3,0,0,13
+service JOMR,11323,11541,10,3,0,0,14
+*SWITCH*,11684,11955,10,3,0,0,
+service MaMeB_MarS,12175,12503,10,4,0,0,15
+service JOMR,12913,13783,11,4,0,0,16
+service JOMR,14067,14498,12,4,0,0,17
+service MaMeB_MarS,15018,15242,12,5,0,0,18
+service JOMR,15625,16109,13,5,0,0,19
+service JOMR,16528,16691,14,5,0,0,20
+service MaMeB_MarS,17068,17319,14,6,0,0,21
+*SWITCH*,17485,17980,14,6,0,0,
+service MaMeB_MarS,18071,18369,14,7,0,0,22
+service MaMeB_MarS,18602,18892,14,8,0,0,23
+service JOMR,19282,19533,15,8,0,0,24
+service JOMR,19802,20030,16,8,0,0,25
+service JOMR,20396,20611,17,8,0,0,26
+service JOMR,20902,21118,18,8,0,0,27
+service MaMeB_MarS,21303,21608,18,9,0,0,28
+*SWITCH*,21723,22115,18,9,0,0,
+service MaMeB_MarS,22413,22682,18,10,0,0,29
+service JOMR,23031,23637,19,10,0,0,30
+service MaMeB_MarS,24234,24706,19,11,0,0,31
+service JOMR,25068,25390,20,11,0,0,32
+end of set,0,0,21,11,1,0,

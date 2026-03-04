@@ -1,5 +1,5 @@
 Service_side,Start_frame,End_frame,JOMR_score,AleN_EmP_score,JOMR_sets,AleN_EmP_sets,point_index
-debut du match,34,88,0,0,0,0,1
+match start - service AleN_EmP,34,88,0,0,0,0,1
 service JOMR,358,748,1,0,0,0,2
 service JOMR,1070,1260,2,0,0,0,3
 service AleN_EmP,1481,1667,2,1,0,0,4
@@ -21,7 +21,7 @@ service AleN_EmP,10241,10414,7,9,0,0,17
 service JOMR,10614,10790,8,9,0,0,18
 service JOMR,11047,11279,9,9,0,0,19
 *SWITCH*,11404,11851,9,9,0,0,
-Temps mort,11888,12905,9,9,0,0,
+Timeout,11888,12905,9,9,0,0,
 service JOMR,13029,13482,10,9,0,0,20
 service AleN_EmP,13728,13902,10,10,0,0,21
 service AleN_EmP,14157,14674,10,11,0,0,22
@@ -36,8 +36,8 @@ service AleN_EmP,18912,19190,14,14,0,0,29
 service JOMR,19644,19777,15,14,0,0,30
 service JOMR,20079,20284,16,14,0,0,31
 service AleN_EmP,20527,20946,16,15,0,0,32
-Temps mort,21736,23188,16,15,0,0,
+Timeout,21736,23188,16,15,0,0,
 service AleN_EmP,23357,23637,16,16,0,0,33
 *SWITCH*,23827,24256,16,16,0,0,
 service JOMR,24383,24888,17,16,0,0,34
-fin du set,0,0,18,16,1,0,
+end of set,0,0,18,16,1,0,

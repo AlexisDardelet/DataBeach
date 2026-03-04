@@ -1,5 +1,5 @@
 Service_side,Start_frame,End_frame,JOMR_score,NoG_AliP_score,JOMR_sets,NoG_AliP_sets,point_index
-debut du match,134,440,0,0,0,0,1
+match start - service NoG_AliP,134,440,0,0,0,0,1
 service JOMR,749,1168,1,0,0,0,2
 service NoG_AliP,1453,1881,1,1,0,0,3
 service NoG_AliP,2156,2546,1,2,0,0,4
@@ -13,7 +13,7 @@ service JOMR,6163,6481,6,3,0,0,10
 service NoG_AliP,6782,7021,6,4,0,0,11
 service JOMR,7359,7586,7,4,0,0,12
 service JOMR,7893,8144,8,4,0,0,13
-Temps mort,8528,10040,8,4,0,0,
+Timeout,8528,10040,8,4,0,0,
 service JOMR,10512,10786,9,4,0,0,14
 *SWITCH*,10953,11596,9,4,0,0,
 service NoG_AliP,11696,11962,9,5,0,0,15
@@ -39,4 +39,4 @@ service NoG_AliP,21236,21584,19,12,0,0,32
 service JOMR,21768,22013,20,12,0,0,33
 service NoG_AliP,22341,22579,20,13,0,0,34
 *SWITCH*,22734,23088,20,13,0,0,
-fin du set,0,0,21,13,1,0,
+end of set,0,0,21,13,1,0,

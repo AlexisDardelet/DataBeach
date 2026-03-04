@@ -153,6 +153,7 @@ class GameEditor:
         self,
         team1_name: str,
         team2_name: str,
+        rewrite_videos: bool = False,
     ):
         """
         Pipeline from the preprocessed video to
@@ -187,6 +188,20 @@ class GameEditor:
 
         # Retrieve video information from the file name
         game_id = os.path.splitext(os.path.basename(self.video_path))[0]
+
+        # Check if the video has already been processed in self.output_dir
+        for file in os.listdir(self.output_dir):
+            if file.startswith(f"{game_id}_p"):
+                if rewrite_videos == False:
+                    # Segmented points videos already exist, skip processing
+                    print(
+                        f"Segmented videos for {game_id} already exist in "
+                        f"{self.output_dir}. Skipping processing."
+                    )
+                    return
+                else:
+                    # Remove existing segmented videos
+                    os.remove(os.path.join(self.output_dir, file))
 
         # Read the video and extract start_frame and end_frame
         df_points = pd.DataFrame()  # Initialize an empty DataFrame

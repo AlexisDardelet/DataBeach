@@ -1,5 +1,5 @@
 Service_side,Start_frame,End_frame,JOMR_score,(adv)_score,JOMR_sets,(adv)_sets,point_index
-debut du match,45,465,0,0,0,0,1
+match start - service JOMR,45,465,0,0,0,0,1
 service (adv),767,1116,0,1,0,0,2
 service (adv),1471,1752,0,2,0,0,3
 service (adv),2029,2292,0,3,0,0,4
@@ -23,11 +23,11 @@ service (adv),12320,12659,7,11,0,0,19
 service JOMR,13645,14141,8,11,0,0,20
 service (adv),14818,15194,8,12,0,0,21
 *SWITCH*,15376,15401,8,12,0,0,
-Temps mort,16098,16833,8,12,0,0,
+Timeout,16098,16833,8,12,0,0,
 service JOMR,17174,17360,9,12,0,0,22
 service (adv),17693,18045,9,13,0,0,23
 service (adv),18327,18650,9,14,0,0,24
-Temps mort,19499,20305,9,14,0,0,
+Timeout,19499,20305,9,14,0,0,
 service (adv),20509,20772,9,15,0,0,25
 service JOMR,21161,21397,10,15,0,0,26
 service JOMR,21844,22139,11,15,0,0,27
@@ -43,8 +43,8 @@ service JOMR,26249,26477,16,18,0,0,35
 service JOMR,26727,26912,17,18,0,0,36
 service (adv),27388,27623,17,19,0,0,37
 service (adv),27937,28197,17,20,0,0,38
-fin du set,0,0,17,21,0,1,
-debut du set,31378,31619,0,0,0,1,39
+end of set,0,0,17,21,0,1,
+set start - service JOMR,31378,31619,0,0,0,1,39
 service (adv),31905,32323,0,1,0,1,40
 service JOMR,32600,32798,1,1,0,1,41
 service JOMR,33102,33448,2,1,0,1,42
@@ -55,7 +55,7 @@ service (adv),35367,35646,2,4,0,1,45
 service (adv),36269,36665,2,5,0,1,46
 service (adv),36931,37236,2,6,0,1,47
 service (adv),37578,38108,2,7,0,1,48
-Temps mort,38419,39821,2,7,0,1,
+Timeout,38419,39821,2,7,0,1,
 service (adv),40060,40433,2,8,0,1,49
 service JOMR,41002,41287,3,8,0,1,50
 service JOMR,41587,42085,4,8,0,1,51
@@ -68,7 +68,7 @@ service (adv),45730,46063,6,11,0,1,56
 service (adv),46329,46643,6,12,0,1,57
 service (adv),47425,47722,6,13,0,1,58
 service JOMR,48189,48555,7,13,0,1,59
-Temps mort,49105,49853,7,13,0,1,
+Timeout,49105,49853,7,13,0,1,
 *SWITCH*,50087,50111,7,13,0,1,
 service JOMR,50423,50753,8,13,0,1,60
 service JOMR,51105,51375,9,13,0,1,61
@@ -87,4 +87,4 @@ service (adv),59397,59796,14,19,0,1,72
 service (adv),60109,60235,14,20,0,1,73
 *SWITCH*,60374,60394,14,20,0,1,
 service JOMR,60864,61364,15,20,0,1,74
-fin du set,0,0,15,21,0,2,
+end of set,0,0,15,21,0,2,

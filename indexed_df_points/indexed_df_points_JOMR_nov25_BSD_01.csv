@@ -1,5 +1,5 @@
 Service_side,Start_frame,End_frame,JOMR_score,MyH_HeR_score,JOMR_sets,MyH_HeR_sets,point_index
-debut du match,33,195,0,0,0,0,1
+match start - service MyH_HeR,33,195,0,0,0,0,1
 service JOMR,441,700,1,0,0,0,2
 service MyH_HeR,1185,1393,1,1,0,0,3
 service JOMR,1782,2012,2,1,0,0,4
@@ -23,13 +23,13 @@ service MyH_HeR,12502,12668,11,6,0,0,18
 service MyH_HeR,12959,13180,11,7,0,0,19
 service MyH_HeR,13392,13653,11,8,0,0,20
 *SWITCH*,13835,13967,11,8,0,0,
-Temps mort,14297,15709,11,8,0,0,
+Timeout,14297,15709,11,8,0,0,
 service JOMR,15972,16128,12,8,0,0,21
 service MyH_HeR,16400,16593,12,9,0,0,22
 service JOMR,16844,17109,13,9,0,0,23
 service JOMR,17355,17866,14,9,0,0,24
-fin du set,0,0,15,9,1,0,
-debut du set,20428,20774,0,0,1,0,25
+end of set,0,0,15,9,1,0,
+set start - service JOMR,20428,20774,0,0,1,0,25
 service JOMR,21057,21500,1,0,1,0,26
 service JOMR,21898,22156,2,0,1,0,27
 service JOMR,22481,22699,3,0,1,0,28
@@ -50,10 +50,10 @@ service JOMR,30127,30433,9,5,1,0,39
 service MyH_HeR,31126,31387,9,6,1,0,40
 service JOMR,31831,32049,10,6,1,0,41
 service JOMR,32298,32503,11,6,1,0,42
-Temps mort,32750,33865,11,6,1,0,
+Timeout,32750,33865,11,6,1,0,
 service JOMR,34125,34468,12,6,1,0,43
 service MyH_HeR,34919,35227,12,7,1,0,44
 *SWITCH*,35461,35756,12,7,1,0,
 service JOMR,35831,36414,13,7,1,0,45
 service JOMR,36898,37165,14,7,1,0,46
-fin du set,0,0,15,7,2,0,
+end of set,0,0,15,7,2,0,

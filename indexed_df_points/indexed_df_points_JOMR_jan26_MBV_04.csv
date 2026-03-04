@@ -1,5 +1,5 @@
 Service_side,Start_frame,End_frame,JOMR_score,AleM_LauA_score,JOMR_sets,AleM_LauA_sets,point_index
-debut du match,47,209,0,0,0,0,1
+match start - service JOMR,47,209,0,0,0,0,1
 service AleM_LauA,522,801,0,1,0,0,2
 service AleM_LauA,1114,1253,0,2,0,0,3
 service AleM_LauA,1436,1531,0,3,0,0,4
@@ -21,12 +21,12 @@ service AleM_LauA,6544,6706,4,11,0,0,16
 service JOMR,6884,7061,5,11,0,0,17
 service AleM_LauA,7293,7422,5,12,0,0,18
 service AleM_LauA,7591,7728,5,13,0,0,19
-Temps mort,7977,8622,5,13,0,0,
+Timeout,7977,8622,5,13,0,0,
 service AleM_LauA,8764,8885,5,14,0,0,20
 *SWITCH*,9017,9335,5,14,0,0,
 service JOMR,9378,9509,6,14,0,0,21
-fin du set,0,0,6,15,0,1,
-debut du set,10932,11012,0,0,0,1,22
+end of set,0,0,6,15,0,1,
+set start - service JOMR,10932,11012,0,0,0,1,22
 service AleM_LauA,11208,11475,0,1,0,1,23
 service JOMR,11740,12023,1,1,0,1,24
 service JOMR,12386,12490,2,1,0,1,25
@@ -35,7 +35,7 @@ service JOMR,12655,13038,3,1,0,1,26
 service AleM_LauA,13088,13454,3,2,0,1,27
 service AleM_LauA,13757,14008,3,3,0,1,28
 service AleM_LauA,14406,14751,3,4,0,1,29
-Temps mort,15041,15737,3,4,0,1,
+Timeout,15041,15737,3,4,0,1,
 service AleM_LauA,15829,16062,3,5,0,1,30
 service AleM_LauA,16249,16427,3,6,0,1,31
 *SWITCH*,16571,16771,3,6,0,1,
@@ -53,4 +53,4 @@ service AleM_LauA,20959,21087,6,13,0,1,41
 *SWITCH*,21135,21267,6,13,0,1,
 service AleM_LauA,21293,21521,6,14,0,1,42
 service JOMR,21831,22042,7,14,0,1,43
-fin du set,0,0,7,15,0,2,
+end of set,0,0,7,15,0,2,

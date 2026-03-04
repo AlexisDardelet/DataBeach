@@ -363,7 +363,7 @@ def extract_segments_from_df_gpu(
                 end_frame=int(row[1]["End_frame"]),
                 output_video=os.path.join(
                     output_dir,
-                    f"{game_id}_{row[1]['point_index']}.mp4"
+                    f"{game_id}_p{row[1]['point_index']}.mp4"
                 ),
             )
 
@@ -587,17 +587,63 @@ def cv2_point_segment_cut(
             elif key in key_action_map:
                 # Record the action associated with the key,
                 # along with the frame number
+                
+                ## Match start and set start
                 if key == ord('0'):
                     # Reset scores at set start
                     score_team1 = 0
                     score_team2 = 0
+                    
+                    # Pause playback at set start
+                    paused = True
+
+                    # Match start vs set start
                     if len(temp_list) == 0:
                         # "Set start" is actually "match start"
                         # if it is the first recorded action
                         action_name = str('match start')
                     else:
+                        # "Set start" after the first one is a real new set
                         action_name = key_action_map[key]
+                
+                    # Assign the team serving based on second key pressed after the set start or match start
+                    # Display overlay asking user to define the serving team
+                    if ret:
+                        overlay_frame = frame.copy()
+                        cv2.putText(
+                            overlay_frame,
+                            "Define serving team:",
+                            (30, 80),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            1,
+                            (0, 255, 255),
+                            2,
+                            cv2.LINE_AA,
+                        )
+                        cv2.putText(
+                            overlay_frame,
+                            f"1: {team1_name}  |  3: {team2_name}",
+                            (30, 115),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            0.8,
+                            (0, 255, 255),
+                            2,
+                            cv2.LINE_AA,
+                        )
+                        cv2.imshow(f'{video_path}', overlay_frame)
+
+                    # Wait for the user to press '1' or '3' to define the serving team
+                    while True:
+                        serve_key = cv2.waitKey(0) & 0xFF
+                        if serve_key == ord('1'):
+                            action_name = f'{action_name} - service {team1_name}'
+                            break
+                        elif serve_key == ord('3'):
+                            action_name = f'{action_name} - service {team2_name}'
+                            break
+
                 else:
+                    # For other keys, just record the associated action
                     action_name = key_action_map[key]
 
                 if key == ord('5'):
@@ -640,7 +686,7 @@ def cv2_point_segment_cut(
         if action['Action'] != 'end of point':
             # If it is a set start, create an 'end of set' item
             # in list_actions for later processing
-            if action['Action'] == 'set start':
+            if action['Action'] == f'set start - service {team1_name}' or action['Action'] == f'set start - service {team2_name}':
                 list_actions.append({
                     'Service_side': 'end of set',
                     'Start_frame': int(0),
@@ -680,9 +726,10 @@ def cv2_point_segment_cut(
     # Update scores based on the service side
     for idx, row in df_points.iterrows():
         if (
-            df_points['Service_side'].iloc[idx] == 'set start'
-            or df_points['Service_side'].iloc[idx]
-            == 'match start'
+            df_points['Service_side'].iloc[idx] == f'set start - service {team1_name}'
+            or df_points['Service_side'].iloc[idx] == f'set start - service {team2_name}'
+            or df_points['Service_side'].iloc[idx] == f'match start - service {team1_name}'
+            or df_points['Service_side'].iloc[idx] == f'match start - service {team2_name}'
         ):
             # First row: initialize according to the service
             if row['Service_side'] == (
@@ -728,7 +775,10 @@ def cv2_point_segment_cut(
 
     # Update set scores at the beginning of each new set
     for idx, row in df_points.iterrows():
-        if row['Service_side'] == 'set start' and idx > 0:
+        if (
+            row['Service_side'] == f'set start - service {team1_name}'
+            or row['Service_side'] == f'set start - service {team2_name}'
+        ) and idx > 0:
             # Compare the scores of the previous set
             prev_score_team1 = df_points.at[
                 idx - 1, f'{team1_name}_score'

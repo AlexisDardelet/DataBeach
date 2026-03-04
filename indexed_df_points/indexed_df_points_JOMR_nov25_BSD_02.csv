@@ -1,5 +1,5 @@
 Service_side,Start_frame,End_frame,JOMR_score,KaE_EmD_score,JOMR_sets,KaE_EmD_sets,point_index
-debut du match,190,441,0,0,0,0,1
+match start - service JOMR,190,441,0,0,0,0,1
 service KaE_EmD,874,1231,0,1,0,0,2
 service JOMR,1564,1766,1,1,0,0,3
 service JOMR,2050,2279,2,1,0,0,4
@@ -21,8 +21,8 @@ service JOMR,9239,9463,11,4,0,0,16
 service KaE_EmD,9796,10065,11,5,0,0,17
 service JOMR,10423,10665,12,5,0,0,18
 service JOMR,10912,11047,13,5,0,0,19
-fin du set,0,0,14,5,1,0,
-debut du set,12546,12884,0,0,1,0,20
+end of set,0,0,14,5,1,0,
+set start - service KaE_EmD,12546,12884,0,0,1,0,20
 service KaE_EmD,13080,13288,0,1,1,0,21
 service JOMR,13778,14256,1,1,1,0,22
 service KaE_EmD,14851,15197,1,2,1,0,23
@@ -48,4 +48,4 @@ service JOMR,25128,25542,14,5,1,0,39
 *SWITCH*,25685,25699,14,5,1,0,
 service KaE_EmD,25967,26150,14,6,1,0,40
 service KaE_EmD,26365,26722,14,7,1,0,41
-fin du set,0,0,15,7,2,0,
+end of set,0,0,15,7,2,0,

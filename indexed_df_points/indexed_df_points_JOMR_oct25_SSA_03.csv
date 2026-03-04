@@ -1,5 +1,5 @@
 Service_side,Start_frame,End_frame,JOMR_score,PauG_AleF_score,JOMR_sets,PauG_AleF_sets,point_index
-match start,40,159,0,0,0,0,1
+match start - service JOMR,40,159,0,0,0,0,1
 service PauG_AleF,468,689,0,1,0,0,2
 service JOMR,1100,1243,1,1,0,0,3
 service JOMR,1507,1778,2,1,0,0,4
@@ -32,7 +32,7 @@ service PauG_AleF,18107,18390,14,10,0,0,25
 *SWITCH*,18632,18932,14,10,0,0,
 service PauG_AleF,18979,19188,14,11,0,0,26
 end of set,0,0,15,11,1,0,
-set start,21631,21815,0,0,1,0,27
+set start - service PauG_AleF,21631,21815,0,0,1,0,27
 service JOMR,22033,22313,1,0,1,0,28
 service JOMR,22573,22847,2,0,1,0,29
 service PauG_AleF,23268,23464,2,1,1,0,30

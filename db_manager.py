@@ -71,11 +71,11 @@ class DBManager:
         
         # Check if the date format is correct (DD-MM-YYYY)
         try:
-            day, month, year = map(int, date.split("-"))
+            day, month, year = map(int, date.split("/"))
             if not (1 <= day <= 31 and 1 <= month <= 12 and year > 1900):
                 raise ValueError
         except ValueError:
-            print(f"❌ Format de date invalide pour '{date}'. Utilisez 'DD-MM-YYYY'.")
+            print(f"❌ Format de date invalide pour '{date}'. Utilisez 'DD/MM/YYYY'.")
             return
 
         query = """
@@ -101,14 +101,25 @@ class DBManager:
         if result:
             print(f"⚠️  L'équipe '{paire_id}' existe déjà.")
             return  # Ne pas insérer si déjà présente
+        
+        # Check if there is the same team but with swapped players
+        query_check_swapped = """SELECT PAIRE_ID FROM table_players 
+         WHERE (Name_joueurA = ? AND Name_joueurB = ?) OR (Name_joueurA = ? AND Name_joueurB = ?)"""
+        self.cursor.execute(query_check_swapped, (name_joueurA, name_joueurB, name_joueurB, name_joueurA))
+        result_swapped = self.cursor.fetchone()
+        if result_swapped:
+            print(f"⚠️  L'équipe '{paire_id}' existe déjà (joueurs inversés).")
+            return  # Ne pas insérer si déjà présente
 
-        query = """
-            INSERT OR IGNORE INTO table_players (PAIRE_ID, Name_joueurA, Name_joueurB, Genre)
-            VALUES (?, ?, ?, ?)
-        """
-        self.execute_query(query, (paire_id, name_joueurA, name_joueurB, genre))
-        print(f"✅ Nouvelle équipe ajoutée : {paire_id} - {name_joueurA} & {name_joueurB} - {genre}"
-    )
+        # If neither the exact pair nor the swapped pair exists, insert the new team
+        if not result and not result_swapped:
+            query = """
+                INSERT OR IGNORE INTO table_players (PAIRE_ID, Name_joueurA, Name_joueurB, Genre)
+                VALUES (?, ?, ?, ?)
+            """
+            self.execute_query(query, (paire_id, name_joueurA, name_joueurB, genre))
+            print(f"✅ Nouvelle équipe ajoutée : {paire_id} - {name_joueurA} & {name_joueurB} - {genre}")
+    
 
     # -----------------------------------------------------------------------------------
 
@@ -122,6 +133,7 @@ class DBManager:
         print(f"✅ Table '{table_name}' exportée : {len(df)} lignes, {len(df.columns)} colonnes")
         return df
     
+    # -----------------------------------------------------------------------------------
 
     def execute_query(self, query, params=None):
         """Exécute une requête SQL avec ou sans paramètres."""
@@ -134,7 +146,6 @@ class DBManager:
         except sqlite3.Error as e:
             print(f"❌ Erreur lors de l'exécution de la requête: {e}")
             self.conn.rollback()
-
 
 
     # ============================================================
