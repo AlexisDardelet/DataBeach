@@ -123,9 +123,10 @@ class DBManager:
 
     # -----------------------------------------------------------------------------------
 
-    def table_to_dataframe(self, 
-                           table_name: str
-                           ) -> pd.DataFrame:
+    def table_to_dataframe(
+        self,
+        table_name: str
+        ) -> pd.DataFrame:
         """Exporte une table entière sous forme de DataFrame pandas."""
         
         query = f"SELECT * FROM {table_name}"
@@ -135,7 +136,11 @@ class DBManager:
     
     # -----------------------------------------------------------------------------------
 
-    def execute_query(self, query, params=None):
+    def execute_query(
+        self,
+        query: str,
+        params=None
+        ):
         """Exécute une requête SQL avec ou sans paramètres."""
         if params is None:
             params = []
@@ -152,7 +157,7 @@ class DBManager:
     # CRÉATION DES TABLES
     # Version initiale : table_players, table_serie, table_game
     # ============================================================
-    def create_tables(self):
+    def create_initial_tables(self):
         """Crée les 3 tables si elles n'existent pas déjà."""
 
         # 1. table_players (pas de FK)
@@ -205,57 +210,254 @@ class DBManager:
 
         self.conn.commit()
         print("✅ Tables créées.")
+    
+    # ====================================================================
+    # ETL METHODS
+    # ====================================================================
+
+    def load_indexed_df_points_csv(
+            self,
+            game_id: str
+    ) -> pd.DataFrame:
+        """Load a CSV file containing the indexed points for a specific game_id and return it as a DataFrame.
+        the CSV file should be located in the 'indexed_df_points' directory and named 'indexed_df_points_{game_id}.csv'.
+        It requires that the CSV file has a header row with column names that match the expected schema for the points data.
+        It returns a pandas DataFrame ready to be loaded into the database with a query
+
+        Arguments:
+            game_id (str): The unique identifier for the game, used to locate the corresponding CSV file. 
+        Returns:
+            pd.DataFrame: A DataFrame containing the indexed points data for the specified game_id, ready for analysis or further processing.
+        """
+
+        teamA_name, teamB_name = self.teams_names_from_game_id(game_id)
+        # DEV DEBUG - to be removed later
+        print(f"Team A: {teamA_name}, Team B: {teamB_name}")
+
+        csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'indexed_df_points', f'indexed_df_points_{game_id}.csv')
+
+        # Load the CSV file into a DataFrame
+        df_points_formatted = pd.DataFrame()
+        df_points_formatted = pd.read_csv(
+            filepath_or_buffer=csv_path,
+            keep_default_na=True,
+            )
+        df_points_formatted['point_index'] = df_points_formatted['point_index'].astype('Int64')
+
+        # Create the 'POINT_ID' column based on 'game_id' and 'point_index'
+        df_points_formatted['POINT_ID'] = df_points_formatted.apply(
+            lambda row: f"{game_id}_p{row['point_index']}" if pd.notna(row['point_index']) else pd.NA,
+            axis=1
+        )
+        df_points_formatted.insert(0, 'POINT_ID', df_points_formatted.pop('POINT_ID'))  # Move 'POINT_ID' to the first column
+
+        # Columns dropped
+        df_points_formatted.drop(columns=['Start_frame', 'End_frame', 'point_index'], inplace=True)
+
+        # Columns renamed
+        df_points_formatted.rename(
+            columns={
+                f'{teamA_name}_score': 'teamA_score',
+                f'{teamB_name}_score': 'teamB_score',
+                f'{teamA_name}_sets': 'teamA_sets',
+                f'{teamB_name}_sets': 'teamB_sets',
+                }, inplace=True)
+
+        # Drop the 'match start - ' and 'set start - ' and 'service ' prefixes from the 'Service_side' column
+        df_points_formatted['Service_side'] = df_points_formatted['Service_side'].str.replace(r'^(match start - |set start - )', '', regex=True)
+        df_points_formatted['Service_side'] = df_points_formatted['Service_side'].str.replace(str('service '), '')
+
+        # # TO BE DETERMINED IF NEEDED LATER - if we want to keep the team names in the 'Service_side' column or if we want to replace them with 'teamA' and 'teamB'
+        # # Rename the strings in the 'Service_side' column to match the team names
+        # df_points_formatted['Service_side'] = df_points_formatted['Service_side'].apply(
+        #     lambda x: str('teamA') if x == teamA_name else (str('teamB') if x == teamB_name else x)
+        # )
+
+        # Create columns 'teamA_score_diff' and 'teamB_score_diff'
+        # which are the differences between the current point's score and the previous point's score for team A and team B respectively
+        df_points_formatted['teamA_score_diff'] = df_points_formatted['teamA_score'] - df_points_formatted['teamB_score']
+        df_points_formatted['teamB_score_diff'] = df_points_formatted['teamB_score'] - df_points_formatted['teamA_score']
+
+        # # Drop the rows with '*SWITCH*', 'Timeout', 'end of set' values in the 'Service_side' column
+        df_points_formatted = df_points_formatted[df_points_formatted['Service_side'] != '*SWITCH*']
+        df_points_formatted = df_points_formatted[df_points_formatted['Service_side'] != 'Timeout']
+
+        # Create a column 'point_winner' which indicates the winner of the point based on the next row
+        df_points_formatted['point_winner'] = df_points_formatted['Service_side'].shift(-1)
+        # Specific treatment for the last point of each set, which has 'end of set' in the 'Service_side' column of the next row
+        for i, row in enumerate(df_points_formatted.itertuples()):
+            row_index = df_points_formatted.index[i]
+            if i + 1 < len(df_points_formatted):
+                next_row_index = df_points_formatted.index[i + 1]
+                if df_points_formatted.loc[next_row_index, 'Service_side'] == 'end of set':
+                    set_winner = str()
+                    # DEV DEBUG - to be removed later
+                    print(f"Row index: {row_index}, Service_side: {df_points_formatted.loc[next_row_index, 'Service_side']}")
+                    if df_points_formatted.loc[row_index, 'teamA_score'] > df_points_formatted.loc[row_index, 'teamB_score']:
+                        set_winner = teamA_name
+                    else:
+                        set_winner = teamB_name
+                    # DEV DEBUG - to be removed later
+                    print(f"Set winner: {set_winner}")
+                    df_points_formatted.loc[row_index, 'point_winner'] = set_winner
+
+        # Drop the rows with 'end of set' values in the 'Service_side' column
+        df_points_formatted = df_points_formatted[df_points_formatted['Service_side'] != 'end of set']
+
+        # Add a column 'game_id' with the value of the game_id for all rows
+        df_points_formatted['game_id'] = game_id
+
+        return df_points_formatted
+
+    def load_indexed_df_points_csv_to_db(
+            self,
+            game_id: str
+    ) -> None:
+        """Load the indexed points DataFrame for a specific game_id and insert it into the database.
+        This method uses the load_indexed_df_points_csv method to get the formatted DataFrame and then inserts it into a new table in the database named 'table_points_{game_id}'.
+        The new table will have columns corresponding to the DataFrame's columns, and the method will handle the creation of the table and the insertion of the data.
+
+        Arguments:
+            game_id (str): The unique identifier for the game, used to locate the corresponding CSV file and to name the new table in the database.
+        """
+
+        df_points_formatted = self.load_indexed_df_points_csv(game_id)
+
+        # Create a new table for the points of this game
+        table_name = f"table_points_{game_id}"
+        create_table_query = f"""
+            CREATE TABLE IF NOT EXISTS {table_name} (
+                POINT_ID TEXT PRIMARY KEY,
+                Service_side TEXT,
+                teamA_score INT,
+                teamB_score INT,
+                teamA_sets INT,
+                teamB_sets INT,
+                teamA_score_diff INT,
+                teamB_score_diff INT,
+                point_winner TEXT,
+                game_id TEXT,
+                FOREIGN KEY (game_id) REFERENCES table_game(GAME_ID)
+            )
+        """
+        self.execute_query(create_table_query)
+
+        # Insert the data from the DataFrame into the new table
+        for _, row in df_points_formatted.iterrows():
+            insert_query = f"""
+                INSERT OR IGNORE INTO {table_name} (
+                    POINT_ID, Service_side, teamA_score, teamB_score, 
+                    teamA_sets, teamB_sets, teamA_score_diff, teamB_score_diff, point_winner, game_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """
+            self.execute_query(insert_query, (
+                row['POINT_ID'], row['Service_side'], row['teamA_score'], row['teamB_score'],
+                row['teamA_sets'], row['teamB_sets'], row['teamA_score_diff'], row['teamB_score_diff'], row['point_winner'], row['game_id']
+            ))
+
+    def load_all_indexed_df_points_csv_to_db(
+        self,
+        indexed_df_points_dir: str = None
+    ) -> None:
+        """Load the indexed points DataFrames for a list of game_ids and insert them into the database.
+        This method iterates over the provided list of game_ids, calls the load_indexed_df_points_csv_to_db method for each game_id to load and insert the corresponding points data into the database.
+
+        Arguments:
+            game_ids (list[str]): A list of unique identifiers for the games, used to locate the corresponding CSV files and to name the new tables in the database.
+        """
+        if indexed_df_points_dir is None:
+            indexed_df_points_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'indexed_df_points')
+        
+        # Get the list of game_ids from the CSV files in the indexed_df_points directory
+        game_ids = []
+        for filename in os.listdir(indexed_df_points_dir):
+            if filename.startswith('indexed_df_points_') and filename.endswith('.csv'):
+                game_id = filename[len('indexed_df_points_'):-len('.csv')]
+                game_ids.append(game_id)
+
+        print(f"✅ {len(game_ids)} fichiers CSV de points trouvés pour les game_ids suivants : {game_ids}")
+
+        # for game_id in game_ids:
+        #     self.load_indexed_df_points_csv_to_db(game_id)
 
     # ============================================================
-    # IMPORT CSV
+    # IMPORT CSV - initial tables : table_players.csv, table_serie.csv, table_game.csv
     # ============================================================
-    def load_csv(self, table_name, filename, ignore_fk=False):
-        """Importe un fichier CSV dans la table spécifiée."""
+    def load_initial_csv(
+        self,
+        table_name: str,
+        filename: str,
+        ignore_fk: bool = False
+    ):
+        """Imports a CSV file into the specified table.
+        This method only works for csv files with column names that exactly match the table schema.
+        (initial tables : table_players.csv, table_serie.csv, table_game.csv)
+
+        Arguments:
+            table_name (str): Name of the target table in the database.
+            filename (str): Name of the CSV file to import.
+            ignore_fk (bool): Whether to ignore foreign key constraints during import."""
+        
+        # Build the full path to the CSV file
         filepath = os.path.join(self.CSV_DIR, filename)
 
+        # Read the CSV and strip whitespace from column names
         with open(filepath, newline="", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
             rows = [{k.strip(): v for k, v in row.items()} for row in reader]
 
         if rows:
+            # Temporarily disable FK checks if requested (e.g. for out-of-order imports)
             if ignore_fk:
                 self.conn.execute("PRAGMA foreign_keys = OFF")
 
+            # Dynamically build the INSERT query from the CSV column names
             columns = ", ".join(rows[0].keys())
             placeholders = ", ".join(["?" for _ in rows[0]])
             query = f"INSERT OR IGNORE INTO {table_name} ({columns}) VALUES ({placeholders})"
+
             try:
+                # Insert all rows in a single batch operation
                 self.cursor.executemany(query, [list(row.values()) for row in rows])
                 self.conn.commit()
-                print(f"✅ {len(rows)} lignes importées dans {table_name}.")
+                print(f"✅ {len(rows)} rows imported into {table_name}.")
             except sqlite3.IntegrityError as e:
-                print(f"❌ Erreur d'intégrité pour {table_name}: {e}")
+                # Roll back the transaction if a FK or UNIQUE constraint is violated
+                print(f"❌ Integrity error for {table_name}: {e}")
                 print(
-                    "   Vérifiez que les données parentes existent dans les tables référencées."
+                    "   Please ensure that the parent data exists in the referenced tables."
                 )
                 self.conn.rollback()
             finally:
+                # Always re-enable FK checks after the import, regardless of outcome
                 if ignore_fk:
                     self.conn.execute("PRAGMA foreign_keys = ON")
 
-    def load_all_csv(self):
-        """Importe les 3 CSV dans l'ordre correct (parents avant enfants)."""
-        self.load_csv("table_players", "table_players.csv")
-        self.load_csv("table_serie", "table_serie.csv")
-        self.load_csv("table_game", "table_game.csv")
+    def load_all_csv(
+        self
+        ):
+        """Imports the 3 CSV files in the correct order (parents before children)."""
+        self.load_initial_csv("table_players", "table_players.csv")
+        self.load_initial_csv("table_serie", "table_serie.csv")
+        self.load_initial_csv("table_game", "table_game.csv")
+
 
     # ============================================================
     # RÉINITIALISATION
     # ============================================================
     def reset_database(self):
         """Supprime et recrée toutes les tables (utile en développement)."""
+        # Disable FK checks to allow dropping tables in any order
+        self.conn.execute("PRAGMA foreign_keys = OFF")
         # Suppression dans l'ordre inverse (enfants d'abord)
         self.cursor.execute("DROP TABLE IF EXISTS table_game")
         self.cursor.execute("DROP TABLE IF EXISTS table_serie")
         self.cursor.execute("DROP TABLE IF EXISTS table_players")
         self.conn.commit()
+        # Re-enable FK checks after dropping
+        self.conn.execute("PRAGMA foreign_keys = ON")
         print("🗑️  Tables supprimées.")
-        self.create_tables()
+        self.create_initial_tables()
         print("✅ Base réinitialisée.")
 
     def check_fk_integrity(self):
@@ -306,6 +508,6 @@ class DBManager:
 if __name__ == "__main__":
     with DBManager() as db:
         db.reset_database()
-        db.create_tables()
+        db.create_initial_tables()
         db.load_all_csv()
         db.check_fk_integrity()

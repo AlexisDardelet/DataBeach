@@ -1,0 +1,46 @@
+Service_side,Start_frame,End_frame,JOMR_score,CloD_CirM_score,JOMR_sets,CloD_CirM_sets,point_index
+match start - service CloD_CirM,48,227,0,0,0,0,1
+service CloD_CirM,542,776,0,1,0,0,2
+service JOMR,1134,1429,1,1,0,0,3
+service CloD_CirM,1789,1927,1,2,0,0,4
+service JOMR,2157,2334,2,2,0,0,5
+service CloD_CirM,2585,2727,2,3,0,0,6
+service CloD_CirM,2885,3073,2,4,0,0,7
+*SWITCH*,3140,3375,2,4,0,0,
+service CloD_CirM,3406,3599,2,5,0,0,8
+service CloD_CirM,3905,4160,2,6,0,0,9
+service JOMR,4413,4649,3,6,0,0,10
+service JOMR,4788,5147,4,6,0,0,11
+service CloD_CirM,5450,5572,4,7,0,0,12
+service JOMR,5729,5804,5,7,0,0,13
+*SWITCH*,5913,6085,5,7,0,0,
+service CloD_CirM,6106,6205,5,8,0,0,14
+service JOMR,6311,6450,6,8,0,0,15
+service CloD_CirM,6717,6828,6,9,0,0,16
+service CloD_CirM,7090,7251,6,10,0,0,17
+service JOMR,7544,7708,7,10,0,0,18
+service JOMR,7932,8164,8,10,0,0,19
+service JOMR,8408,8650,9,10,0,0,20
+*SWITCH*,8830,9031,9,10,0,0,
+service JOMR,9598,9817,10,10,0,0,21
+service CloD_CirM,10214,10356,10,11,0,0,22
+service CloD_CirM,10606,10735,10,12,0,0,23
+service JOMR,10954,11170,11,12,0,0,24
+service CloD_CirM,11371,11487,11,13,0,0,25
+service JOMR,11654,11840,12,13,0,0,26
+service JOMR,12065,12155,13,13,0,0,27
+*SWITCH*,12188,12368,13,13,0,0,
+service JOMR,12383,12609,14,13,0,0,28
+service CloD_CirM,12888,13027,14,14,0,0,29
+service JOMR,13213,13340,15,14,0,0,30
+service JOMR,13479,13586,16,14,0,0,31
+service CloD_CirM,13717,13841,16,15,0,0,32
+service CloD_CirM,14397,14483,16,16,0,0,33
+service JOMR,14656,14711,17,16,0,0,34
+*SWITCH*,14777,14824,17,16,0,0,
+service CloD_CirM,15172,15273,17,17,0,0,35
+service JOMR,15399,15710,18,17,0,0,36
+Timeout,16097,17236,18,17,0,0,
+service JOMR,17387,17552,19,17,0,0,37
+*SWITCH*,17620,17940,19,17,0,0,
+end of set,0,0,20,17,1,0,
