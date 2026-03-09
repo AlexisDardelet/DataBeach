@@ -3,6 +3,11 @@ import os
 import sys
 import pandas as pd
 import cv2
+from dotenv import load_dotenv
+
+# Environment variables
+load_dotenv()
+VIDEO_DIR = os.getenv("VIDEO_DIR")
 
 # Local imports
 sys.path.append(os.path.join(os.path.dirname(__file__), "db_manager"))
@@ -16,7 +21,6 @@ class VideoGrader:
     """
     def __init__(
         self,
-        video_dir: str,
         paire_id: str
         ) -> None:
         """
@@ -25,7 +29,7 @@ class VideoGrader:
             video_dir (str): The directory containing the video files.
             paire_id (str): The unique identifier for the pair.
         """
-        self.video_dir = video_dir
+        self.video_dir = VIDEO_DIR
         self.paire_id = paire_id
     
     # ==============================================================================
@@ -55,6 +59,10 @@ class VideoGrader:
         # Validate the input parameters
         if game_id is None and serie_id is None:
             raise ValueError("At least one of game_id or serie_id must be provided.")
+        if serve_or_pass not in ["serve", "pass"]:
+            raise ValueError("serve_or_pass must be either 'serve' or 'pass'.")
+        if game_id is not None and serie_id is not None:
+            raise ValueError("Only one of game_id or serie_id should be provided, not both.")
 
         # Initiating variables
         points_ids = list()
@@ -63,12 +71,74 @@ class VideoGrader:
         if serve_or_pass == "serve":
 
             # Loading the point_ids to grade according to the provided arguments
-            if game_id is not None:
-                with DBManager() as db:
-                    db.cursor.execute(
-                        """SELECT POINT_ID, Service_side 
-                        FROM table_points 
-                        WHERE game_id = ? AND Service_side = ?""",
-                        (game_id,self.paire_id)
-                    )
-                    POINTS_IDS = [row[0] for row in db.cursor.fetchall()]
+            with DBManager() as db:
+                if game_id is not None: # Only 1 game to grade
+                        db.cursor.execute(
+                            """SELECT POINT_ID, Service_side 
+                            FROM table_points 
+                            WHERE game_id = ? AND Service_side = ?""",
+                            (game_id,self.paire_id)
+                        )
+                elif serie_id is not None: # All games in the serie to grade
+                        db.cursor.execute(
+                            """SELECT POINT_ID, Service_side 
+                            FROM table_points
+                            WHERE game_id IN
+                                (SELECT GAME_ID
+                                FROM table_game
+                                WHERE serie = ?)
+                            AND Service_side = ?""",
+                            (serie_id,self.paire_id)
+                        )
+                # Fetching the results and storing the point_ids in a list       
+                points_ids = [row[0] for row in db.cursor.fetchall()]
+
+        ## PASSING GRADING ##################################################
+        elif serve_or_pass == "pass":
+
+            # Loading the point_ids to grade according to the provided arguments
+            with DBManager() as db:
+                if game_id is not None: # Only 1 game to grade
+                        db.cursor.execute(
+                            """SELECT POINT_ID, Service_side 
+                            FROM table_points 
+                            WHERE game_id = ? AND Service_side != ?""",
+                            (game_id,self.paire_id)
+                        )
+                elif serie_id is not None: # All games in the serie to grade
+                        db.cursor.execute(
+                            """SELECT POINT_ID, Service_side 
+                            FROM table_points
+                            WHERE game_id IN
+                                (SELECT GAME_ID
+                                FROM table_game
+                                WHERE serie = ?)
+                            AND Service_side != ?""",
+                            (serie_id,self.paire_id)
+                        )
+                # Fetching the results and storing the point_ids in a list       
+                points_ids = [row[0] for row in db.cursor.fetchall()]  
+
+        # DEV DEBUG [REMOVE LATER]
+        print(f"Points to grade : {points_ids}")
+
+
+
+
+
+
+
+
+
+
+#######################################################################################
+# Main script for testing the VideoGrader class 
+
+if __name__ == "__main__":
+    grader = VideoGrader(paire_id="JOMR")
+    grader.service_passing_grading(
+        serve_or_pass="pass",
+        game_id="JOMR_nov25_BSD_01",
+        serie_id=None,
+        rewrite_db=False
+    )
