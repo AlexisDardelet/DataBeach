@@ -5,11 +5,14 @@ import sys
 import cv2
 import pandas as pd
 
+# Environment variables
+from dotenv import load_dotenv
+load_dotenv()
+FFMPEG_PATH = os.getenv("FFMPEG_PATH")
 
 # -------------------------------------------------------------------
 # Core GPU extraction for a single played point (start-end frames)
 # -------------------------------------------------------------------
-
 def cut_point_gpu(
     video_path: str,
     start_frame: int,
@@ -37,7 +40,7 @@ def cut_point_gpu(
 
     # Path to the ffmpeg build compiled with NVENC support
     # for GPU-accelerated extraction
-    ffmpeg_path = r"C:\ffmpeg\bin\ffmpeg.exe"
+    ffmpeg_path = FFMPEG_PATH
 
     # ffmpeg command to extract the segment using the GPU
     cmd = [
@@ -56,11 +59,9 @@ def cut_point_gpu(
     # Run the ffmpeg command to extract the segment using the GPU
     subprocess.run(cmd, check=True)
 
-
 # -------------------------------------------------------------------
 # Video rotation (if needed) with ffmpeg + GPU
 # -------------------------------------------------------------------
-
 def video_rotation(
     video_path: str,
     rotation_state: int = 0,
@@ -106,7 +107,7 @@ def video_rotation(
 
         # Path to the ffmpeg build compiled with NVENC support
         # for GPU-accelerated rotation
-        ffmpeg_path = r"C:\ffmpeg\bin\ffmpeg.exe"
+        ffmpeg_path = FFMPEG_PATH
 
         command = [
             ffmpeg_path,
@@ -120,12 +121,10 @@ def video_rotation(
         # Run the ffmpeg command to apply the rotation
         subprocess.run(command, check=True)
 
-
 # -------------------------------------------------------------------
 # Record montage actions for video pre-processing via cv2
 # and keyboard interaction, on a single video
 # -------------------------------------------------------------------
-
 def montage_operations(
     video_path: str,
     play_speed: float = 1.0
@@ -315,12 +314,10 @@ def montage_operations(
 
     return montage_actions
 
-
 # -------------------------------------------------------------------
 # Cut each played point into a segmented video, based on the
 # start-end frames from a pandas DataFrame
 # -------------------------------------------------------------------
-
 def extract_segments_from_df_gpu(
     video_path: str,
     actions_df: pd.DataFrame,
@@ -367,12 +364,10 @@ def extract_segments_from_df_gpu(
                 ),
             )
 
-
 # -------------------------------------------------------------------
 # Create a DataFrame for cutting a match into played-point
 # segments (accounting for the score)
 # -------------------------------------------------------------------
-
 def cv2_point_segment_cut(
     video_path: str,
     play_speed: float = 1.0,
@@ -872,7 +867,6 @@ def cv2_point_segment_cut(
 
     return df_points
 
-
 # -------------------------------------------------------------------
 # Point indexer
 # -------------------------------------------------------------------
@@ -928,7 +922,6 @@ def point_indexeer(
     )
 
     return df
-
 
 # -------------------------------------------------------------------
 # Score checker
@@ -1072,11 +1065,11 @@ def score_checker(
 # -------------------------------------------------------------------
 def basic_action_grader(
         video_path: str,
+        point_id: str,
         player_a: str,
         player_b: str,
         action_to_grade: str ="serve" or "pass",
         play_speed: float = 1.0,
-        # dict_grades: dict = None,
 ) -> dict:
     """
     Grade a specific action for a given player across a points of,
@@ -1091,9 +1084,7 @@ def basic_action_grader(
         player_b (str): Name of the second player whose actions are to be graded.
         action_to_grade (str): Type of action to grade (e.g.,
             'service', 'attack').
-        dict_grades (dict, optional): Existing dictionary of grades
-            depending on each action type (APPENDIX TO BE DONE)
-            Basic grades are from 1 to 3 (0 being 'undetermined')
+        play_speed (float, optional): Video playback speed
     Returns:
         dict: Dictionary containing the action graded for a player
     """
@@ -1227,29 +1218,15 @@ def basic_action_grader(
                     cv2.LINE_AA,
                 )
 
-            # Show pause indicator on the displayed frame
-            if paused and ret:
-                cv2.putText(
-                    frame,
-                    "|| PAUSE ||",
-                    (30, 80),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    1,
-                    (0, 0, 255),
-                    2,
-                    cv2.LINE_AA,
-                )
-
             # Display the current frame
             if ret:
                 cv2.imshow(f'{video_path}', frame)
 
             # Keyboard player input
             key = _wait_key_fast(30) & 0xFF
-            if key == ord('q'):
+            if key == ord('8'):
                 # Quit and stop looping
                 video_loop_active = False
-                break
             elif key == ord('\r'):
                 # Enter key: restart playback from beginning
                 cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
@@ -1270,15 +1247,18 @@ def basic_action_grader(
                 player_to_grade = key_player_map[key]
             elif key in key_grade_result and player_to_grade:
                 grade = key_grade_result[key]   
+
+                # Pause to confirm the grade
+                paused = True
+
+                # Store the graded action in the dictionary
                 action_graded = {
+                    'point_id': point_id,
                     'player': player_to_grade,
                     'action': action_to_grade,
                     'grade': grade
                 }
-                # Stop the video loop once a grade has been assigned
-                video_loop_active = False
             
-
     finally:
         # Release OpenCV resources
         cap.release()
@@ -1293,10 +1273,11 @@ def basic_action_grader(
 if __name__ == "__main__":
     # Example usage of the functions
     action_graded = basic_action_grader(
-    video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented\JOMR_jan26_MBV_01_p1.mp4',
+    video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented\JOMR_nov25_BSD_02_p41.mp4',
+    point_id='JOMR_nov25_BSD_02_p41',
     player_a='Jade',
     player_b='Math',
-    action_to_grade='pass'
+    action_to_grade='serve'
 )
     
     print(action_graded)

@@ -2,16 +2,17 @@
 import os
 import sys
 import pandas as pd
-import cv2
 from dotenv import load_dotenv
-
-# Environment variables
-load_dotenv()
-SEGMENTED_POINTS_DIR = os.getenv("SEGMENTED_POINTS_DIR")
 
 # Local imports
 sys.path.append(os.path.join(os.path.dirname(__file__), "db_manager"))
 from db_manager import DBManager
+sys.path.append(os.path.join(os.path.dirname(__file__), "video_edit_utils"))
+from video_edit_utils import basic_action_grader
+
+# Environment variables
+load_dotenv()
+SEGMENTED_POINTS_DIR = os.getenv("SEGMENTED_POINTS_DIR")
 
 class VideoGrader:
     """
@@ -120,25 +121,60 @@ class VideoGrader:
                 points_ids = [row[0] for row in db.cursor.fetchall()]  
 
         # DEV DEBUG [REMOVE LATER]
-        print(f"Points to grade : {points_ids}")
+        # print(f"Points to grade : {points_ids}")
 
+        # Fetching the player names in table_players for the game_id or serie_id provided
+        with DBManager() as db:
+            db.cursor.execute(
+                """SELECT Name_joueurA, Name_joueurB 
+                FROM table_players 
+                WHERE PAIRE_ID = ?""",
+                (self.paire_id,)
+            )
+            result = db.cursor.fetchone()
+            if result: 
+                player_a, player_b = result
+                # DEV DEBUG [REMOVE LATER]
+                print(f"Player A: {player_a}, Player B: {player_b}")
 
+        # Initiate a list to store the grades for each action in each point
+        actions_grades_list = list()
 
+        # Looping through the points to grade and applying the basic_action_grader
+        for point_id in points_ids:
+            # Constructing the path to the segmented video for the point
+            video_path = os.path.join(
+                self.segmented_points_dir,
+                f"{point_id}.mp4"
+            )
 
-
-
-
-
-
+            print(f"Grading point: {point_id} using video: {video_path}")
+            # Grading the action in the video and storing the results in a list
+            action_grades = basic_action_grader(
+                video_path=video_path,
+                point_id=point_id,
+                player_a=player_a,
+                player_b=player_b,
+                action_to_grade=serve_or_pass,
+            )
+            # Appending the grades for the current action to the main list
+            actions_grades_list.append(action_grades)
+        
+        return actions_grades_list
+            
 
 #######################################################################################
 # Main script for testing the VideoGrader class 
 
 if __name__ == "__main__":
-    grader = VideoGrader(paire_id="JOMR")
-    grader.service_passing_grading(
-        serve_or_pass="pass",
-        game_id="JOMR_nov25_BSD_01",
-        serie_id=None,
-        rewrite_db=False
-    )
+    # grader = VideoGrader(paire_id="JOMR")
+    # test_list = grader.service_passing_grading(
+    #     serve_or_pass="pass",
+    #     game_id="JOMR_nov25_BSD_02",
+    #     serie_id=None,
+    #     rewrite_db=False
+    # )
+    # print(test_list)
+
+    df = pd.DataFrame(
+    "data": test_list)
