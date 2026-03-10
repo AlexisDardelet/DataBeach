@@ -1075,6 +1075,7 @@ def basic_action_grader(
         player_a: str,
         player_b: str,
         action_to_grade: str ="serve" or "pass",
+        play_speed: float = 1.0,
         # dict_grades: dict = None,
 ) -> dict:
     """
@@ -1098,10 +1099,12 @@ def basic_action_grader(
     """
     # Initialize variables
     action_graded = dict()
+    player_to_grade = str()
+    grade = str()
+    video_loop_active = bool(True)
 
-    # Serve grading
-    dict_grades_result = dict()
-    dict_grades_result={
+    # Define the grading options for serve and pass
+    dict_grades_result=dict({
         'serve': {
             0: 'undetermined',
             1: 'error',
@@ -1113,31 +1116,35 @@ def basic_action_grader(
             0: 'undetermined',
             1: 'error',
             2: 'out-of-system pass',
-            3: 'good pass',
+            3: 'average pass',
+            4: 'perfect pass'
         }
-    }
+    })
 
-    # Map keys to grades
-    key_grade_result = {
+    # Map keys to player selected and grade assigned
+    key_player_map = dict({
+        ord('7'): player_a,
+        ord('9'): player_b,
+    })
+    key_grade_result = dict({
         ord('0'): dict_grades_result[action_to_grade][0],
         ord('1'): dict_grades_result[action_to_grade][1],
         ord('2'): dict_grades_result[action_to_grade][2],
         ord('3'): dict_grades_result[action_to_grade][3],
         ord('4'): dict_grades_result[action_to_grade][4]
-    }
+    })
 
     # Display available keys as an overlay on the video
-    help_lines = [
+    help_lines = list([
+        f"Grading {action_to_grade} for :",
+        f"{player_a} (7) and {player_b} (9)",
         f"0 : {dict_grades_result[action_to_grade][0]}",
         f"1 : {dict_grades_result[action_to_grade][1]}",
         f"2 : {dict_grades_result[action_to_grade][2]}",
         f"3 : {dict_grades_result[action_to_grade][3]}",
         f"4 : {dict_grades_result[action_to_grade][4]}"
-    ]
+    ])
     
-    # Initialize scores for overlay display
-    player_to_grade = str()
-
     # Override cv2.imshow to add help overlay and scores
     _orig_imshow = cv2.imshow
 
@@ -1149,11 +1156,11 @@ def basic_action_grader(
                 cv2.putText(
                     frame,
                     line,
-                    (x, y + i * 15),
+                    (x, y + i * 25),
                     cv2.FONT_HERSHEY_SIMPLEX,
-                    0.3,
-                    (255, 255, 255),
-                    1,
+                    0.6,
+                    (0, 0, 0),
+                    2,
                     cv2.LINE_AA,
                 )
 
@@ -1176,30 +1183,46 @@ def basic_action_grader(
 
     # Pause and state
     paused = False
+    frame = int(0)
 
     # Video playback loop
     try:
-        while cap.isOpened():
+        while video_loop_active:
+            # Open the video if not already open
+            if not cap.isOpened():
+                cap = cv2.VideoCapture(video_path)
+                if not cap.isOpened():
+                    print("Error: unable to open the video.")
+                    break
 
             # Read a frame only if not paused
             if not paused:
                 ret, frame = cap.read()
 
-                # Stop at end of video or on read error
+                # Loop the video when it reaches the end
                 if not ret:
-                    print("End of video or read error.")
-                    break
+                    cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                    ret, frame = cap.read()
 
-            ### DEV MARKER - TO BE CONTINUED HERE ####
-            # Display the action to grade
+            # Display the player being graded and the grade assigned
             if action_to_grade and ret:
                 cv2.putText(
                     frame,
-                    f"Last action: {last_action}",
+                    f"player: {player_to_grade}",
                     (30, 40),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     1,
-                    (0, 255, 0),
+                    (255, 0, 0),
+                    2,
+                    cv2.LINE_AA,
+                )
+                cv2.putText(
+                    frame,
+                    f"{action_to_grade} grade: {grade}",
+                    (30, 70),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    1,
+                    (255, 0, 0),
                     2,
                     cv2.LINE_AA,
                 )
@@ -1221,11 +1244,16 @@ def basic_action_grader(
             if ret:
                 cv2.imshow(f'{video_path}', frame)
 
-            # Handle keyboard input
+            # Keyboard player input
             key = _wait_key_fast(30) & 0xFF
             if key == ord('q'):
-                # Quit
+                # Quit and stop looping
+                video_loop_active = False
                 break
+            elif key == ord('\r'):
+                # Enter key: restart playback from beginning
+                cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                paused = False
             if key == ord(' '):
                 # Pause/resume
                 paused = not paused
@@ -1237,118 +1265,38 @@ def basic_action_grader(
                 # Decrease speed
                 play_speed = max(0.5, play_speed - 0.5)
                 continue
-            elif key == ord('4') and len(temp_list) > 0:
-                # Find the last "switch" action
-                last_switch_index = int(-1)
-                for i in range(len(temp_list) - 1, -1, -1):
-                    if temp_list[i]['Action'] == '*SWITCH*':
-                        last_switch_index = i
-                        break
-                if last_switch_index != -1:
-                    # Remove all actions after the last switch from temp_list
-                    temp_list = temp_list[:last_switch_index + 1]
-                    # Reset scores at last *SWITCH* and last action
-                    score_team1 = switch_scores_team1
-                    score_team2 = switch_scores_team2
-                    last_action = (
-                        temp_list[-1]['Action']
-                        if temp_list else None
-                    )
-                    # Go back to the frame of the last switch action and pause playback
-                    cap.set(
-                        cv2.CAP_PROP_POS_FRAMES,
-                        temp_list[-1]['Frame'],
-                    )
-                    frame_number = temp_list[-1]['Frame']
-                    paused = True
-
-            elif key in key_action_map:
-                # Record the action associated with the key,
-                # along with the frame number
-                
-                ## Match start and set start
-                if key == ord('0'):
-                    # Reset scores at set start
-                    score_team1 = 0
-                    score_team2 = 0
-                    
-                    # Pause playback at set start
-                    paused = True
-
-                    # Match start vs set start
-                    if len(temp_list) == 0:
-                        # "Set start" is actually "match start"
-                        # if it is the first recorded action
-                        action_name = str('match start')
-                    else:
-                        # "Set start" after the first one is a real new set
-                        action_name = key_action_map[key]
-                
-                    # Assign the team serving based on second key pressed after the set start or match start
-                    # Display overlay asking user to define the serving team
-                    if ret:
-                        overlay_frame = frame.copy()
-                        cv2.putText(
-                            overlay_frame,
-                            "Define serving team:",
-                            (30, 80),
-                            cv2.FONT_HERSHEY_SIMPLEX,
-                            1,
-                            (0, 255, 255),
-                            2,
-                            cv2.LINE_AA,
-                        )
-                        cv2.putText(
-                            overlay_frame,
-                            f"1: {team1_name}  |  3: {team2_name}",
-                            (30, 115),
-                            cv2.FONT_HERSHEY_SIMPLEX,
-                            0.8,
-                            (0, 255, 255),
-                            2,
-                            cv2.LINE_AA,
-                        )
-                        cv2.imshow(f'{video_path}', overlay_frame)
-
-                    # Wait for the user to press '1' or '3' to define the serving team
-                    while True:
-                        serve_key = cv2.waitKey(0) & 0xFF
-                        if serve_key == ord('1'):
-                            action_name = f'{action_name} - service {team1_name}'
-                            break
-                        elif serve_key == ord('3'):
-                            action_name = f'{action_name} - service {team2_name}'
-                            break
-
-                else:
-                    # For other keys, just record the associated action
-                    action_name = key_action_map[key]
-
-                if key == ord('5'):
-                    # Save the current scores at the time of the *SWITCH* action
-                    # to be able to restore them if we go back to this switch with key '4'
-                    switch_scores_team1 = int(score_team1)
-                    switch_scores_team2 = int(score_team2)
-
-                last_action = action_name
-                temp_list.append({
-                    'Frame': frame_number,
-                    'Action': action_name
-                })
-
-                # Refresh display to update the score overlay
-                if ret:
-                    cv2.imshow(f'{video_path}', frame)
-                # Add a point to the scores based on the action
-                if action_name == f'service {team1_name}':
-                    score_team1 += 1
-                elif action_name == f'service {team2_name}':
-                    score_team2 += 1
-
+            # Action grading keys
+            elif key in key_player_map:
+                player_to_grade = key_player_map[key]
+            elif key in key_grade_result and player_to_grade:
+                grade = key_grade_result[key]   
+                action_graded = {
+                    'player': player_to_grade,
+                    'action': action_to_grade,
+                    'grade': grade
+                }
+                # Stop the video loop once a grade has been assigned
+                video_loop_active = False
+            
 
     finally:
         # Release OpenCV resources
         cap.release()
         cv2.destroyAllWindows()
+        cv2.imshow = _orig_imshow
 
     return action_graded
+
+
+# -------------------------------------------------------------------
+# Testing in main script
+if __name__ == "__main__":
+    # Example usage of the functions
+    action_graded = basic_action_grader(
+    video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented\JOMR_jan26_MBV_01_p1.mp4',
+    player_a='Jade',
+    player_b='Math',
+    action_to_grade='pass'
+)
+    
+    print(action_graded)

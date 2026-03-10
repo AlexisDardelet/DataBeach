@@ -486,11 +486,3 @@ if __name__ == "__main__":
         # db.load_all_indexed_df_points_csv_to_db()
         pass
 
-        db.cursor.execute(
-            """SELECT POINT_ID, Service_side 
-            FROM table_points 
-            WHERE game_id = ? AND Service_side = ?""",
-            (game_id,team_serving)
-        )
-        POINTS_IDS = [row[0] for row in db.cursor.fetchall()]
-        print(f"POINTS_IDS for game_id '{game_id}' and team_serving '{team_serving}': {POINTS_IDS}")

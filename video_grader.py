@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 # Environment variables
 load_dotenv()
-VIDEO_DIR = os.getenv("VIDEO_DIR")
+SEGMENTED_POINTS_DIR = os.getenv("SEGMENTED_POINTS_DIR")
 
 # Local imports
 sys.path.append(os.path.join(os.path.dirname(__file__), "db_manager"))
@@ -29,7 +29,7 @@ class VideoGrader:
             video_dir (str): The directory containing the video files.
             paire_id (str): The unique identifier for the pair.
         """
-        self.video_dir = VIDEO_DIR
+        self.segmented_points_dir = SEGMENTED_POINTS_DIR
         self.paire_id = paire_id
     
     # ==============================================================================
