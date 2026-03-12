@@ -1,4 +1,4 @@
-Service_side,Start_frame,End_frame,JOMR_score,MyH_HeR_score,JOMR_sets,MyH_HeR_sets,point_index
+service_side,start_frame,end_frame,JOMR_score,MyH_HeR_score,JOMR_sets,MyH_HeR_sets,point_index
 match start - service MyH_HeR,33,195,0,0,0,0,1
 service JOMR,441,700,1,0,0,0,2
 service MyH_HeR,1185,1393,1,1,0,0,3

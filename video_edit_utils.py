@@ -350,14 +350,14 @@ def extract_segments_from_df_gpu(
         if not pd.isna(row[1]['point_index']):
             print(
                 f"Cutting point {row[1]['point_index']}: "
-                f"frames {row[1]['Start_frame']} - "
-                f"{row[1]['End_frame']}"
+                f"frames {row[1]['start_frame']} - "
+                f"{row[1]['end_frame']}"
             )
 
             cut_point_gpu(
                 video_path=video_path,
-                start_frame=int(row[1]["Start_frame"]),
-                end_frame=int(row[1]["End_frame"]),
+                start_frame=int(row[1]["start_frame"]),
+                end_frame=int(row[1]["end_frame"]),
                 output_video=os.path.join(
                     output_dir,
                     f"{game_id}_p{row[1]['point_index']}.mp4"
@@ -683,9 +683,9 @@ def cv2_point_segment_cut(
             # in list_actions for later processing
             if action['Action'] == f'set start - service {team1_name}' or action['Action'] == f'set start - service {team2_name}':
                 list_actions.append({
-                    'Service_side': 'end of set',
-                    'Start_frame': int(0),
-                    'End_frame': int(0)
+                    'service_side': 'end of set',
+                    'start_frame': int(0),
+                    'end_frame': int(0)
                 })
             # Then process the action normally
             start_frame = action['Frame']
@@ -702,9 +702,9 @@ def cv2_point_segment_cut(
             # Add to the list if an 'end of point' was found
             if end_frame is not None:
                 list_actions.append({
-                    'Service_side': service_side,
-                    'Start_frame': start_frame,
-                    'End_frame': end_frame
+                    'service_side': service_side,
+                    'start_frame': start_frame,
+                    'end_frame': end_frame
                 })
 
         i += 1
@@ -721,13 +721,13 @@ def cv2_point_segment_cut(
     # Update scores based on the service side
     for idx, row in df_points.iterrows():
         if (
-            df_points['Service_side'].iloc[idx] == f'set start - service {team1_name}'
-            or df_points['Service_side'].iloc[idx] == f'set start - service {team2_name}'
-            or df_points['Service_side'].iloc[idx] == f'match start - service {team1_name}'
-            or df_points['Service_side'].iloc[idx] == f'match start - service {team2_name}'
+            df_points['service_side'].iloc[idx] == f'set start - service {team1_name}'
+            or df_points['service_side'].iloc[idx] == f'set start - service {team2_name}'
+            or df_points['service_side'].iloc[idx] == f'match start - service {team1_name}'
+            or df_points['service_side'].iloc[idx] == f'match start - service {team2_name}'
         ):
             # First row: initialize according to the service
-            if row['Service_side'] == (
+            if row['service_side'] == (
                 f'service {team1_name}'
             ):
                 df_points.at[
@@ -736,7 +736,7 @@ def cv2_point_segment_cut(
                 df_points.at[
                     idx, f'{team2_name}_score'
                 ] = 0
-            elif row['Service_side'] == (
+            elif row['service_side'] == (
                 f'service {team2_name}'
             ):
                 df_points.at[
@@ -755,13 +755,13 @@ def cv2_point_segment_cut(
                 df_points.at[idx - 1, f'{team2_name}_score']
             )
 
-            if row['Service_side'] == (
+            if row['service_side'] == (
                 f'service {team1_name}'
             ):
                 df_points.at[
                     idx, f'{team1_name}_score'
                 ] += 1
-            elif row['Service_side'] == (
+            elif row['service_side'] == (
                 f'service {team2_name}'
             ):
                 df_points.at[
@@ -771,8 +771,8 @@ def cv2_point_segment_cut(
     # Update set scores at the beginning of each new set
     for idx, row in df_points.iterrows():
         if (
-            row['Service_side'] == f'set start - service {team1_name}'
-            or row['Service_side'] == f'set start - service {team2_name}'
+            row['service_side'] == f'set start - service {team1_name}'
+            or row['service_side'] == f'set start - service {team2_name}'
         ) and idx > 0:
             # Compare the scores of the previous set
             prev_score_team1 = df_points.at[
@@ -812,9 +812,9 @@ def cv2_point_segment_cut(
     # easier downstream processing
     last_idx = len(df_points) - 1
     df_points.loc[len(df_points)] = {
-        'Service_side': 'end of set',
-        'Start_frame': int(0),
-        'End_frame': int(0),
+        'service_side': 'end of set',
+        'start_frame': int(0),
+        'end_frame': int(0),
         f'{team1_name}_score': df_points.at[
             last_idx, f'{team1_name}_score'
         ],
@@ -833,7 +833,7 @@ def cv2_point_segment_cut(
     # the previous set's score
     for idx, row in df_points.iterrows():
         if (
-            row['Service_side'] == 'end of set'
+            row['service_side'] == 'end of set'
             and idx > 0
         ):
             # The winner of the previous point/set is the one
@@ -881,7 +881,7 @@ def point_indexeer(
     Args:
         df (pd.DataFrame): DataFrame containing the extracted
             point segments, with the columns:
-            'Service_side', 'Start_frame', 'End_frame',
+            'service_side', 'start_frame', 'end_frame',
             'score_team1', 'score_team2', 'set_team1',
             'set_team2'
     Returns:
@@ -897,10 +897,10 @@ def point_indexeer(
         )
         return df
 
-    if not all(col in df.columns for col in ['Service_side']):
+    if not all(col in df.columns for col in ['service_side']):
         print(
             "Error: the DataFrame does not contain the "
-            "'Service_side' column. Please check the "
+            "'service_side' column. Please check the "
             "DataFrame columns."
         )
         return df
@@ -909,11 +909,11 @@ def point_indexeer(
     point_indices = []
     excluded = ('*SWITCH*', 'Timeout', 'end of set')
     for _, row in df.iterrows():
-        if row['Service_side'] not in excluded:
+        if row['service_side'] not in excluded:
             point_idx += int(1)
         point_indices.append(
             point_idx
-            if row['Service_side'] not in excluded
+            if row['service_side'] not in excluded
             else None
         )
 
@@ -962,7 +962,7 @@ def score_checker(
 
     # Remove 'Timeout' rows to avoid skewing calculations
     df_points = df_points[
-        df_points['Service_side'] != 'Timeout'
+        df_points['service_side'] != 'Timeout'
     ].reset_index(drop=True)
 
     # Retrieve team names from the DataFrame columns
@@ -972,7 +972,7 @@ def score_checker(
     # Initialize variables for score and match format
     score_switch_points = []
     for idx, row in df_points.iterrows():
-        if row['Service_side'] == '*SWITCH*':
+        if row['service_side'] == '*SWITCH*':
             if idx + 1 < len(df_points):
                 score_sum = (
                     df_points.at[
@@ -1035,7 +1035,7 @@ def score_checker(
     set_count = 0
     current_set_scores = []
     for idx, row in df_points.iterrows():
-        if row['Service_side'] == 'end of set':
+        if row['service_side'] == 'end of set':
             current_set_scores.append({
                 'set': set_count + 1,
                 'score': (
@@ -1093,6 +1093,7 @@ def basic_action_grader(
     player_to_grade = str()
     grade = str()
     video_loop_active = bool(True)
+    quit_grading = bool(False)
 
     # Define the grading options for serve and pass
     dict_grades_result=dict({
@@ -1224,8 +1225,12 @@ def basic_action_grader(
 
             # Keyboard player input
             key = _wait_key_fast(30) & 0xFF
-            if key == ord('8'):
-                # Quit and stop looping
+            if key == ord('q'):
+                # Stop the whole grading process and exit
+                quit_grading = True
+                break
+            if key == ord('8') and player_to_grade and grade:
+                # Confirm the grade and exit
                 video_loop_active = False
             elif key == ord('\r'):
                 # Enter key: restart playback from beginning
@@ -1265,7 +1270,7 @@ def basic_action_grader(
         cv2.destroyAllWindows()
         cv2.imshow = _orig_imshow
 
-    return action_graded
+    return action_graded, quit_grading
 
 
 # -------------------------------------------------------------------

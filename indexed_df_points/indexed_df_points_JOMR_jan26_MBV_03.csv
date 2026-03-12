@@ -1,4 +1,4 @@
-Service_side,Start_frame,End_frame,JOMR_score,PauG_NeCH_score,JOMR_sets,PauG_NeCH_sets,point_index
+service_side,start_frame,end_frame,JOMR_score,PauG_NeCH_score,JOMR_sets,PauG_NeCH_sets,point_index
 match start - service PauG_NeCH,48,227,0,0,0,0,1
 service PauG_NeCH,639,914,0,1,0,0,2
 service JOMR,1416,1599,1,1,0,0,3

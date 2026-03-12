@@ -1,4 +1,4 @@
-Service_side,Start_frame,End_frame,JOMR_score,(adv)_score,JOMR_sets,(adv)_sets,point_index
+service_side,start_frame,end_frame,JOMR_score,(adv)_score,JOMR_sets,(adv)_sets,point_index
 match start - service JOMR,45,465,0,0,0,0,1
 service (adv),767,1116,0,1,0,0,2
 service (adv),1471,1752,0,2,0,0,3

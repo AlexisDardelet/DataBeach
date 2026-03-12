@@ -1,4 +1,4 @@
-Service_side,Start_frame,End_frame,JOMR_score,NoG_AliP_score,JOMR_sets,NoG_AliP_sets,point_index
+service_side,start_frame,end_frame,JOMR_score,NoG_AliP_score,JOMR_sets,NoG_AliP_sets,point_index
 match start - service NoG_AliP,134,440,0,0,0,0,1
 service JOMR,749,1168,1,0,0,0,2
 service NoG_AliP,1453,1881,1,1,0,0,3

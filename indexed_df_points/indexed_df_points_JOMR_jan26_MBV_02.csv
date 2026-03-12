@@ -1,4 +1,4 @@
-Service_side,Start_frame,End_frame,JOMR_score,AleN_EmP_score,JOMR_sets,AleN_EmP_sets,point_index
+service_side,start_frame,end_frame,JOMR_score,AleN_EmP_score,JOMR_sets,AleN_EmP_sets,point_index
 match start - service AleN_EmP,34,88,0,0,0,0,1
 service JOMR,358,748,1,0,0,0,2
 service JOMR,1070,1260,2,0,0,0,3

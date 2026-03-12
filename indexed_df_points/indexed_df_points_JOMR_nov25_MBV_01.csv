@@ -1,4 +1,4 @@
-Service_side,Start_frame,End_frame,JOMR_score,ClaM_MaMeB_score,JOMR_sets,ClaM_MaMeB_sets,point_index
+service_side,start_frame,end_frame,JOMR_score,ClaM_MaMeB_score,JOMR_sets,ClaM_MaMeB_sets,point_index
 match start - service JOMR,43,349,0,0,0,0,1
 service ClaM_MaMeB,670,870,0,1,0,0,2
 service JOMR,1209,1526,1,1,0,0,3

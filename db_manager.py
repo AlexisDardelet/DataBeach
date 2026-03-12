@@ -38,20 +38,20 @@ class DBManager:
     
     # ============================================================
     # CRÉATION DES TABLES
-    # Version initiale : table_players, table_serie, table_game
+    # Version initiale : table_player, table_serie, table_game
     # ============================================================
 
     def create_initial_tables(self):
         """Crée les 3 tables si elles n'existent pas déjà."""
 
-        # 1. table_players (pas de FK)
+        # 1. table_player (pas de FK)
         self.cursor.execute(
             """
-            CREATE TABLE IF NOT EXISTS table_players (
-                PAIRE_ID        TEXT PRIMARY KEY,
-                Name_joueurA TEXT NOT NULL,
-                Name_joueurB TEXT NOT NULL,
-                Genre        TEXT NOT NULL
+            CREATE TABLE IF NOT EXISTS table_player (
+                paire_id        TEXT PRIMARY KEY,
+                player_a TEXT NOT NULL,
+                player_b TEXT NOT NULL,
+                genre        TEXT NOT NULL
             )
         """
         )
@@ -60,7 +60,7 @@ class DBManager:
         self.cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS table_serie (
-                SERIE_ID TEXT PRIMARY KEY,
+                serie_id TEXT PRIMARY KEY,
                 club  TEXT NOT NULL,
                 type  TEXT NOT NULL,
                 genre TEXT NOT NULL,
@@ -69,25 +69,25 @@ class DBManager:
         """
         )
 
-        # 3. table_game (FK vers table_players x2 et table_serie)
+        # 3. table_game (FK vers table_player x2 et table_serie)
         self.cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS table_game (
-                GAME_ID        TEXT PRIMARY KEY,
-                serie          TEXT NOT NULL,
-                stage          TEXT,
-                teamA          TEXT NOT NULL,
-                teamB          TEXT,
-                victoire       TEXT,
-                set1_score     INT,
-                set2_score     INT,
-                set3_score     INT,
-                set1_score_adv INT,
-                set2_score_adv INT,
-                set3_score_adv INT,
-                FOREIGN KEY (serie) REFERENCES table_serie(SERIE_ID),
-                FOREIGN KEY (teamA) REFERENCES table_players(PAIRE_ID),
-                FOREIGN KEY (teamB) REFERENCES table_players(PAIRE_ID)
+            game_id        TEXT PRIMARY KEY,
+            serie          TEXT NOT NULL,
+            stage          TEXT,
+            team_a          TEXT NOT NULL,
+            team_b         TEXT,
+            victory     TEXT NOT NULL,
+            set1_score     INT,
+            set2_score     INT,
+            set3_score     INT,
+            set1_score_adv INT,
+            set2_score_adv INT,
+            set3_score_adv INT,
+            FOREIGN KEY (serie) REFERENCES table_serie(serie_id),
+            FOREIGN KEY (team_a) REFERENCES table_player(paire_id),
+            FOREIGN KEY (team_b) REFERENCES table_player(paire_id)
             )
         """
         )
@@ -100,7 +100,7 @@ class DBManager:
     def load_initial_csv(self, table_name: str, filename: str, ignore_fk: bool = False):
         """Imports a CSV file into the specified table.
         This method only works for csv files with column names that exactly match the table schema.
-        (initial tables : table_players.csv, table_serie.csv, table_game.csv)
+        (initial tables : table_player.csv, table_serie.csv, table_game.csv)
 
         Arguments:
             table_name (str): Name of the target table in the database.
@@ -147,29 +147,56 @@ class DBManager:
 
     def load_all_initial_csv(self):
         """Imports the 3 CSV files in the correct order (parents before children)."""
+        initial_table_list = ['table_game','table_player','table_serie']
+        for table_name in initial_table_list:
+            self.cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
         self.create_initial_tables()
-        self.load_initial_csv("table_players", "table_players.csv")
+        self.load_initial_csv("table_player", "table_player.csv")
         self.load_initial_csv("table_serie", "table_serie.csv")
         self.load_initial_csv("table_game", "table_game.csv")
+
+    # -----------------------------------------------------------
+
+    def create_actions_table(self,
+        action_name: str):
+        """Creates a new table for the specified action (e.g. serve, pass) with the appropriate schema.
+        Arguments:
+            action_name (str): The name of the action for which to create the table (e.g. 'serve', 'pass
+        """  
+        create_table_query = f"""
+            CREATE TABLE IF NOT EXISTS table_{action_name} (
+            {action_name}_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            point_id TEXT NOT NULL,
+            paire_id TEXT NOT NULL,
+            player TEXT NOT NULL,
+            action TEXT NOT NULL,
+            grade TEXT NOT NULL,
+            point_won BOOLEAN,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (point_id) REFERENCES table_point(point_id),
+            FOREIGN KEY (paire_id) REFERENCES table_player(paire_id)
+            )
+        """
 
     # ============================================================
     # FREQUENT QUERIES METHODS
     # ============================================================
 
     def teams_names_from_game_id(
-        self, game_id: str
+        self, 
+        game_id : str
     ) -> tuple[str, str] | tuple[None, None]:
         """Récupère les noms des équipes à partir du game_id."""
-        query = "SELECT teamA, teamB FROM table_game WHERE GAME_ID = ?"
+        query = "SELECT team_a, team_b FROM table_game WHERE game_id = ?"
         self.cursor.execute(query, (game_id,))
         result = self.cursor.fetchone()
         if result:
             print(
-                f"✅ GAME_ID '{game_id}' trouvé : "
+                f"✅ game_id '{game_id}' trouvé : "
                 f"teamA='{result[0]}', teamB='{result[1]}'"
             )
             return result[0], result[1]
-        print(f"⚠️  Aucun résultat trouvé pour GAME_ID '{game_id}'.")
+        print(f"⚠️  Aucun résultat trouvé pour game_id '{game_id}'.")
         return None, None
 
     # -----------------------------------------------------------------------------------
@@ -179,7 +206,7 @@ class DBManager:
     ) -> None:
         """Insère une nouvelle série de beach dans la table_serie."""
         # Check if the serie_id already exists
-        query_check = "SELECT SERIE_ID FROM table_serie WHERE SERIE_ID = ?"
+        query_check = "SELECT serie_id FROM table_serie WHERE serie_id = ?"
         self.cursor.execute(query_check, (serie_id,))
         result = self.cursor.fetchone()
         if result:
@@ -196,7 +223,7 @@ class DBManager:
             return
 
         query = """
-            INSERT OR IGNORE INTO table_serie (SERIE_ID, club, type, genre, date)
+            INSERT OR IGNORE INTO table_serie (serie_id, club, type, genre, date)
             VALUES (?, ?, ?, ?, ?)
         """
         self.execute_query(query, (serie_id, club, serie_type, genre, date))
@@ -210,9 +237,9 @@ class DBManager:
     def new_team(
         self, paire_id: str, name_joueur_a: str, name_joueur_b: str, genre: str
     ) -> None:
-        """Insère une nouvelle équipe dans la table_players."""
+        """Insère une nouvelle équipe dans la table_player."""
         # Check if the paire_id already exists
-        query_check = "SELECT PAIRE_ID FROM table_players WHERE PAIRE_ID = ?"
+        query_check = "SELECT paire_id FROM table_player WHERE paire_id = ?"
         self.cursor.execute(query_check, (paire_id,))
         result = self.cursor.fetchone()
         if result:
@@ -220,7 +247,7 @@ class DBManager:
             return  # Ne pas insérer si déjà présente
 
         # Check if there is the same team but with swapped players
-        query_check_swapped = """SELECT PAIRE_ID FROM table_players
+        query_check_swapped = """SELECT paire_id FROM table_player
          WHERE (Name_joueurA = ? AND Name_joueurB = ?)
          OR (Name_joueurA = ? AND Name_joueurB = ?)"""
         self.cursor.execute(
@@ -235,8 +262,8 @@ class DBManager:
         # If neither the exact pair nor the swapped pair exists, insert the new team
         if not result and not result_swapped:
             query = """
-                INSERT OR IGNORE INTO table_players
-                (PAIRE_ID, Name_joueurA, Name_joueurB, Genre)
+                INSERT OR IGNORE INTO table_player
+                (paire_id, Name_joueurA, Name_joueurB, Genre)
                 VALUES (?, ?, ?, ?)
             """
             self.execute_query(
@@ -312,7 +339,7 @@ class DBManager:
             self,
             game_id: str) -> pd.DataFrame:
         """From a given game_id, extract, transform and load the corresponding 
-        indexed points CSV file into the table_points in the database.
+        indexed points CSV file into the table_point in the database.
 
         Arguments:
             game_id (str): The unique identifier for the game,
@@ -333,11 +360,11 @@ class DBManager:
             team_b_name=team_b_name
         )
 
-        # Create a new table_points with the appropriate schema
+        # Create a new table_point with the appropriate schema
         create_table_query = """
-            CREATE TABLE IF NOT EXISTS table_points (
-            POINT_ID TEXT PRIMARY KEY,
-            Service_side TEXT,
+            CREATE TABLE IF NOT EXISTS table_point (
+            point_id TEXT PRIMARY KEY,
+            service_side TEXT,
             team_a_score INT,
             team_b_score INT,
             team_a_sets INT,
@@ -346,23 +373,23 @@ class DBManager:
             team_b_score_diff INT,
             point_winner TEXT,
             game_id TEXT,
-            FOREIGN KEY (game_id) REFERENCES table_game(GAME_ID)
+            FOREIGN KEY (game_id) REFERENCES table_game(game_id)
             )
         """
         self.execute_query(create_table_query)
 
         # Insert the data from the DataFrame into the new table
         insert_query = """
-            INSERT OR IGNORE INTO table_points (
-            POINT_ID, Service_side, team_a_score, team_b_score,
+            INSERT OR IGNORE INTO table_point (
+            point_id, service_side, team_a_score, team_b_score,
             team_a_sets, team_b_sets, team_a_score_diff, team_b_score_diff,
             point_winner, game_id
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         rows_to_insert = [
             (
-                row["POINT_ID"],
-                row["Service_side"],
+                row["point_id"],
+                row["service_side"],
                 row["team_a_score"],
                 row["team_b_score"],
                 row["team_a_sets"],
@@ -424,22 +451,21 @@ class DBManager:
     # RÉINITIALISATION
     # ============================================================
 
-
     def check_fk_integrity(self):
         """Vérifie les FK de table_game avant import.
-        Early version: only checks that teamA and teamB in table_game exist in table_players,
+        Early version: only checks that teamA and teamB in table_game exist in table_player,
         and that serie in table_game exists in table_serie."""
 
         print("\n🔍 Vérification des Foreign Keys...\n")
 
-        self.cursor.execute("SELECT PAIRE_ID FROM table_players")
+        self.cursor.execute("SELECT paire_id FROM table_player")
         paires = {row[0] for row in self.cursor.fetchall()}
 
-        self.cursor.execute("SELECT SERIE_ID FROM table_serie")
+        self.cursor.execute("SELECT serie_id FROM table_serie")
         series = {row[0] for row in self.cursor.fetchall()}
 
-        # print(f"   PAIRE_ID disponibles  : {paires}")
-        # print(f"   SERIE_ID disponibles  : {series}\n")
+        # print(f"   paire_id disponibles  : {paires}")
+        # print(f"   serie_id disponibles  : {series}\n")
 
         filepath = os.path.join(self.CSV_DIR, "table_game.csv")
         with open(filepath, newline="", encoding="utf-8-sig") as f:
@@ -448,17 +474,17 @@ class DBManager:
 
         errors = []
         for row in rows:
-            if row["teamA"] not in paires:
+            if row["team_a"] not in paires:
                 errors.append(
-                    f"  ❌ GAME_ID {row['GAME_ID']} — teamA '{row['teamA']}' introuvable"
+                    f"  ❌ game_id {row['game_id']} — teamA '{row['team_a']}' introuvable"
                 )
-            if row["teamB"] not in paires:
+            if row["team_b"] not in paires:
                 errors.append(
-                    f"  ❌ GAME_ID {row['GAME_ID']} — teamB '{row['teamB']}' introuvable"
+                    f"  ❌ game_id {row['game_id']} — teamB '{row['team_b']}' introuvable"
                 )
             if row["serie"] not in series:
                 errors.append(
-                    f"  ❌ GAME_ID {row['GAME_ID']} — serie '{row['serie']}' introuvable"
+                    f"  ❌ game_id {row['game_id']} — serie '{row['serie']}' introuvable"
                 )
 
         if errors:
@@ -479,10 +505,8 @@ team_serving = "JOMR"
 if __name__ == "__main__":
     with DBManager() as db:
         # db.load_all_initial_csv()
-        # # db.drop_all_tables()
-        # db.list_all_tables()
+        # db.drop_all_tables()
         # db.check_fk_integrity()
         # db.load_indexed_df_points_csv(game_id)
-        # db.load_all_indexed_df_points_csv_to_db()
-        pass
-
+        db.load_all_indexed_df_points_csv_to_db()
+        # db.list_all_tables()

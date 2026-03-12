@@ -1,4 +1,4 @@
-Service_side,Start_frame,End_frame,JOMR_score,CloD_CirM_score,JOMR_sets,CloD_CirM_sets,point_index
+service_side,start_frame,end_frame,JOMR_score,CloD_CirM_score,JOMR_sets,CloD_CirM_sets,point_index
 match start - service CloD_CirM,40,495,0,0,0,0,1
 service CloD_CirM,915,1116,0,1,0,0,2
 service JOMR,1347,1711,1,1,0,0,3

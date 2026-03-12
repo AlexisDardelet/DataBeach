@@ -1,4 +1,4 @@
-Service_side,Start_frame,End_frame,JOMR_score,MaMeB_MarS_score,JOMR_sets,MaMeB_MarS_sets,point_index
+service_side,start_frame,end_frame,JOMR_score,MaMeB_MarS_score,JOMR_sets,MaMeB_MarS_sets,point_index
 match start - service JOMR,82,254,0,0,0,0,1
 service JOMR,608,929,1,0,0,0,2
 service MaMeB_MarS,1498,1783,1,1,0,0,3

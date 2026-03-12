@@ -4,6 +4,7 @@ import sys
 import pandas as pd
 import json
 from dotenv import load_dotenv
+import datetime
 
 # Local imports
 sys.path.append(os.path.join(os.path.dirname(__file__), "db_manager"))
@@ -140,18 +141,19 @@ class VideoGrader:
 
         # Initiate a list to store the grades for each action in each point
         actions_grades_list = list()
+        quit_grading = bool(False)
 
         # Looping through the points to grade and applying the basic_action_grader
         for point_id in points_ids:
+            if quit_grading:
+                break
             # Constructing the path to the segmented video for the point
             video_path = os.path.join(
                 self.segmented_points_dir,
                 f"{point_id}.mp4"
             )
-
-            print(f"Grading point: {point_id} using video: {video_path}")
             # Grading the action in the video and storing the results in a list
-            action_grades = basic_action_grader(
+            action_grades, quit_grading = basic_action_grader(
                 video_path=video_path,
                 point_id=point_id,
                 player_a=player_a,
@@ -160,14 +162,53 @@ class VideoGrader:
             )
             # Appending the grades for the current action to the main list
             actions_grades_list.append(action_grades)
-        
-        # Saving the list in a JSON file
-        with open(f'list_grades_{serie_id}.json', 'w') as f:
-            json.dump(list_grades_BSD_02, f, indent=2)
+
+        if not quit_grading:
+            # Saving the list in a JSON file, dated with the current date and time
+            # for history and traceability purposes, and to be able to reuse it later if needed
+            datetime_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M"))
+            with open(f'list_grades_{serve_or_pass}_{game_id}_{datetime_str}.json', 'w') as f:
+                json.dump(actions_grades_list, f, indent=2)
+            
+            # Entering the grades in the database
+            with DBManager() as db:
+                # If rewrite_db is False, using a query
+                # with ON CONFLICT () DO NOTHING
+                if not rewrite_db:
+                    for action_graded in actions_grades_list:
+                        db.cursor.execute(
+                            f"""INSERT INTO table_{serve_or_pass} 
+                            (point_id, paire_id, player, action, grade)
+                            VALUES (?, ?, ?, ?, ?)
+                            ON CONFLICT (POINT_ID) DO NOTHING""",
+                            (
+                                action_graded['point_id'],
+                                self.paire_id,
+                                action_graded['player'],
+                                action_graded['action'],
+                                action_graded['grade']
+                            )
+                        )
+                # If rewrite_db is True, using a query
+                # with ON CONFLICT () DO UPDATE SET
+                else:
+                    for action_graded in actions_grades_list:
+                        db.cursor.execute(
+                            f"""INSERT INTO table_{serve_or_pass} 
+                            (point_id, paire_id, player, action, grade)
+                            VALUES (?, ?, ?, ?, ?)
+                            ON CONFLICT (POINT_ID) DO UPDATE SET""",
+                            (
+                                action_graded['point_id'],
+                                self.paire_id,
+                                action_graded['player'],
+                                action_graded['action'],
+                                action_graded['grade']
+                            )
+                        )
 
 
         return actions_grades_list
-            
 
 #######################################################################################
 # Main script for testing the VideoGrader class 

@@ -1,4 +1,4 @@
-Service_side,Start_frame,End_frame,JOMR_score,MaDK_LuDK_score,JOMR_sets,MaDK_LuDK_sets,point_index
+service_side,start_frame,end_frame,JOMR_score,MaDK_LuDK_score,JOMR_sets,MaDK_LuDK_sets,point_index
 match start - service MaDK_LuDK,40,135,0,0,0,0,1
 service JOMR,350,573,1,0,0,0,2
 service MaDK_LuDK,831,1316,1,1,0,0,3

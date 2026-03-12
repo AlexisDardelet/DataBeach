@@ -1,4 +1,4 @@
-﻿GAME_ID,serie,stage,teamA,teamB,victoire,set1_score,set2_score,set3_score,set1_score_adv,set2_score_adv,set3_score_adv
+﻿game_id,serie,stage,team_a,team_b,victory,set1_score,set2_score,set3_score,set1_score_adv,set2_score_adv,set3_score_adv
 JOMR_jan26_MBV_01,MBV_S2-250_F_jan26,poule,JOMR,NoG_AliP,JOMR,,,,,,
 JOMR_jan26_MBV_02,MBV_S2-250_F_jan26,poule,JOMR,AleN_EmP,JOMR,,,,,,
 JOMR_jan26_MBV_03,MBV_S2-250_F_jan26,demi,JOMR,PauG_NeCH,JOMR,,,,,,

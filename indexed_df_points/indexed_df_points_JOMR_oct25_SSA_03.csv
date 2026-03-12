@@ -1,4 +1,4 @@
-Service_side,Start_frame,End_frame,JOMR_score,PauG_AleF_score,JOMR_sets,PauG_AleF_sets,point_index
+service_side,start_frame,end_frame,JOMR_score,PauG_AleF_score,JOMR_sets,PauG_AleF_sets,point_index
 match start - service JOMR,40,159,0,0,0,0,1
 service PauG_AleF,468,689,0,1,0,0,2
 service JOMR,1100,1243,1,1,0,0,3

@@ -206,7 +206,9 @@ class GameEditor:
         # Read the video and extract start_frame and end_frame
         df_points = pd.DataFrame()  # Initialize an empty DataFrame
         df_points = cv2_point_segment_cut(
-            video_path=self.video_path, team1_name=team1_name, team2_name=team2_name
+            video_path=self.video_path, 
+            team1_name=team1_name, 
+            team2_name=team2_name
         )
         # Index the points
         indexed_df_points = pd.DataFrame()  # Initialize an empty DataFrame

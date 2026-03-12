@@ -1,4 +1,4 @@
-Service_side,Start_frame,End_frame,JOMR_score,AleM_LauA_score,JOMR_sets,AleM_LauA_sets,point_index
+service_side,start_frame,end_frame,JOMR_score,AleM_LauA_score,JOMR_sets,AleM_LauA_sets,point_index
 match start - service JOMR,47,209,0,0,0,0,1
 service AleM_LauA,522,801,0,1,0,0,2
 service AleM_LauA,1114,1253,0,2,0,0,3

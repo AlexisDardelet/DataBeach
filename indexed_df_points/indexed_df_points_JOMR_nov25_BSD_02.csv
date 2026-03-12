@@ -1,4 +1,4 @@
-Service_side,Start_frame,End_frame,JOMR_score,KaE_EmD_score,JOMR_sets,KaE_EmD_sets,point_index
+service_side,start_frame,end_frame,JOMR_score,KaE_EmD_score,JOMR_sets,KaE_EmD_sets,point_index
 match start - service JOMR,190,441,0,0,0,0,1
 service KaE_EmD,874,1231,0,1,0,0,2
 service JOMR,1564,1766,1,1,0,0,3
