@@ -2,6 +2,7 @@
 import os
 import sys
 import pandas as pd
+import json
 from dotenv import load_dotenv
 
 # Local imports
@@ -160,6 +161,11 @@ class VideoGrader:
             # Appending the grades for the current action to the main list
             actions_grades_list.append(action_grades)
         
+        # Saving the list in a JSON file
+        with open(f'list_grades_{serie_id}.json', 'w') as f:
+            json.dump(list_grades_BSD_02, f, indent=2)
+
+
         return actions_grades_list
             
 
@@ -167,14 +173,11 @@ class VideoGrader:
 # Main script for testing the VideoGrader class 
 
 if __name__ == "__main__":
-    # grader = VideoGrader(paire_id="JOMR")
-    # test_list = grader.service_passing_grading(
-    #     serve_or_pass="pass",
-    #     game_id="JOMR_nov25_BSD_02",
-    #     serie_id=None,
-    #     rewrite_db=False
-    # )
-    # print(test_list)
-
-    df = pd.DataFrame(
-    "data": test_list)
+    grader = VideoGrader(paire_id="JOMR")
+    test_list = grader.service_passing_grading(
+        serve_or_pass="pass",
+        game_id="JOMR_nov25_BSD_02",
+        serie_id=None,
+        rewrite_db=False
+    )
+    print(test_list)
