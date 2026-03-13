@@ -1,4 +1,5 @@
 """Database manager module for DataBeach SQLite operations."""
+import json
 import sqlite3
 import csv
 import os
@@ -157,11 +158,11 @@ class DBManager:
 
     # -----------------------------------------------------------
 
-    def create_actions_table(self,
+    def create_simple_actions_table(self,
         action_name: str):
         """Creates a new table for the specified action (e.g. serve, pass) with the appropriate schema.
         Arguments:
-            action_name (str): The name of the action for which to create the table (e.g. 'serve', 'pass
+            action_name (str): The name of the action for which to create the table (e.g. 'serve', 'pass')
         """  
         create_table_query = f"""
             CREATE TABLE IF NOT EXISTS table_{action_name} (
@@ -173,11 +174,14 @@ class DBManager:
             grade TEXT NOT NULL,
             point_won BOOLEAN,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE (point_id, player, action),
             FOREIGN KEY (point_id) REFERENCES table_point(point_id),
             FOREIGN KEY (paire_id) REFERENCES table_player(paire_id)
             )
         """
-
+        self.execute_query(create_table_query)
+        print(f"✅ Table 'table_{action_name}' créée.")
+    
     # ============================================================
     # FREQUENT QUERIES METHODS
     # ============================================================
@@ -438,17 +442,84 @@ class DBManager:
                 game_id = filename[len("indexed_df_points_") : -len(".csv")]
                 game_ids.append(game_id)
 
-        # DEV DEBUG - to be removed later
-        print(
-            f"✅ {len(game_ids)} fichiers CSV de points trouvés "
-            f"pour les game_ids suivants : {game_ids}"
-        )
+        # # DEV DEBUG - to be removed later
+        # print(
+        #     f"✅ {len(game_ids)} fichiers CSV de points trouvés "
+        #     f"pour les game_ids suivants : {game_ids}"
+        # )
 
         for game_id in game_ids:
             self.load_indexed_df_points_csv_to_db(game_id)
 
+    # ---------------------------------------------------------------------------
+
+    def load_json_actions(self,
+        action_name: str,
+        action_graded_dir: str = None,
+        rewrite_db: bool = False
+        ) -> None: 
+        """Load the actions from the JSON files in the recap_dict_score directory
+        and insert them into the corresponding action tables in the database.
+        Arguments:
+            action_name (str): The name of the action for which to load the data (e.g. 'serve', 'pass')
+        """
+        # Rewrite the database if requested (string used in the INSERT query)
+        do_nothing_or_update = str('UPDATE') if rewrite_db else str('NOTHING')
+
+        # If no directory is provided, use the default 'recap_dict_score' directory
+        if action_graded_dir is None:
+            action_graded_dir = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)), "actions_graded"
+            )
+
+        # Get a list of files in action_graded_dir that match the pattern 
+        # 'list_grades_{action_name}_{game_id}.json'
+        json_files = []
+        for filename in os.listdir(action_graded_dir):
+            if filename.startswith(f"list_grades_{action_name}_") and filename.endswith(".json"):
+                json_files.append(filename)
+        # DEV DEBUG - to be removed later
+        print(
+            f"✅ {len(json_files)} fichiers JSON de grades trouvés "
+            f"pour les game_ids suivants : {[f[len(f'list_grades_{action_name}_'):-len('.json')] for f in json_files]}"
+        )
+
+        for json_file in json_files:
+            with open(os.path.join(action_graded_dir, json_file), "r") as f:
+                list_grades = json.load(f)
+
+            # # Create the action table if it doesn't exist
+            # self.create_simple_actions_table(action_name)
+
+            # Insert the grades into the action table
+            insert_query = f"""
+                INSERT INTO table_{action_name} (
+                    point_id, player, action, grade
+                ) VALUES (?, ?, ?, ?)
+                ON CONFLICT(point_id, player, action) DO {do_nothing_or_update}
+            """
+            rows_to_insert = [
+                (
+                    grade["point_id"],
+                    grade["player"],
+                    grade["action"],
+                    grade["grade"],
+                )
+                for grade in list_grades
+            ]
+            try:
+                with self.conn:
+                    self.cursor.executemany(insert_query, rows_to_insert)
+                print(
+                    f"✅ {len(rows_to_insert)} grades de '{action_name}' insérés "
+                    f"pour game_id '{game_id}'."
+                )
+            except sqlite3.Error as e:
+                print(f"❌ Erreur lors de l'insertion des grades : {e}")
+
+
     # ============================================================
-    # RÉINITIALISATION
+    # UTILS
     # ============================================================
 
     def check_fk_integrity(self):
@@ -508,5 +579,6 @@ if __name__ == "__main__":
         # db.drop_all_tables()
         # db.check_fk_integrity()
         # db.load_indexed_df_points_csv(game_id)
-        db.load_all_indexed_df_points_csv_to_db()
+        # db.load_all_indexed_df_points_csv_to_db()
         # db.list_all_tables()
+        db.load_json_actions('pass')
