@@ -488,7 +488,7 @@ class DBManager:
 
         for json_file in json_files:
             with open(os.path.join(action_graded_dir, json_file), "r") as f:
-                list_grades = json.load(f)
+                actions_grades_list = json.load(f)
 
             # # Create the action table if it doesn't exist
             # self.create_simple_actions_table(action_name)
@@ -509,7 +509,7 @@ class DBManager:
                     action_grade["action"],
                     action_grade["grade"],
                 )
-                for action_grade in list_grades
+                for action_grade in actions_grades_list
             ]
             try:
                 with self.conn:
@@ -517,63 +517,65 @@ class DBManager:
                 print(
                     f"✅ {len(rows_to_insert)} grades de '{action_name}' insérés "
                     f"pour le fichier '{json_file}'."
+
                 )
             except sqlite3.Error as e:
                 print(f"❌ Erreur lors de l'insertion des grades : {e}")
-                print(
-                    f"✅ {len(rows_to_insert)} grades de '{action_name}' insérés "
-                    f"pour game_id '{game_id}'."
-                )
-            except sqlite3.Error as e:
-                print(f"❌ Erreur lors de l'insertion des grades : {e}")
+
 
 
     # ============================================================
     # UTILS
     # ============================================================
 
-    def check_fk_integrity(self) -> None:
-        """Vérifie les FK de table_game avant import.
-        Early version: only checks that team_a and team_b in table_game exist in table_player,
-        and that serie in table_game exists in table_serie."""
+    def false_aces_corrector(self, 
+                             paire_id: str) -> None:
+        """
+        Corrects the false aces in the table_serve for a given paire_id.
 
-        print("\n🔍 Vérification des Foreign Keys...\n")
+        This method identifies serves that were graded as 'ace' in table_serve,
+        but the serving team (paire_id) did not actually win the point (i.e., the point_winner in table_point is not the serving team).
+        Such cases are considered "false aces" and should be corrected to 'error' in the grade column.
 
-        self.cursor.execute("SELECT paire_id FROM table_player")
-        paires = {row[0] for row in self.cursor.fetchall()}
+        Arguments:
+            paire_id (str): The unique identifier for the team (paire) 
+                            for which to correct the false aces.
+        """
+        # Find all point_ids where the serve was graded as 'ace' but the serving team did not win the point
+        self.cursor.execute(
+            """
+            SELECT table_serve.point_id
+            FROM table_serve
+            INNER JOIN table_point ON table_serve.point_id = table_point.point_id
+            WHERE table_point.point_winner != ? AND table_serve.grade = ?
+            """,
+            (paire_id, "ace")
+        )
+        result = self.cursor.fetchall()
 
-        self.cursor.execute("SELECT serie_id FROM table_serie")
-        series = {row[0] for row in self.cursor.fetchall()}
+        if not result:
+            print(f"✅ No false aces found for '{paire_id}'.")
+            return
 
-        # print(f"   paire_id disponibles  : {paires}")
-        # print(f"   serie_id disponibles  : {series}\n")
+        # Extract the point_ids that need correction
+        point_ids_to_correct = [row[0] for row in result]
 
-        filepath = os.path.join(self.CSV_DIR, "table_game.csv")
-        with open(filepath, newline="", encoding="utf-8-sig") as f:
-            reader = csv.DictReader(f)
-            rows = [{k.strip(): v for k, v in row.items()} for row in reader]
-
-        errors = []
-        for row in rows:
-            if row["team_a"] not in paires:
-                errors.append(
-                    f"  ❌ game_id {row['game_id']} — team_a '{row['team_a']}' introuvable"
-                )
-            if row["team_b"] not in paires:
-                errors.append(
-                    f"  ❌ game_id {row['game_id']} — team_b '{row['team_b']}' introuvable"
-                )
-            if row["serie"] not in series:
-                errors.append(
-                    f"  ❌ game_id {row['game_id']} — serie '{row['serie']}' introuvable"
-                )
-
-        if errors:
-            print(f"⚠️  {len(errors)} problème(s) détecté(s) :")
-            for e in errors:
-                print(e)
-        else:
-            print("✅ Toutes les FK sont valides.")
+        # Build the update query to set grade='error' for these point_ids
+        update_query = f"""
+            UPDATE table_serve
+            SET grade = 'error'
+            WHERE point_id IN ({','.join(['?']*len(point_ids_to_correct))})
+            AND grade = 'ace'
+        """
+        try:
+            # Execute the update within a transaction
+            with self.conn:
+                self.cursor.execute(update_query, point_ids_to_correct)
+            print(
+                f"✅ {len(point_ids_to_correct)} false aces corrected for '{paire_id}'."
+            )
+        except sqlite3.Error as e:
+            print(f"❌ Error correcting false aces for '{paire_id}': {e}")
 
 
 # ============================================================

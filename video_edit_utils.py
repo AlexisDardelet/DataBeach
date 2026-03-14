@@ -1101,16 +1101,18 @@ def basic_action_grader(
         'serve': {
             0: 'undetermined',
             1: 'error',
-            2: 'easy pass',
-            3: 'out-of-system pass',
-            4: 'ace'
+            2: 'good pass',
+            3: 'average pass',
+            4: 'out-of-system pass',
+            5: 'ace'
         },
         'pass': {
             0: 'undetermined',
             1: 'error',
             2: 'out-of-system pass',
             3: 'average pass',
-            4: 'perfect pass'
+            4: 'good pass',
+            5: '<NA>'
         }
     })
 
@@ -1124,7 +1126,8 @@ def basic_action_grader(
         ord('1'): dict_grades_result[action_to_grade][1],
         ord('2'): dict_grades_result[action_to_grade][2],
         ord('3'): dict_grades_result[action_to_grade][3],
-        ord('4'): dict_grades_result[action_to_grade][4]
+        ord('4'): dict_grades_result[action_to_grade][4],
+        ord('5'): dict_grades_result[action_to_grade][5]
     })
 
     # Display available keys as an overlay on the video
@@ -1135,7 +1138,8 @@ def basic_action_grader(
         f"1 : {dict_grades_result[action_to_grade][1]}",
         f"2 : {dict_grades_result[action_to_grade][2]}",
         f"3 : {dict_grades_result[action_to_grade][3]}",
-        f"4 : {dict_grades_result[action_to_grade][4]}"
+        f"4 : {dict_grades_result[action_to_grade][4]}",
+        f"5 : {dict_grades_result[action_to_grade][5]}",
     ])
     
     # Override cv2.imshow to add help overlay and scores

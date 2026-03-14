@@ -218,12 +218,12 @@ class VideoGrader:
                     with db.conn:
                         db.cursor.executemany(insert_query, rows_to_insert)
                     print(
-                        f"""{len(actions_grades_list)} grades for {serve_or_pass}
-                        actions have been {'updated' if rewrite_db else 'inserted'} 
-                        in the database."""
+                        f"""{len(actions_grades_list)} grades for {serve_or_pass} actions have been {'updated' if rewrite_db else 'inserted'} in the database."""
                     )
                 except Exception as e:
                     print(f"❌ Error inserting grades into the database: {e}")
+
+
 
 
 #######################################################################################
@@ -232,7 +232,7 @@ class VideoGrader:
 if __name__ == "__main__":
     grader = VideoGrader(paire_id='JOMR')
     grader.service_passing_grading(
-        game_id='JOMR_jan26_MBV_03',
+        game_id='JOMR_oct25_SSA_01',
         serve_or_pass='serve',
         rewrite_db=False,
         )

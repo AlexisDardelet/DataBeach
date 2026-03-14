@@ -18,7 +18,7 @@
     "paire_id": "JOMR",
     "player": "RANC Mathilde",
     "action": "serve",
-    "grade": "easy pass"
+    "grade": "good pass"
   },
   {
     "point_id": "JOMR_jan26_MBV_02_p7",
@@ -46,7 +46,7 @@
     "paire_id": "JOMR",
     "player": "OFFREDI Jade",
     "action": "serve",
-    "grade": "easy pass"
+    "grade": "good pass"
   },
   {
     "point_id": "JOMR_jan26_MBV_02_p18",
@@ -67,7 +67,7 @@
     "paire_id": "JOMR",
     "player": "RANC Mathilde",
     "action": "serve",
-    "grade": "easy pass"
+    "grade": "good pass"
   },
   {
     "point_id": "JOMR_jan26_MBV_02_p23",
@@ -116,6 +116,6 @@
     "paire_id": "JOMR",
     "player": "OFFREDI Jade",
     "action": "serve",
-    "grade": "easy pass"
+    "grade": "good pass"
   }
 ]
