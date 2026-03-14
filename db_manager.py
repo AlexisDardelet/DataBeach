@@ -164,6 +164,11 @@ class DBManager:
         Arguments:
             action_name (str): The name of the action for which to create the table (e.g. 'serve', 'pass')
         """  
+        self.cursor.execute(f"SELECT * FROM table_{action_name}")
+        if self.cursor.fetchone() is not None:
+            print(f"⚠️ Table 'table_{action_name}' already exists.")
+            return  # Do not recreate if already present
+
         create_table_query = f"""
             CREATE TABLE IF NOT EXISTS table_{action_name} (
             {action_name}_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -180,7 +185,7 @@ class DBManager:
             )
         """
         self.execute_query(create_table_query)
-        print(f"✅ Table 'table_{action_name}' créée.")
+        print(f"✅ Table 'table_{action_name}' has been created")
     
     # ============================================================
     # FREQUENT QUERIES METHODS
@@ -463,9 +468,6 @@ class DBManager:
         Arguments:
             action_name (str): The name of the action for which to load the data (e.g. 'serve', 'pass')
         """
-        # Rewrite the database if requested (string used in the INSERT query)
-        do_nothing_or_update = str('UPDATE') if rewrite_db else str('NOTHING')
-
         # If no directory is provided, use the default 'recap_dict_score' directory
         if action_graded_dir is None:
             action_graded_dir = os.path.join(
@@ -494,22 +496,30 @@ class DBManager:
             # Insert the grades into the action table
             insert_query = f"""
                 INSERT INTO table_{action_name} (
-                    point_id, player, action, grade
-                ) VALUES (?, ?, ?, ?)
-                ON CONFLICT(point_id, player, action) DO {do_nothing_or_update}
+                    point_id, paire_id, player, action, grade
+                ) VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(point_id, player, action) 
+                DO {"UPDATE SET grade=excluded.grade" if rewrite_db else "NOTHING"}
             """
             rows_to_insert = [
                 (
-                    grade["point_id"],
-                    grade["player"],
-                    grade["action"],
-                    grade["grade"],
+                    action_grade["point_id"],
+                    action_grade["paire_id"],
+                    action_grade["player"],
+                    action_grade["action"],
+                    action_grade["grade"],
                 )
-                for grade in list_grades
+                for action_grade in list_grades
             ]
             try:
                 with self.conn:
                     self.cursor.executemany(insert_query, rows_to_insert)
+                print(
+                    f"✅ {len(rows_to_insert)} grades de '{action_name}' insérés "
+                    f"pour le fichier '{json_file}'."
+                )
+            except sqlite3.Error as e:
+                print(f"❌ Erreur lors de l'insertion des grades : {e}")
                 print(
                     f"✅ {len(rows_to_insert)} grades de '{action_name}' insérés "
                     f"pour game_id '{game_id}'."
@@ -522,9 +532,9 @@ class DBManager:
     # UTILS
     # ============================================================
 
-    def check_fk_integrity(self):
+    def check_fk_integrity(self) -> None:
         """Vérifie les FK de table_game avant import.
-        Early version: only checks that teamA and teamB in table_game exist in table_player,
+        Early version: only checks that team_a and team_b in table_game exist in table_player,
         and that serie in table_game exists in table_serie."""
 
         print("\n🔍 Vérification des Foreign Keys...\n")
@@ -547,11 +557,11 @@ class DBManager:
         for row in rows:
             if row["team_a"] not in paires:
                 errors.append(
-                    f"  ❌ game_id {row['game_id']} — teamA '{row['team_a']}' introuvable"
+                    f"  ❌ game_id {row['game_id']} — team_a '{row['team_a']}' introuvable"
                 )
             if row["team_b"] not in paires:
                 errors.append(
-                    f"  ❌ game_id {row['game_id']} — teamB '{row['team_b']}' introuvable"
+                    f"  ❌ game_id {row['game_id']} — team_b '{row['team_b']}' introuvable"
                 )
             if row["serie"] not in series:
                 errors.append(
@@ -581,4 +591,10 @@ if __name__ == "__main__":
         # db.load_indexed_df_points_csv(game_id)
         # db.load_all_indexed_df_points_csv_to_db()
         # db.list_all_tables()
-        db.load_json_actions('pass')
+        db.load_json_actions(
+            action_name='serve',
+            action_graded_dir=r'C:\Users\habib\Documents\GitHub\DataBeach\actions_graded',
+            rewrite_db=True)
+        # db.create_simple_actions_table('pass')
+
+

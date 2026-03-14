@@ -1066,6 +1066,7 @@ def score_checker(
 def basic_action_grader(
         video_path: str,
         point_id: str,
+        paire_id: str,
         player_a: str,
         player_b: str,
         action_to_grade: str ="serve" or "pass",
@@ -1259,6 +1260,7 @@ def basic_action_grader(
                 # Store the graded action in the dictionary
                 action_graded = {
                     'point_id': point_id,
+                    'paire_id': paire_id,
                     'player': player_to_grade,
                     'action': action_to_grade,
                     'grade': grade
@@ -1280,6 +1282,7 @@ if __name__ == "__main__":
     action_graded = basic_action_grader(
     video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented\JOMR_nov25_BSD_02_p41.mp4',
     point_id='JOMR_nov25_BSD_02_p41',
+    paire_id='JOMR',
     player_a='Jade',
     player_b='Math',
     action_to_grade='serve'

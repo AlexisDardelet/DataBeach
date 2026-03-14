@@ -44,7 +44,8 @@ class VideoGrader:
         serie_id: str = None,
         rewrite_db: bool = False,
     ) -> None:
-        """Grades the service or passing actions in a beach volleyball game video.
+        """
+        Grades the service or passing actions in a beach volleyball game video.
 
         This method uses the DBManager class to load the indexed points data
         for the specified identifiers, and then processes the video to grade
@@ -61,80 +62,81 @@ class VideoGrader:
         """
         # Validate the input parameters
         if game_id is None and serie_id is None:
-            raise ValueError("At least one of game_id or serie_id must be provided.")
+            raise ValueError(
+                "At least one of game_id or serie_id must be provided."
+            )
         if serve_or_pass not in ["serve", "pass"]:
-            raise ValueError("serve_or_pass must be either 'serve' or 'pass'.")
+            raise ValueError(
+                "serve_or_pass must be either 'serve' or 'pass'."
+            )
         if game_id is not None and serie_id is not None:
-            raise ValueError("Only one of game_id or serie_id should be provided, not both.")
+            raise ValueError(
+                "Only one of game_id or serie_id should be provided, not both."
+            )
 
         # Initiating variables
         points_ids = list()
 
         ## SERVICE GRADING ##################################################
         if serve_or_pass == "serve":
-
             # Loading the point_ids to grade according to the provided arguments
             with DBManager() as db:
-                if game_id is not None: # Only 1 game to grade
-                        db.cursor.execute(
-                            """SELECT POINT_ID, Service_side 
-                            FROM table_points 
-                            WHERE game_id = ? AND Service_side = ?""",
-                            (game_id,self.paire_id)
-                        )
-                elif serie_id is not None: # All games in the serie to grade
-                        db.cursor.execute(
-                            """SELECT POINT_ID, Service_side 
-                            FROM table_points
-                            WHERE game_id IN
-                                (SELECT GAME_ID
-                                FROM table_game
-                                WHERE serie = ?)
-                            AND Service_side = ?""",
-                            (serie_id,self.paire_id)
-                        )
-                # Fetching the results and storing the point_ids in a list       
+                if game_id is not None:  # Only 1 game to grade
+                    db.cursor.execute(
+                        """SELECT POINT_ID, Service_side 
+                        FROM table_point 
+                        WHERE game_id = ? AND Service_side = ?""",
+                        (game_id, self.paire_id),
+                    )
+                elif serie_id is not None:  # All games in the serie to grade
+                    db.cursor.execute(
+                        """SELECT POINT_ID, Service_side 
+                        FROM table_point
+                        WHERE game_id IN
+                            (SELECT GAME_ID
+                            FROM table_game
+                            WHERE serie = ?)
+                        AND Service_side = ?""",
+                        (serie_id, self.paire_id),
+                    )
+                # Fetching the results and storing the point_ids in a list
                 points_ids = [row[0] for row in db.cursor.fetchall()]
 
         ## PASSING GRADING ##################################################
         elif serve_or_pass == "pass":
-
             # Loading the point_ids to grade according to the provided arguments
             with DBManager() as db:
-                if game_id is not None: # Only 1 game to grade
-                        db.cursor.execute(
-                            """SELECT POINT_ID, Service_side 
-                            FROM table_points 
-                            WHERE game_id = ? AND Service_side != ?""",
-                            (game_id,self.paire_id)
-                        )
-                elif serie_id is not None: # All games in the serie to grade
-                        db.cursor.execute(
-                            """SELECT POINT_ID, Service_side 
-                            FROM table_points
-                            WHERE game_id IN
-                                (SELECT GAME_ID
-                                FROM table_game
-                                WHERE serie = ?)
-                            AND Service_side != ?""",
-                            (serie_id,self.paire_id)
-                        )
-                # Fetching the results and storing the point_ids in a list       
-                points_ids = [row[0] for row in db.cursor.fetchall()]  
+                if game_id is not None:  # Only 1 game to grade
+                    db.cursor.execute(
+                        """SELECT POINT_ID, Service_side 
+                        FROM table_point 
+                        WHERE game_id = ? AND Service_side != ?""",
+                        (game_id, self.paire_id),
+                    )
+                elif serie_id is not None:  # All games in the series to grade
+                    db.cursor.execute(
+                        """SELECT POINT_ID, Service_side 
+                        FROM table_point
+                        WHERE game_id IN
+                            (SELECT GAME_ID
+                            FROM table_game
+                            WHERE serie = ?)
+                        AND Service_side != ?""",
+                        (serie_id, self.paire_id),
+                    )
+                # Fetching the results and storing the point_ids in a list
+                points_ids = [row[0] for row in db.cursor.fetchall()]
 
-        # DEV DEBUG [REMOVE LATER]
-        # print(f"Points to grade : {points_ids}")
-
-        # Fetching the player names in table_players for the game_id or serie_id provided
+        # Fetching the player names in table_player for the game_id or serie_id provided
         with DBManager() as db:
             db.cursor.execute(
-                """SELECT Name_joueurA, Name_joueurB 
-                FROM table_players 
+                """SELECT player_a, player_b 
+                FROM table_player 
                 WHERE PAIRE_ID = ?""",
-                (self.paire_id,)
+                (self.paire_id,),
             )
             result = db.cursor.fetchone()
-            if result: 
+            if result:
                 player_a, player_b = result
                 # DEV DEBUG [REMOVE LATER]
                 print(f"Player A: {player_a}, Player B: {player_b}")
@@ -143,6 +145,10 @@ class VideoGrader:
         actions_grades_list = list()
         quit_grading = bool(False)
 
+        # Create the table if it doesn't exist in the database
+        with DBManager() as db:
+            db.create_simple_actions_table(serve_or_pass)
+
         # Looping through the points to grade and applying the basic_action_grader
         for point_id in points_ids:
             if quit_grading:
@@ -150,12 +156,14 @@ class VideoGrader:
             # Constructing the path to the segmented video for the point
             video_path = os.path.join(
                 self.segmented_points_dir,
-                f"{point_id}.mp4"
+                f"{point_id}.mp4",
             )
+
             # Grading the action in the video and storing the results in a list
             action_grades, quit_grading = basic_action_grader(
                 video_path=video_path,
                 point_id=point_id,
+                paire_id=self.paire_id,
                 player_a=player_a,
                 player_b=player_b,
                 action_to_grade=serve_or_pass,
@@ -166,59 +174,65 @@ class VideoGrader:
         if not quit_grading:
             # Saving the list in a JSON file, dated with the current date and time
             # for history and traceability purposes, and to be able to reuse it later if needed
-            datetime_str = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M"))
-            with open(f'list_grades_{serve_or_pass}_{game_id}_{datetime_str}.json', 'w') as f:
+            datetime_str = str(
+                datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
+            )
+            actions_graded_dir = os.path.join(
+                os.path.dirname(__file__),
+                "actions_graded",
+            )
+            # Ensure the actions_graded directory exists
+            os.makedirs(actions_graded_dir, exist_ok=True)
+            # Build the JSON file path
+            json_filename = (
+                f"list_grades_{serve_or_pass}_{game_id}_{self.paire_id}_{datetime_str}.json"
+            )
+            json_filepath = os.path.join(actions_graded_dir, json_filename)
+            # Write the grades list to the JSON file
+            with open(json_filepath, "w") as f:
                 json.dump(actions_grades_list, f, indent=2)
-            
+
             # Entering the grades in the database
             with DBManager() as db:
-                # If rewrite_db is False, using a query
-                # with ON CONFLICT () DO NOTHING
-                if not rewrite_db:
-                    for action_graded in actions_grades_list:
-                        db.cursor.execute(
-                            f"""INSERT INTO table_{serve_or_pass} 
-                            (point_id, paire_id, player, action, grade)
-                            VALUES (?, ?, ?, ?, ?)
-                            ON CONFLICT (POINT_ID) DO NOTHING""",
-                            (
-                                action_graded['point_id'],
-                                self.paire_id,
-                                action_graded['player'],
-                                action_graded['action'],
-                                action_graded['grade']
-                            )
-                        )
-                # If rewrite_db is True, using a query
-                # with ON CONFLICT () DO UPDATE SET
-                else:
-                    for action_graded in actions_grades_list:
-                        db.cursor.execute(
-                            f"""INSERT INTO table_{serve_or_pass} 
-                            (point_id, paire_id, player, action, grade)
-                            VALUES (?, ?, ?, ?, ?)
-                            ON CONFLICT (POINT_ID) DO UPDATE SET""",
-                            (
-                                action_graded['point_id'],
-                                self.paire_id,
-                                action_graded['player'],
-                                action_graded['action'],
-                                action_graded['grade']
-                            )
-                        )
+                # Insert the grades into the action table
+                insert_query = (
+                    f"""
+                    INSERT INTO table_{serve_or_pass} (
+                        point_id, paire_id, player, action, grade
+                    ) VALUES (?, ?, ?, ?, ?)
+                    ON CONFLICT(point_id, player, action) 
+                    DO {"UPDATE SET action=excluded.action, grade=excluded.grade, player=excluded.player" if rewrite_db else "NOTHING"}
+                    """
+                )
+                rows_to_insert = [
+                    (
+                        action_grade["point_id"],
+                        action_grade["paire_id"],
+                        action_grade["player"],
+                        action_grade["action"],
+                        action_grade["grade"],
+                    )
+                    for action_grade in actions_grades_list
+                ]
+                try:
+                    with db.conn:
+                        db.cursor.executemany(insert_query, rows_to_insert)
+                    print(
+                        f"""{len(actions_grades_list)} grades for {serve_or_pass}
+                        actions have been {'updated' if rewrite_db else 'inserted'} 
+                        in the database."""
+                    )
+                except Exception as e:
+                    print(f"❌ Error inserting grades into the database: {e}")
 
-
-        return actions_grades_list
 
 #######################################################################################
 # Main script for testing the VideoGrader class 
 
 if __name__ == "__main__":
-    grader = VideoGrader(paire_id="JOMR")
-    test_list = grader.service_passing_grading(
-        serve_or_pass="pass",
-        game_id="JOMR_nov25_BSD_02",
-        serie_id=None,
-        rewrite_db=False
-    )
-    print(test_list)
+    grader = VideoGrader(paire_id='JOMR')
+    grader.service_passing_grading(
+        game_id='JOMR_jan26_MBV_03',
+        serve_or_pass='serve',
+        rewrite_db=False,
+        )
