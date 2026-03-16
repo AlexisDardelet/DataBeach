@@ -7,7 +7,7 @@ cookies_alexis.txt
 # ========================
 # Base de données SQLite
 # ========================
-*.db
+.db
 *.sqlite
 *.sqlite3
 

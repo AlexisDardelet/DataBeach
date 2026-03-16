@@ -83,20 +83,20 @@ class VideoGrader:
             with DBManager() as db:
                 if game_id is not None:  # Only 1 game to grade
                     db.cursor.execute(
-                        """SELECT POINT_ID, Service_side 
+                        """SELECT point_id, service_side
                         FROM table_point 
-                        WHERE game_id = ? AND Service_side = ?""",
+                        WHERE game_id = ? AND service_side = ?""",
                         (game_id, self.paire_id),
                     )
                 elif serie_id is not None:  # All games in the serie to grade
                     db.cursor.execute(
-                        """SELECT POINT_ID, Service_side 
+                        """SELECT point_id, service_side 
                         FROM table_point
                         WHERE game_id IN
                             (SELECT GAME_ID
                             FROM table_game
                             WHERE serie = ?)
-                        AND Service_side = ?""",
+                        AND service_side = ?""",
                         (serie_id, self.paire_id),
                     )
                 # Fetching the results and storing the point_ids in a list
@@ -108,20 +108,20 @@ class VideoGrader:
             with DBManager() as db:
                 if game_id is not None:  # Only 1 game to grade
                     db.cursor.execute(
-                        """SELECT POINT_ID, Service_side 
+                        """SELECT point_id, service_side
                         FROM table_point 
-                        WHERE game_id = ? AND Service_side != ?""",
+                        WHERE game_id = ? AND service_side != ?""",
                         (game_id, self.paire_id),
                     )
                 elif serie_id is not None:  # All games in the series to grade
                     db.cursor.execute(
-                        """SELECT POINT_ID, Service_side 
+                        """SELECT point_id, service_side 
                         FROM table_point
                         WHERE game_id IN
                             (SELECT GAME_ID
                             FROM table_game
                             WHERE serie = ?)
-                        AND Service_side != ?""",
+                        AND service_side != ?""",
                         (serie_id, self.paire_id),
                     )
                 # Fetching the results and storing the point_ids in a list
@@ -138,8 +138,6 @@ class VideoGrader:
             result = db.cursor.fetchone()
             if result:
                 player_a, player_b = result
-                # DEV DEBUG [REMOVE LATER]
-                print(f"Player A: {player_a}, Player B: {player_b}")
 
         # Initiate a list to store the grades for each action in each point
         actions_grades_list = list()
@@ -175,7 +173,7 @@ class VideoGrader:
             # Saving the list in a JSON file, dated with the current date and time
             # for history and traceability purposes, and to be able to reuse it later if needed
             datetime_str = str(
-                datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
+                datetime.datetime.now().strftime("%Y-%m-%d")
             )
             actions_graded_dir = os.path.join(
                 os.path.dirname(__file__),
@@ -184,8 +182,9 @@ class VideoGrader:
             # Ensure the actions_graded directory exists
             os.makedirs(actions_graded_dir, exist_ok=True)
             # Build the JSON file path
+            game_or_serie_id = str(game_id if game_id is not None else serie_id)
             json_filename = (
-                f"list_grades_{serve_or_pass}_{game_id}_{self.paire_id}_{datetime_str}.json"
+                f"list_grades_{serve_or_pass}_{game_or_serie_id}_{self.paire_id}_graded_at_{datetime_str}.json"
             )
             json_filepath = os.path.join(actions_graded_dir, json_filename)
             # Write the grades list to the JSON file
@@ -223,16 +222,14 @@ class VideoGrader:
                 except Exception as e:
                     print(f"❌ Error inserting grades into the database: {e}")
 
-
-
-
 #######################################################################################
 # Main script for testing the VideoGrader class 
 
 if __name__ == "__main__":
     grader = VideoGrader(paire_id='JOMR')
     grader.service_passing_grading(
-        game_id='JOMR_oct25_SSA_01',
+        serie_id='SSA_S2-500_F_oct25',
         serve_or_pass='serve',
         rewrite_db=False,
         )
+    

@@ -31,7 +31,7 @@ def extract_transform_indexed_df_points_csv(
 
     # Path to the CSV file containing the indexed points df for the specified game_id
     csv_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
         "indexed_df_points",
         f"indexed_df_points_{game_id}.csv",
     )
@@ -162,3 +162,10 @@ def extract_transform_indexed_df_points_csv(
 
 # =============================================================
 
+if __name__ == "__main__":
+    csv_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "indexed_df_points",
+        f"indexed_df_points_game_id.csv",
+        )
+    print(csv_path)

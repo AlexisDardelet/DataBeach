@@ -1,0 +1,1017 @@
+[
+  {
+    "point_id": "JOMR_oct25_SSA_01_p2",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p4",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p5",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p7",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p8",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p11",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p13",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p17",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p20",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p21",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p22",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "undetermined"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p23",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p26",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p28",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p29",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p30",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p31",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p33",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p35",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_01_p36",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p1",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p2",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p4",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p5",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p8",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p9",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p10",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p11",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p12",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p13",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p14",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p16",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p17",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p19",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p20",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p24",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p25",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p26",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p27",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p30",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_02_p32",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p1",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p3",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p4",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p6",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p7",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p9",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p11",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p14",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p15",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p16",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p17",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p18",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p20",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p21",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p24",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p28",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "undetermined"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p29",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p31",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "undetermined"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p32",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p34",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p36",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p37",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p38",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p39",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p40",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p44",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p45",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p47",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_03_p48",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "undetermined"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p1",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p5",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p10",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p13",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p16",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p17",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p19",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p21",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p22",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p23",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p33",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p34",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p36",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p38",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p41",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p43",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p44",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p48",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p49",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p51",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p53",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p54",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p58",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p59",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p65",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_04_p67",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p1",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p2",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p3",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p4",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p6",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p7",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p10",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p11",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p17",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p18",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p19",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p20",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p21",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p22",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p24",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p25",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p26",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p31",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p33",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p34",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p37",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p44",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p50",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p53",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p54",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p57",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p58",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p60",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p64",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p66",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p68",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p69",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p70",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p72",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p73",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p75",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p76",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p78",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p79",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p80",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p81",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p84",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p88",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "average pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p89",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p91",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "out-of-system pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p93",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p94",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "good pass"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p98",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "serve",
+    "grade": "error"
+  },
+  {
+    "point_id": "JOMR_oct25_SSA_05_p100",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "serve",
+    "grade": "average pass"
+  }
+]
