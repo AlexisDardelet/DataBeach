@@ -170,7 +170,11 @@ class DBManager:
             action_name (str): The name of the action 
             for which to create the table (e.g. 'serve', 'pass')
         """  
-        self.cursor.execute(f"SELECT * FROM table_{action_name}")
+        try :
+            self.cursor.execute(f"SELECT * FROM table_{action_name}")
+        except sqlite3.OperationalError:
+            pass
+
         if self.cursor.fetchone() is not None:
             print(f"⚠️ Table 'table_{action_name}' already exists.")
             return  # Do not recreate if already present
@@ -334,14 +338,19 @@ class DBManager:
 
     # -----------------------------------------------------------------------------------
 
-    def execute_query(self, query: str, params=None):
+    def execute_query(self, 
+                      query: str, 
+                      params=None,
+                      print_query: bool = False) -> None:
         """Executes an SQL query with or without parameters."""
         if params is None:
             params = []
         try:
             self.cursor.execute(query, params)
             self.conn.commit()
-            print("✅ Query executed successfully.")
+            if print_query is True:
+                print(f"✅ Query executed: {query}")
+
         except sqlite3.Error as e:
             print(f"❌ Error executing query: {e}")
             self.conn.rollback()
@@ -478,8 +487,16 @@ class DBManager:
         # If no directory is provided, use the default 'recap_dict_score' directory
         if action_graded_dir is None:
             action_graded_dir = os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), "actions_graded"
+                os.path.dirname(
+                    os.path.dirname(
+                        os.path.abspath(__file__)
+                        )
+                ), "actions_graded"
             )
+        print(f"📂 Looking for JSON files in '{action_graded_dir}' for action '{action_name}'...")
+
+        # # Create the action table if it doesn't exist
+        self.create_simple_actions_table(action_name)
 
         # Get a list of files in action_graded_dir that match the pattern 
         # 'list_grades_{action_name}_{game_id}.json'
@@ -487,18 +504,10 @@ class DBManager:
         for filename in os.listdir(action_graded_dir):
             if filename.startswith(f"list_grades_{action_name}_") and filename.endswith(".json"):
                 json_files.append(filename)
-        # DEV DEBUG - to be removed later
-        print(
-            f"✅ {len(json_files)} JSON grade files found "
-            f"for the following game_ids: {[f[len(f'list_grades_{action_name}_'):-len('.json')] for f in json_files]}"
-        )
 
         for json_file in json_files:
             with open(os.path.join(action_graded_dir, json_file), "r") as f:
                 actions_grades_list = json.load(f)
-
-            # # Create the action table if it doesn't exist
-            # self.create_simple_actions_table(action_name)
 
             # Insert the grades into the action table
             insert_query = f"""
@@ -521,102 +530,59 @@ class DBManager:
             try:
                 with self.conn:
                     self.cursor.executemany(insert_query, rows_to_insert)
+                insert_or_update = "updated" if rewrite_db else "inserted"
                 print(
-                    f"✅ {len(rows_to_insert)} '{action_name}' grades inserted "
+                    f"✅ {len(rows_to_insert)} '{action_name}' grades {insert_or_update} "
                     f"for file '{json_file}'."
-
                 )
             except sqlite3.Error as e:
                 print(f"❌ Error inserting grades: {e}")
+        
+        ## ONLY FOR SERVE ACTION
+        # After inserting/updating the grades, update the point_won column in the serve
+        if action_name == 'serve':
+            point_won_query = """
+            UPDATE table_serve
+            SET point_won = CASE
+                WHEN paire_id = (
+                    SELECT tp.point_winner
+                    FROM table_point AS tp
+                    WHERE tp.point_id = table_serve.point_id
+                ) THEN 1
+                ELSE 0
+            END
+            """
+            self.execute_query(point_won_query)
 
+        ## false aces and direct serve errors correction
+        self.false_aces_corrector()
 
 
     # ============================================================
     # UTILS
     # ============================================================
 
-    def false_aces_corrector(self, 
-                             paire_id: str) -> None:
+    def false_aces_corrector(self) -> None:
         """
-        Corrects the false aces and false direct serve errors
-        in the table_serve for a given paire_id.
-
-        Arguments:
-            paire_id (str): The unique identifier for the team (paire) 
-                            for which to correct the false aces.
+        In table_serve, corrects the false aces and false direct 
+        serve errors in the table_serve based on point_won
         """
-        ## FALSE ACES
-        # Find all point_ids where the serve was graded as 'ace' but the serving team did not win the point
-        self.cursor.execute(
-            """
-            SELECT table_serve.point_id
-            FROM table_serve
-            INNER JOIN table_point ON table_serve.point_id = table_point.point_id
-            WHERE table_point.point_winner != ? AND table_serve.grade = ?
-            """,
-            (paire_id, "ace")
-        )
-        result = self.cursor.fetchall()
 
-        if not result:
-            print(f"✅ No false aces found for '{paire_id}'.")
+        # Correct false 'ace' grades where point_won is 0
+        false_aces_query = str("""
+        UPDATE table_serve
+        SET grade = 'error'
+        WHERE grade = 'ace' AND point_won = 0
+        """)
+        self.execute_query(false_aces_query)
 
-        # Extract the point_ids that need correction
-        point_ids_to_correct = [row[0] for row in result]
-
-        # Build the update query to set grade='error' for these point_ids
-        update_query = f"""
-            UPDATE table_serve
-            SET grade = 'error'
-            WHERE point_id IN ({','.join(['?']*len(point_ids_to_correct))})
-            AND grade = 'ace'
-        """
-        try:
-            # Execute the update within a transaction
-            with self.conn:
-                self.cursor.execute(update_query, point_ids_to_correct)
-            print(
-                f"✅ {len(point_ids_to_correct)} false aces corrected for '{paire_id}'."
-            )
-        except sqlite3.Error as e:
-            print(f"❌ Error correcting false aces for '{paire_id}': {e}")
-
-        ## FALSE DIRECT SERVE ERRORS
-        # Find all point_ids where the serve was graded as 'error' but the serving team won the point
-        self.cursor.execute(
-
-            """
-            SELECT table_serve.point_id
-            FROM table_serve
-            INNER JOIN table_point ON table_serve.point_id = table_point.point_id
-            WHERE table_point.point_winner = ? AND table_serve.grade = ?
-            """,
-            (paire_id, "error")
-        )
-        result = self.cursor.fetchall()
-
-        if not result:
-            print(f"✅ No false direct serve errors found for '{paire_id}'.")
-
-        # Extract the point_ids that need correction
-        point_ids_to_correct = [row[0] for row in result]
-
-        # Build the update query to set grade='error' for these point_ids
-        update_query = f"""
-            UPDATE table_serve
-            SET grade = 'ace'
-            WHERE point_id IN ({','.join(['?']*len(point_ids_to_correct))})
-            AND grade = 'error'
-        """
-        try:
-            # Execute the update within a transaction
-            with self.conn:
-                self.cursor.execute(update_query, point_ids_to_correct)
-            print(
-                f"✅ {len(point_ids_to_correct)} false direct serve errors corrected for '{paire_id}'."
-            )
-        except sqlite3.Error as e:
-            print(f"❌ Error correcting false direct serve errors for '{paire_id}': {e}")
+        # Correct false 'error' grades where point_won is 1
+        false_errors_query = str("""
+        UPDATE table_serve
+        SET grade = 'ace'
+        WHERE grade = 'error' AND point_won = 1
+        """)
+        self.execute_query(false_errors_query)
 
 
 # ============================================================
@@ -630,10 +596,7 @@ if __name__ == "__main__":
         # db.load_indexed_df_points_csv(game_id)
         # db.load_all_indexed_df_points_csv_to_db()
         # db.list_all_tables()
-        # db.load_json_actions(
-        #     action_name='serve',
-        #     action_graded_dir=r'C:\Users\habib\Documents\GitHub\DataBeach\actions_graded',
-        #     rewrite_db=True)
-        # db.create_simple_actions_table('pass')
-        db.false_aces_corrector('JOMR')
+        db.load_json_actions(action_name='serve',rewrite_db=True)
+        # db.false_aces_corrector()
+
 

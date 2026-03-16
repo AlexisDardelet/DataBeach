@@ -222,6 +222,28 @@ class VideoGrader:
                 except Exception as e:
                     print(f"❌ Error inserting grades into the database: {e}")
 
+        # poin_won querry update according to the grades for serve or pass
+        # and false_aces_corrector() [ONLY FOR SERVE GRADING]
+        if serve_or_pass == 'serve':
+            with DBManager() as db:
+                point_won_query = """
+                UPDATE table_serve
+                SET point_won = CASE
+                    WHEN paire_id = (
+                        SELECT tp.point_winner
+                        FROM table_point AS tp
+                        WHERE tp.point_id = table_serve.point_id
+                    ) THEN 1
+                    ELSE 0
+                END
+                """
+                self.execute_query(point_won_query)
+                # False aces and direct serve errors correction
+                db.false_aces_corrector()
+        
+
+
+
 #######################################################################################
 # Main script for testing the VideoGrader class 
 
