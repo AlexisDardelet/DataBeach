@@ -237,7 +237,7 @@ class VideoGrader:
                     ELSE 0
                 END
                 """
-                self.execute_query(point_won_query)
+                db.execute_query(point_won_query)
                 # False aces and direct serve errors correction
                 db.false_aces_corrector()
         
