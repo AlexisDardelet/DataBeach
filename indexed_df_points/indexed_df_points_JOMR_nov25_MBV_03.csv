@@ -18,7 +18,7 @@ service VerF_FloA,7359,7836,10,3,0,0,14
 *SWITCH*,7993,8187,10,3,0,0,
 service JOMR,8210,8425,11,3,0,0,15
 service VerF_FloA,8583,8686,11,4,0,0,16
-service JOMR,8880,8977,12,4,0,0,17
+service VerF_FloA,8880,8977,12,4,0,0,17
 service JOMR,9105,9259,13,4,0,0,18
 service VerF_FloA,9468,9665,13,5,0,0,19
 service JOMR,9876,10103,14,5,0,0,20

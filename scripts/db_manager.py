@@ -302,7 +302,6 @@ class DBManager:
         )
         tables = [row[0] for row in self.cursor.fetchall()]
         print(f"📋 Available tables: {tables}")
-        return tables
 
     # -----------------------------------------------------------------------------------
 
@@ -325,8 +324,12 @@ class DBManager:
 
         # Fetch all table names
         tables = self.cursor.execute(
-            "SELECT name FROM sqlite_master WHERE type='table'"
+            """SELECT name FROM sqlite_master WHERE type='table' AND name!='sqlite_sequence'
+            """
         ).fetchall()
+
+        # DEV DEBUG - to be removed later
+        print(f"📋 [DEV] Tables to be dropped: {tables}")
 
         for (table_name,) in tables:
             self.cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
@@ -452,8 +455,15 @@ class DBManager:
         # If no directory is provided, use the default 'indexed_df_points' directory
         if indexed_df_points_dir is None:
             indexed_df_points_dir = os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), "indexed_df_points"
-            )
+                    os.path.dirname(
+                        os.path.dirname(
+                            os.path.abspath(__file__)
+                        )
+                    ),
+                    "indexed_df_points"
+                )
+        # DEV DEBUG - to be removed later
+        print(f"📋 [DEV] 📂 Looking for indexed points CSV files in '{indexed_df_points_dir}'...")
 
         # Get the list of game_ids from the CSV files in the indexed_df_points directory
         game_ids = []
@@ -585,18 +595,30 @@ class DBManager:
         self.execute_query(false_errors_query)
 
 
+    # -----------------------------------------------------------
+    # Reset the database (for dev/testing purposes only)
+    def reset_database(self,
+                       action_name_list: list
+                       )-> None:
+        """Drops all tables and reloads the .csv and .json files"""
+        self.drop_all_tables()
+        self.load_all_initial_csv()
+        self.load_all_indexed_df_points_csv_to_db()
+        for action_name in action_name_list:
+            self.load_json_actions(action_name=action_name, 
+                                   rewrite_db=True)
+        print("✅ Database reset complete.")
+
+
 # ============================================================
 # ENTRY POINT
 # ============================================================
 
 if __name__ == "__main__":
     with DBManager() as db:
-        # db.load_all_initial_csv()
-        # db.drop_all_tables()
-        # db.load_indexed_df_points_csv(game_id)
-        # db.load_all_indexed_df_points_csv_to_db()
-        # db.list_all_tables()
-        db.load_json_actions(action_name='serve',rewrite_db=True)
+        # db.load_json_actions(action_name='serve',rewrite_db=True)
         # db.false_aces_corrector()
+        db.reset_database(action_name_list=['serve'])
+        db.list_all_tables()
 
 

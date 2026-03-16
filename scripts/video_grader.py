@@ -175,10 +175,10 @@ class VideoGrader:
             datetime_str = str(
                 datetime.datetime.now().strftime("%Y-%m-%d")
             )
-            actions_graded_dir = os.path.join(
+            actions_graded_dir = os.path.join(os.path.dirname(
                 os.path.dirname(__file__),
                 "actions_graded",
-            )
+            ))
             # Ensure the actions_graded directory exists
             os.makedirs(actions_graded_dir, exist_ok=True)
             # Build the JSON file path
@@ -242,16 +242,63 @@ class VideoGrader:
                 db.false_aces_corrector()
         
 
+    # -----------------------------------------------------------------------
+    # Missing games to grade for serve and pass
+    # -------------------------------------------------------------------------
 
+    def missing_games_to_grade(self,
+                               action_to_grade: str,
+                               ) -> list:
+        """ For a specified action, gives the games that are still to be graded
+        according to the content of the database.
+        [DEVELOPMENT IN PROGRESS] So far, only available for 'serve' and 'pass'
+
+        Args:
+            action_to_grade (str): The action to check for missing grades.
+        Returns:
+            list: A list of game_ids that are missing grades for the specified action.
+        """
+        if action_to_grade not in ['serve', 'pass']:
+            raise ValueError("action_to_grade must be either 'serve' or 'pass'")
+        
+
+        with DBManager() as db:
+            # Point_ids
+            sub_subquery = str(f"SELECT point_id FROM table_{action_to_grade}")
+            
+            subquery = str(f"""
+                SELECT tp.game_id
+                FROM table_point AS tp
+                LEFT JOIN table_{action_to_grade} AS ta ON tp.point_id = ta.point_id
+                WHERE tp.point_id IN ({sub_subquery})
+                GROUP BY tp.game_id
+                """)
+
+            db.execute_query(
+                f"""SELECT game_id 
+                FROM table_game
+
+                WHERE game_id NOT IN ({subquery})
+                """
+            )
+            result = db.cursor.fetchall()
+        missing_serve_game_ids_list = [row[0] for row in result]
+
+        print(f"""[DEV] {len(missing_serve_game_ids_list)} games missing {action_to_grade} grades: 
+              {missing_serve_game_ids_list}""")
+
+        return missing_serve_game_ids_list
 
 #######################################################################################
 # Main script for testing the VideoGrader class 
 
 if __name__ == "__main__":
     grader = VideoGrader(paire_id='JOMR')
-    grader.service_passing_grading(
-        serie_id='SSA_S2-500_F_oct25',
-        serve_or_pass='serve',
-        rewrite_db=False,
-        )
+    # grader.service_passing_grading(
+    #     serie_id='MBV_S2-500_F_nov25',
+    #     # game_id='JOMR_nov24_Leuven_01',
+    #     serve_or_pass='serve',
+    #     rewrite_db=False,
+    #     )
+    grader.missing_games_to_grade(action_to_grade='serve')
     
