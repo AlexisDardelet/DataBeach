@@ -175,10 +175,10 @@ class VideoGrader:
             datetime_str = str(
                 datetime.datetime.now().strftime("%Y-%m-%d")
             )
-            actions_graded_dir = os.path.join(os.path.dirname(
-                os.path.dirname(__file__),
+            actions_graded_dir = os.path.join(
+                os.path.dirname(os.path.dirname(__file__)),
                 "actions_graded",
-            ))
+            )
             # Ensure the actions_graded directory exists
             os.makedirs(actions_graded_dir, exist_ok=True)
             # Build the JSON file path
@@ -240,7 +240,6 @@ class VideoGrader:
                 db.execute_query(point_won_query)
                 # False aces and direct serve errors correction
                 db.false_aces_corrector()
-        
 
     # -----------------------------------------------------------------------
     # Missing games to grade for serve and pass

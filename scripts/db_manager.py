@@ -218,7 +218,28 @@ class DBManager:
         print(f"⚠️  No result found for game_id '{game_id}'.")
         return None, None
 
-    # -----------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------
+
+    def list_teams_with_players_names(self
+                                      ) -> list[str]:
+        """Retrieves the names of all teams with their players.
+         Returns:
+            list[str]: A list of tuples containing player_a and player_b names for each team."""
+        
+        query = """
+            SELECT paire_id, player_a, player_b
+            FROM table_player
+        """
+        self.cursor.execute(query)
+        results = self.cursor.fetchall()
+
+        # DEV DEBUG - to be removed later
+        # print('[DEV] Teams with players:')
+        # print([(row[0],str(f'{row[1]} - {row[2]}')) for row in results])
+
+        return [(row[0],str(f'{row[1]} - {row[2]}')) for row in results]
+
+    # -----------------------------------------------------------------------
 
     def new_beach_serie(
         self, serie_id: str, club: str, serie_type: str, genre: str, date: str
@@ -267,8 +288,8 @@ class DBManager:
 
         # Check if there is the same team but with swapped players
         query_check_swapped = """SELECT paire_id FROM table_player
-         WHERE (Name_joueurA = ? AND Name_joueurB = ?)
-         OR (Name_joueurA = ? AND Name_joueurB = ?)"""
+         WHERE (player_a = ? AND player_b = ?)
+         OR (player_a = ? AND player_b = ?)"""
         self.cursor.execute(
             query_check_swapped,
             (name_joueur_a, name_joueur_b, name_joueur_b, name_joueur_a),
@@ -282,7 +303,7 @@ class DBManager:
         if not result and not result_swapped:
             query = """
                 INSERT OR IGNORE INTO table_player
-                (paire_id, Name_joueurA, Name_joueurB, Genre)
+                (paire_id, player_a, player_b, genre)
                 VALUES (?, ?, ?, ?)
             """
             self.execute_query(
@@ -567,7 +588,6 @@ class DBManager:
         ## false aces and direct serve errors correction
         self.false_aces_corrector()
 
-
     # ============================================================
     # UTILS
     # ============================================================
@@ -594,9 +614,8 @@ class DBManager:
         """)
         self.execute_query(false_errors_query)
 
+    # -----------------------------------------------------------------------
 
-    # -----------------------------------------------------------
-    # Reset the database (for dev/testing purposes only)
     def reset_database(self,
                        action_name_list: list
                        )-> None:
@@ -618,7 +637,10 @@ if __name__ == "__main__":
     with DBManager() as db:
         # db.load_json_actions(action_name='serve',rewrite_db=True)
         # db.false_aces_corrector()
-        db.reset_database(action_name_list=['serve'])
-        db.list_all_tables()
+        # db.reset_database(action_name_list=['serve'])
+        # db.list_all_tables()
+        test_list =db.list_teams_with_players_names()
+        for team in test_list:
+            print(team[1])
 
 
