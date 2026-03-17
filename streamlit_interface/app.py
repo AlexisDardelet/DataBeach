@@ -9,6 +9,7 @@ import json
 import sys
 
 from coach_overview import coach_overview
+from serve_focus import serve_focus
 
 # Pages import
 
@@ -43,7 +44,8 @@ with st.sidebar:
     
     # Select team dropdown menu
     with st.container(border=True):
-        paire_id = st.selectbox("Select a team:", [team[1] for team in teams_list])
+        paire_name = st.selectbox("Select a team:", [team[1] for team in teams_list])
+        paire_id = next((team[0] for team in teams_list if team[1] == paire_name), None)
 
     # Menu options for the coaching view
     if st.session_state.get("Coaching view", True):
@@ -75,12 +77,10 @@ with st.sidebar:
 
 ## Page content based on the selected menu option
 # Coaching view pages
-if st.session_state.get("Coaching view", True):
-    if selected == "Coach overview":
-        coach_overview(paire_id)
-
-        
-
+if selected == "Coach overview":
+    coach_overview(paire_id)
+elif selected == "Serve focus":
+    serve_focus(paire_id)
 
 # # Dev view pages
 # if st.session_state.get("Dev view", True):

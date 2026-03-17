@@ -13,6 +13,11 @@ sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__f
 from db_manager import DBManager
 
 def coach_overview(paire_id):
+    # Page configuration
     st.set_page_config(layout="wide")
+
+    # # Fetching the data for the selected team
+    # with DBManager() as db:
+        
 
     
