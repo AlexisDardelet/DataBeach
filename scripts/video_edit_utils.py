@@ -9,6 +9,7 @@ import pandas as pd
 from dotenv import load_dotenv
 load_dotenv()
 FFMPEG_PATH = os.getenv("FFMPEG_PATH")
+SEGMENTED_POINTS_DIR = os.getenv("SEGMENTED_POINTS_DIR")
 
 # -------------------------------------------------------------------
 # Core GPU extraction for a single played point (start-end frames)
@@ -1278,18 +1279,149 @@ def basic_action_grader(
 
     return action_graded, quit_grading
 
+# -------------------------------------------------------------------
+# All possession game
+# -------------------------------------------------------------------
+
+def all_possession_game(
+        video_dir: str,
+        game_id: str,
+        indexed_df_points_csv_path: str,
+        team1_name: str = None,
+        team2_name: str = None,
+        output_video_name: str = None,
+        output_dir: str = None,
+    ) -> None:
+    """
+    Do a montage of all the possessions of a game, based on the extracted
+    points segments. If a CSV path is provided, it reads the indexed points 
+    DataFrame from the CSV file and displays the score on the video output.
+    """
+    # Check if the video directory is NOT the segmented points directory
+    if video_dir == SEGMENTED_POINTS_DIR:
+        raise ValueError(f"""WARNING: The video directory cannot 
+                         be the same as the segmented points directory.""")
+
+    # Set the output directory to the video directory if not provided
+    output_dir = video_dir if output_dir is None else output_dir
+
+    # Get all .mp4 files in the video directory
+    video_files = [
+        os.path.join(video_dir, f) for f in os.listdir(video_dir)
+        if f.endswith('.mp4')
+    ]
+    # Rename files to ensure correct order in the montage (p1, p2, ..., p10, etc.)
+    replace_dict = {
+        'p1.mp4': 'p01.mp4',
+        'p2.mp4': 'p02.mp4',
+        'p3.mp4': 'p03.mp4',
+        'p4.mp4': 'p04.mp4',
+        'p5.mp4': 'p05.mp4',
+        'p6.mp4': 'p06.mp4',
+        'p7.mp4': 'p07.mp4',
+        'p8.mp4': 'p08.mp4',
+        'p9.mp4': 'p09.mp4',
+    }
+    for filename in video_files:
+        new_filename = filename
+        for old, new in replace_dict.items():
+            new_filename = new_filename.replace(old, new)
+        os.rename(filename, new_filename)
+    
+    # Error message if no .mp4 files found in the directory 
+    if not video_files:
+        print(f"No .mp4 files found in {video_dir}")
+        return
+        # # [DEV] Get just the file names without the directory for printing
+    # video_file_names = [os.path.basename(f) for f in video_files]
+    # print(video_file_names)
+
+
+    # Open the first video to get properties
+    cap = cv2.VideoCapture(video_files[0])
+    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fps = int(cap.get(cv2.CAP_PROP_FPS))
+    cap.release()
+
+
+
+    # Create VideoWriter for the output montage
+    if output_video_name is not None:
+        output_path = os.path.join(output_dir, output_video_name)
+    else:
+        output_path = os.path.join(output_dir, f'all_possessions_montage_{game_id}.mp4')
+    os.makedirs(output_dir, exist_ok=True)
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height))
+
+
+    # Load the indexed points DataFrame from the CSV file
+    indexed_df_points = pd.DataFrame()
+    indexed_df_points = pd.read_csv(indexed_df_points_csv_path)
+    # Retrieve team names from the DataFrame columns
+    team1_id = indexed_df_points.columns[3].replace('_score', '')
+    team2_id = indexed_df_points.columns[4].replace('_score', '')
+
+    # Ensure the DataFrame is sorted by point_index
+    indexed_df_points = indexed_df_points.sort_values(by='point_index').reset_index(drop=True)
+    # Create a list of scores for each point index
+    test_score_list = list(zip(
+        indexed_df_points[f'{team1_id}_score'],
+        indexed_df_points[f'{team2_id}_score'],
+        indexed_df_points[f'{team1_id}_sets'],
+        indexed_df_points[f'{team2_id}_sets']
+    ))
+
+    if game_id is not None:
+        output_video_name = f'all_possessions_montage_{team1_name}_vs_{team2_name}.mp4'
+    else:
+        output_video_name = f'all_possessions_montage_{game_id}.mp4'
+
+    # Concatenate all videos, with the score overlay 
+    for i, video_file in enumerate(video_files):
+        cap = cv2.VideoCapture(video_file)
+        score = test_score_list[i] if i < len(test_score_list) else (0, 0)
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            # Overlay score on the frame
+            score_text = f"""{team1_id}: {score[0]} - {team2_id}: {score[1]}\nSets: {team1_id} {score[2]} - {team2_id} {score[3]}"""
+
+            cv2.putText(
+                frame,
+                score_text,
+                (30, 50),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1,
+                (0, 255, 0),
+                2,
+                cv2.LINE_AA,
+            )
+            out.write(frame)
+        cap.release()
+
+    out.release()
+
+    # Remove the mp4 files in video_dir after montage is created
+    video_files = [os.path.join(video_dir, f) for f in os.listdir(video_dir)
+        if f.endswith('.mp4')]
+    for video_file in video_files:
+        os.remove(video_file)
+
+    print(f"Montage saved to: {output_path}")
+
 
 # -------------------------------------------------------------------
 # Testing in main script
 if __name__ == "__main__":
     # Example usage of the functions
-    action_graded = basic_action_grader(
-    video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented\JOMR_nov25_BSD_02_p41.mp4',
-    point_id='JOMR_nov25_BSD_02_p41',
-    paire_id='JOMR',
-    player_a='Jade',
-    player_b='Math',
-    action_to_grade='serve'
-)
-    
-    print(action_graded)
+    all_possession_game(
+        video_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\test_all_possessions',
+        indexed_df_points_csv_path=r'C:\Users\habib\Documents\GitHub\DataBeach\indexed_df_points\indexed_df_points_JOMR_jan26_MBV_02.csv',
+        team1_name='Jade et Math',
+        team2_name='Alex Neel et Emeraude Panaget',
+        game_id='JOMR_jan26_MBV_02',
+        output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\test_all_possessions\all_poss'
+    )
