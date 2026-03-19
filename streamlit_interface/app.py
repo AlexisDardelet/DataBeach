@@ -56,7 +56,7 @@ with st.sidebar:
             "Serve focus",
             "Side-out focus", 
             "Block-defense focus",
-            "Specific play focus",
+            "Specific plays focus",
             ],
             icons=["house","arrow-up-right", "arrow-left", "bricks", "eyeglasses"],
             menu_icon="cast",
