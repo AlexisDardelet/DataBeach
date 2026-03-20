@@ -343,26 +343,35 @@ def extract_segments_from_df_gpu(
         os.path.basename(video_path)
     )[0]
 
+    print(f'game_id: {game_id}')
+
     # Build intervals: 1 row = time(Point) - following
     # time(Dead time)
     for row in actions_df.iterrows():
         # Only cut rows corresponding to played points
         # (not timeouts or other actions)
-        if not pd.isna(row[1]['point_index']):
+        if row[1]['point_index'] != '999':
             print(
                 f"Cutting point {row[1]['point_index']}: "
                 f"frames {row[1]['start_frame']} - "
                 f"{row[1]['end_frame']}"
             )
 
+            print(f'video_path: {video_path}')
+            print(f'start_frame: {row[1]["start_frame"]}')
+            print(f'end_frame: {row[1]["end_frame"]}')
+            print(f'output_dir: {output_dir}')
+            output_video = os.path.join(
+                output_dir,
+                f"{game_id}_p{row[1]['point_index']}.mp4"
+            )
+            print(f"output_video: {output_video}")
+
             cut_point_gpu(
                 video_path=video_path,
                 start_frame=int(row[1]["start_frame"]),
                 end_frame=int(row[1]["end_frame"]),
-                output_video=os.path.join(
-                    output_dir,
-                    f"{game_id}_p{row[1]['point_index']}.mp4"
-                ),
+                output_video=output_video,
             )
 
 # -------------------------------------------------------------------
@@ -890,6 +899,42 @@ def point_indexeer(
             column assigning a unique point number to each
             played point.
     """
+    # # [DEV] New old version
+
+    # if 'point_index' in df.columns:
+    #     print(
+    #         "The 'point_index' column already exists in the "
+    #         "DataFrame. Please remove or rename the existing "
+    #         "column before running this function."
+    #     )
+    #     return df
+
+    # if not all(col in df.columns for col in ['service_side']):
+    #     print(
+    #         "Error: the DataFrame does not contain the "
+    #         "'service_side' column. Please check the "
+    #         "DataFrame columns."
+    #     )
+    #     return df
+
+    # point_idx = int(0)
+    # point_indices = []
+    # excluded = ('*SWITCH*', 'Timeout', 'end of set')
+    # for _, row in df.iterrows():
+    #     if row['service_side'] not in excluded:
+    #         point_idx += int(1)
+    #     point_indices.append(
+    #         point_idx
+    #         if row['service_side'] not in excluded
+    #         else None
+    #     )
+
+    # df['point_index'] = pd.array(
+    #     point_indices, dtype=pd.Int64Dtype()
+    # )
+
+    # return df
+
     if 'point_index' in df.columns:
         print(
             "The 'point_index' column already exists in the "
@@ -906,8 +951,9 @@ def point_indexeer(
         )
         return df
 
+    # Create the point_indices list
     point_idx = int(0)
-    point_indices = []
+    point_indices = list([])
     excluded = ('*SWITCH*', 'Timeout', 'end of set')
     for _, row in df.iterrows():
         if row['service_side'] not in excluded:
@@ -915,12 +961,15 @@ def point_indexeer(
         point_indices.append(
             point_idx
             if row['service_side'] not in excluded
-            else None
+            else int(999)
         )
 
+    # Add the 'point_index' column to the DataFrame
     df['point_index'] = pd.array(
-        point_indices, dtype=pd.Int64Dtype()
+        point_indices, dtype=pd.StringDtype()
     )
+    # Zero-pad the 'point_index' values to 3 digits
+    df['point_index'] = df['point_index'].astype('string').str.zfill(3)
 
     return df
 
@@ -1299,8 +1348,7 @@ def all_possession_game(
     """
     # Check if the video directory is NOT the segmented points directory
     if video_dir == SEGMENTED_POINTS_DIR:
-        raise ValueError(f"""WARNING: The video directory cannot 
-                         be the same as the segmented points directory.""")
+        raise ValueError("WARNING: The video directory cannot be the same as the segmented points directory.")
 
     # Set the output directory to the video directory if not provided
     output_dir = video_dir if output_dir is None else output_dir
@@ -1332,10 +1380,6 @@ def all_possession_game(
     if not video_files:
         print(f"No .mp4 files found in {video_dir}")
         return
-        # # [DEV] Get just the file names without the directory for printing
-    # video_file_names = [os.path.basename(f) for f in video_files]
-    # print(video_file_names)
-
 
     # Open the first video to get properties
     cap = cv2.VideoCapture(video_files[0])
@@ -1343,8 +1387,6 @@ def all_possession_game(
     frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     cap.release()
-
-
 
     # Create VideoWriter for the output montage
     if output_video_name is not None:
@@ -1417,11 +1459,15 @@ def all_possession_game(
 # Testing in main script
 if __name__ == "__main__":
     # Example usage of the functions
-    all_possession_game(
-        video_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\test_all_possessions',
-        indexed_df_points_csv_path=r'C:\Users\habib\Documents\GitHub\DataBeach\indexed_df_points\indexed_df_points_JOMR_jan26_MBV_02.csv',
-        team1_name='Jade et Math',
-        team2_name='Alex Neel et Emeraude Panaget',
-        game_id='JOMR_jan26_MBV_02',
-        output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\test_all_possessions\all_poss'
+
+    test_df = pd.read_csv(
+        filepath_or_buffer=r'C:\Users\habib\Documents\GitHub\DataBeach\indexed_df_points\test_indexed_df_with_point_index.csv',
+        dtype={'point_index': 'string'}
+                    )
+    print(test_df.tail())
+
+    extract_segments_from_df_gpu(
+        video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Alex&Co\preprocessed games\AleD-RonP_mar26_session_01_started.mp4',
+        actions_df=test_df,
+        output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Alex&Co\segmented points',
     )

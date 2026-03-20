@@ -176,9 +176,10 @@ class VideoGrader:
                 datetime.datetime.now().strftime("%Y-%m-%d")
             )
             actions_graded_dir = os.path.join(os.path.dirname(
-                os.path.dirname(__file__),
+                os.path.dirname(__file__)
+            ),
                 "actions_graded",
-            ))
+            )
             # Ensure the actions_graded directory exists
             os.makedirs(actions_graded_dir, exist_ok=True)
             # Build the JSON file path
@@ -292,12 +293,17 @@ class VideoGrader:
 # Main script for testing the VideoGrader class 
 
 if __name__ == "__main__":
-    grader = VideoGrader(paire_id='JOMR')
-    # grader.service_passing_grading(
-    #     serie_id='MBV_S2-500_F_nov25',
-    #     # game_id='JOMR_nov24_Leuven_01',
-    #     serve_or_pass='serve',
-    #     rewrite_db=False,
-    #     )
-    grader.missing_games_to_grade(action_to_grade='serve')
-    
+    # grader = VideoGrader(paire_id='JOMR')
+    # # grader.service_passing_grading(
+    # #     serie_id='MBV_S2-500_F_nov25',
+    # #     # game_id='JOMR_nov24_Leuven_01',
+    # #     serve_or_pass='serve',
+    # #     rewrite_db=False,
+    # #     )
+    # grader.missing_games_to_grade(action_to_grade='serve')
+    actions_graded_dir = os.path.join(os.path.dirname(
+    os.path.dirname(__file__)
+    ),
+        "actions_graded",
+    )
+    print(f"Actions graded directory: {actions_graded_dir}")
