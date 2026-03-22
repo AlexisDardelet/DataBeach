@@ -1,0 +1,23 @@
+{
+    "teams": [
+        "JOMR",
+        "(adv)"
+    ],
+    "match_format": "15 points per set",
+    "winner": "JOMR",
+    "final_score": "2 - 1",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "16 - 18"
+        },
+        {
+            "set": 2,
+            "score": "15 - 9"
+        },
+        {
+            "set": 3,
+            "score": "11 - 3"
+        }
+    ]
+}

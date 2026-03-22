@@ -339,9 +339,13 @@ def extract_segments_from_df_gpu(
     os.makedirs(output_dir, exist_ok=True)
 
     # Insert the game ID into the name of each extracted clip
-    game_id = os.path.splitext(
+    game_id = str(os.path.splitext(
         os.path.basename(video_path)
-    )[0]
+    )[0])
+    # Removing '_started' etc. suffixes from the game_id
+    if "_started" in game_id:
+        game_id = game_id.split("_started", 1)[0] + "_started"
+        game_id = game_id.replace("_started", "")
 
     print(f'game_id: {game_id}')
 
@@ -474,7 +478,7 @@ def cv2_point_segment_cut(
                 (score_x, score_y),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.7,
-                (0, 255, 0),
+                (0, 0, 0),
                 2,
                 cv2.LINE_AA,
             )
@@ -526,7 +530,7 @@ def cv2_point_segment_cut(
                     (30, 40),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     1,
-                    (0, 255, 0),
+                    (0, 0, 0),
                     2,
                     cv2.LINE_AA,
                 )
@@ -1458,16 +1462,10 @@ def all_possession_game(
 # -------------------------------------------------------------------
 # Testing in main script
 if __name__ == "__main__":
-    # Example usage of the functions
-
-    test_df = pd.read_csv(
-        filepath_or_buffer=r'C:\Users\habib\Documents\GitHub\DataBeach\indexed_df_points\test_indexed_df_with_point_index.csv',
-        dtype={'point_index': 'string'}
-                    )
-    print(test_df.tail())
-
-    extract_segments_from_df_gpu(
-        video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Alex&Co\preprocessed games\AleD-RonP_mar26_session_01_started.mp4',
-        actions_df=test_df,
-        output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Alex&Co\segmented points',
+    test_df = cv2_point_segment_cut(
+        video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\JOMR_mar26_VSG_01_started_rotated_270.mp4',
+        team1_name="JOMR",
+        team2_name="(adv)",
+        play_speed=2
     )
+    print(test_df)

@@ -15,6 +15,9 @@ from video_edit_utils import basic_action_grader
 # Environment variables
 load_dotenv()
 SEGMENTED_POINTS_DIR = os.getenv("SEGMENTED_POINTS_DIR")
+ACTIONS_GRADED_DIR = os.getenv("ACTIONS_GRADED_DIR")
+RECAP_DICT_SCORE_DIR = os.getenv("RECAP_DICT_SCORE_DIR")
+
 
 class VideoGrader:
     """
@@ -301,9 +304,11 @@ if __name__ == "__main__":
     # #     rewrite_db=False,
     # #     )
     # grader.missing_games_to_grade(action_to_grade='serve')
-    actions_graded_dir = os.path.join(os.path.dirname(
-    os.path.dirname(__file__)
-    ),
-        "actions_graded",
-    )
-    print(f"Actions graded directory: {actions_graded_dir}")
+
+
+    # actions_graded_dir = os.path.join(os.path.dirname(
+    # os.path.dirname(__file__)
+    # ),
+    #     "actions_graded",
+    # )
+    # print(f"Actions graded directory: {actions_graded_dir}")

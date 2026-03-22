@@ -4,6 +4,7 @@ def download_video(url):
     ydl_opts = {
         'format': 'best',
         'outtmpl': '%(title)s.%(ext)s',
+        'cookies'
     }
     
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:

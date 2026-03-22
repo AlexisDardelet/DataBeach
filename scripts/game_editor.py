@@ -3,6 +3,10 @@ import os
 import sys
 import pandas as pd
 import json
+from dotenv import load_dotenv
+load_dotenv()
+INDEXED_DF_POINTS_DIR = os.getenv("INDEXED_DF_POINTS_DIR")
+RECAP_DICT_SCORE_DIR = os.getenv("RECAP_DICT_SCORE_DIR")
 
 # Local imports
 sys.path.append(os.path.join(os.path.dirname(__file__), "video_edit_utils"))
@@ -23,7 +27,6 @@ class GameEditor:
     from the raw video to segmented clips of each point.
     It also returns dictionaries with information about the score.
     """
-
     # Initialisation of the class with the path to the video(s)
     # and the output directory for the edited videos
     def __init__(
@@ -44,6 +47,9 @@ class GameEditor:
         self.video_dir = video_dir
         self.video_path = video_path
         self.output_dir = output_dir if output_dir else video_dir
+
+        self.indexed_df_points_dir = INDEXED_DF_POINTS_DIR
+        self.recap_dict_score_dir = RECAP_DICT_SCORE_DIR
 
     # Method for pre-match editing of the videos
     # in a directory (rotation and pre-match cutting)
@@ -147,6 +153,8 @@ class GameEditor:
                 # Delete the intermediate unrotated video
                 os.remove(started_path)
 
+
+
     # -----------------------------------------------------------------------------------
 
     def game_to_segmented_points(
@@ -179,20 +187,31 @@ class GameEditor:
                 "video_path is not set. Please provide a valid video_path "
                 "when initializing GameEditor."
             )
+        
 
         # Check if 'indexed_df_points' and 'recap_dict_score' directories exist
-        if not os.path.exists("indexed_df_points"):
-            os.makedirs("indexed_df_points")
-        if not os.path.exists("recap_dict_score"):
-            os.makedirs("recap_dict_score")
+        if not os.path.exists(self.indexed_df_points_dir):
+            raise ValueError(
+                f"Directory '{self.indexed_df_points_dir}' does not exist. "
+                f"Please ensure the directory is created before running the pipeline."
+            )
+        if not os.path.exists(self.recap_dict_score_dir):
+            raise ValueError(
+                f"Directory '{self.recap_dict_score_dir}' does not exist. "
+                f"Please ensure the directory is created before running the pipeline."
+            )
 
         # Retrieve video information from the file name
-        game_id = os.path.splitext(os.path.basename(self.video_path))[0]
+        game_id = str(os.path.splitext(os.path.basename(self.video_path))[0])
+        # Removing '_started' etc. suffixes from the game_id
+        if "_started" in game_id:
+            game_id = game_id.split("_started", 1)[0] + "_started"
+            game_id = game_id.replace("_started", "")
 
         # Check if the video has already been processed in self.output_dir
         for file in os.listdir(self.output_dir):
             if file.startswith(f"{game_id}_p"):
-                if rewrite_videos == False:
+                if rewrite_videos is False:
                     # Segmented points videos already exist, skip processing
                     print(
                         f"Segmented videos for {game_id} already exist in "
@@ -220,12 +239,12 @@ class GameEditor:
         # Save the indexing and score to CSV and JSON files
         indexed_df_points.to_csv(
             path_or_buf=os.path.join(
-                "indexed_df_points", f"indexed_df_points_{game_id}.csv"
+                self.indexed_df_points_dir, f"indexed_df_points_{game_id}.csv"
             ),
             index=False,
         )
         with open(
-            os.path.join("recap_dict_score", f"recap_dict_score_{game_id}.json"),
+            os.path.join(self.recap_dict_score_dir, f"recap_dict_score_{game_id}.json"),
             "w",
             encoding="utf-8",
         ) as json_file:
