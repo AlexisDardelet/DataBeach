@@ -639,8 +639,8 @@ if __name__ == "__main__":
         # db.false_aces_corrector()
         # db.reset_database(action_name_list=['serve'])
         # db.list_all_tables()
-        test_list =db.list_teams_with_players_names()
-        for team in test_list:
-            print(team[1])
+        db.reset_database(action_name_list=['serve'])
+
+
 
 

@@ -1,60 +1,60 @@
-service_side,start_frame,end_frame,JOMR_score,(adv)_score,JOMR_sets,(adv)_sets,point_index
-match start - service (adv),70,567,0,0,0,0,001
-service (adv),842,1168,0,1,0,0,002
+service_side,start_frame,end_frame,JOMR_score,LeaS_MarG_score,JOMR_sets,LeaS_MarG_sets,point_index
+match start - service LeaS_MarG,70,567,0,0,0,0,001
+service LeaS_MarG,842,1168,0,1,0,0,002
 service JOMR,1528,1699,1,1,0,0,003
 service JOMR,2022,2132,2,1,0,0,004
-service (adv),2473,2622,2,2,0,0,005
+service LeaS_MarG,2473,2622,2,2,0,0,005
 *SWITCH*,2848,2871,2,2,0,0,999
-service (adv),3155,3273,2,3,0,0,006
+service LeaS_MarG,3155,3273,2,3,0,0,006
 service JOMR,3536,3883,3,3,0,0,007
-service (adv),4271,4531,3,4,0,0,008
+service LeaS_MarG,4271,4531,3,4,0,0,008
 service JOMR,4995,5125,4,4,0,0,009
-service (adv),5554,5696,4,5,0,0,010
+service LeaS_MarG,5554,5696,4,5,0,0,010
 *SWITCH*,5838,6074,4,5,0,0,999
 service JOMR,6367,6486,5,5,0,0,011
 service JOMR,6844,6999,6,5,0,0,012
-service (adv),7288,7390,6,6,0,0,013
+service LeaS_MarG,7288,7390,6,6,0,0,013
 service JOMR,7828,8224,7,6,0,0,014
 service JOMR,8647,8900,8,6,0,0,015
 *SWITCH*,9309,9335,8,6,0,0,999
 service JOMR,9644,9946,9,6,0,0,016
-service (adv),10543,10938,9,7,0,0,017
+service LeaS_MarG,10543,10938,9,7,0,0,017
 service JOMR,11459,11901,10,7,0,0,018
-service (adv),12308,12573,10,8,0,0,019
+service LeaS_MarG,12308,12573,10,8,0,0,019
 service JOMR,13050,13222,11,8,0,0,020
 *SWITCH*,13532,13680,11,8,0,0,999
 Timeout,14101,15354,11,8,0,0,999
 service JOMR,15574,15847,12,8,0,0,021
 service JOMR,16329,16584,13,8,0,0,022
 service JOMR,17045,17268,14,8,0,0,023
-service (adv),17875,18059,14,9,0,0,024
-service (adv),18397,18560,14,10,0,0,025
+service LeaS_MarG,17875,18059,14,9,0,0,024
+service LeaS_MarG,18397,18560,14,10,0,0,025
 *SWITCH*,18850,18911,14,10,0,0,999
-service (adv),19102,19511,14,11,0,0,026
-service (adv),19965,20348,14,12,0,0,027
-service (adv),20789,21096,14,13,0,0,028
+service LeaS_MarG,19102,19511,14,11,0,0,026
+service LeaS_MarG,19965,20348,14,12,0,0,027
+service LeaS_MarG,20789,21096,14,13,0,0,028
 Timeout,21661,23094,14,13,0,0,999
-service (adv),23300,23589,14,14,0,0,029
+service LeaS_MarG,23300,23589,14,14,0,0,029
 service JOMR,23905,24178,15,14,0,0,030
 *SWITCH*,24358,24394,15,14,0,0,999
-service (adv),24773,25155,15,15,0,0,031
-service (adv),25698,25898,15,16,0,0,032
+service LeaS_MarG,24773,25155,15,15,0,0,031
+service LeaS_MarG,25698,25898,15,16,0,0,032
 service JOMR,26299,26413,16,16,0,0,033
-service (adv),26758,27258,16,17,0,0,034
+service LeaS_MarG,26758,27258,16,17,0,0,034
 end of set,0,0,16,18,0,1,999
 set start - service JOMR,29875,30233,0,0,0,1,035
-service (adv),30702,30976,0,1,0,1,036
+service LeaS_MarG,30702,30976,0,1,0,1,036
 service JOMR,31650,31744,1,1,0,1,037
-service (adv),32029,32226,1,2,0,1,038
+service LeaS_MarG,32029,32226,1,2,0,1,038
 service JOMR,32638,32770,2,2,0,1,039
 *SWITCH*,32903,32943,2,2,0,1,999
 service JOMR,33331,33544,3,2,0,1,040
-service (adv),33949,34119,3,3,0,1,041
-service (adv),34396,34549,3,4,0,1,042
+service LeaS_MarG,33949,34119,3,3,0,1,041
+service LeaS_MarG,34396,34549,3,4,0,1,042
 service JOMR,35062,35363,4,4,0,1,043
-service (adv),35725,35968,4,5,0,1,044
+service LeaS_MarG,35725,35968,4,5,0,1,044
 *SWITCH*,36122,36182,4,5,0,1,999
-service (adv),36591,36870,4,6,0,1,045
+service LeaS_MarG,36591,36870,4,6,0,1,045
 service JOMR,37231,37437,5,6,0,1,046
 service JOMR,37799,37964,6,6,0,1,047
 service JOMR,38328,38648,7,6,0,1,048
@@ -62,20 +62,20 @@ Timeout,39200,39651,7,6,0,1,999
 service JOMR,40539,40847,8,6,0,1,049
 *SWITCH*,41213,41240,8,6,0,1,999
 service JOMR,41454,41608,9,6,0,1,050
-service (adv),42046,42265,9,7,0,1,051
-service (adv),42678,43094,9,8,0,1,052
+service LeaS_MarG,42046,42265,9,7,0,1,051
+service LeaS_MarG,42678,43094,9,8,0,1,052
 service JOMR,43714,43972,10,8,0,1,053
 service JOMR,44276,44395,11,8,0,1,054
 *SWITCH*,44559,44602,11,8,0,1,999
 service JOMR,44945,45423,12,8,0,1,055
 service JOMR,45798,45928,13,8,0,1,056
-service (adv),46309,46655,13,9,0,1,057
+service LeaS_MarG,46309,46655,13,9,0,1,057
 service JOMR,47145,47306,14,9,0,1,058
 end of set,0,0,15,9,1,1,999
-set start - service (adv),49607,49957,0,0,1,1,059
+set start - service LeaS_MarG,49607,49957,0,0,1,1,059
 service JOMR,50267,50488,1,0,1,1,060
 service JOMR,50831,51034,2,0,1,1,061
-service (adv),51447,51766,2,1,1,1,062
+service LeaS_MarG,51447,51766,2,1,1,1,062
 service JOMR,52238,52411,3,1,1,1,063
 *SWITCH*,52752,52774,3,1,1,1,999
 service JOMR,53018,53148,4,1,1,1,064
@@ -83,10 +83,10 @@ Timeout,53802,54579,4,1,1,1,999
 service JOMR,54974,55295,5,1,1,1,065
 service JOMR,55801,55982,6,1,1,1,066
 service JOMR,56175,56488,7,1,1,1,067
-service (adv),56894,57034,7,2,1,1,068
+service LeaS_MarG,56894,57034,7,2,1,1,068
 *SWITCH*,57193,57325,7,2,1,1,999
 service JOMR,57621,57814,8,2,1,1,069
 service JOMR,58126,58296,9,2,1,1,070
 service JOMR,58596,58759,10,2,1,1,071
-service (adv),59131,59402,10,3,1,1,072
+service LeaS_MarG,59131,59402,10,3,1,1,072
 end of set,0,0,11,3,2,1,999
