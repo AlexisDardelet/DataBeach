@@ -1,56 +1,56 @@
 service_side,start_frame,end_frame,JOMR_score,AleM_LauA_score,JOMR_sets,AleM_LauA_sets,point_index
-match start - service JOMR,47,209,0,0,0,0,1
-service AleM_LauA,522,801,0,1,0,0,2
-service AleM_LauA,1114,1253,0,2,0,0,3
-service AleM_LauA,1436,1531,0,3,0,0,4
-service JOMR,1687,1796,1,3,0,0,5
-*SWITCH*,1851,2018,1,3,0,0,
-service JOMR,2092,2233,2,3,0,0,6
-service AleM_LauA,2475,2670,2,4,0,0,7
-service AleM_LauA,2850,3002,2,5,0,0,8
-service AleM_LauA,3173,3336,2,6,0,0,9
-service JOMR,3576,3662,3,6,0,0,10
-*SWITCH*,3783,3941,3,6,0,0,
-service AleM_LauA,3978,4331,3,7,0,0,11
-service AleM_LauA,4483,4724,3,8,0,0,12
-service JOMR,5021,5175,4,8,0,0,13
-service AleM_LauA,5410,5555,4,9,0,0,14
-service AleM_LauA,5765,6164,4,10,0,0,15
-*SWITCH*,6258,6478,4,10,0,0,
-service AleM_LauA,6544,6706,4,11,0,0,16
-service JOMR,6884,7061,5,11,0,0,17
-service AleM_LauA,7293,7422,5,12,0,0,18
-service AleM_LauA,7591,7728,5,13,0,0,19
-Timeout,7977,8622,5,13,0,0,
-service AleM_LauA,8764,8885,5,14,0,0,20
-*SWITCH*,9017,9335,5,14,0,0,
-service JOMR,9378,9509,6,14,0,0,21
-end of set,0,0,6,15,0,1,
-set start - service JOMR,10932,11012,0,0,0,1,22
-service AleM_LauA,11208,11475,0,1,0,1,23
-service JOMR,11740,12023,1,1,0,1,24
-service JOMR,12386,12490,2,1,0,1,25
-service JOMR,12655,13038,3,1,0,1,26
-*SWITCH*,12852,13038,3,1,0,1,
-service AleM_LauA,13088,13454,3,2,0,1,27
-service AleM_LauA,13757,14008,3,3,0,1,28
-service AleM_LauA,14406,14751,3,4,0,1,29
-Timeout,15041,15737,3,4,0,1,
-service AleM_LauA,15829,16062,3,5,0,1,30
-service AleM_LauA,16249,16427,3,6,0,1,31
-*SWITCH*,16571,16771,3,6,0,1,
-service AleM_LauA,16856,17083,3,7,0,1,32
-service JOMR,17276,17442,4,7,0,1,33
-service JOMR,17670,17780,5,7,0,1,34
-service AleM_LauA,17947,18094,5,8,0,1,35
-service AleM_LauA,18272,18427,5,9,0,1,36
-*SWITCH*,18548,18718,5,9,0,1,
-service AleM_LauA,18926,19039,5,10,0,1,37
-service AleM_LauA,19248,19771,5,11,0,1,38
-service AleM_LauA,20080,20237,5,12,0,1,39
-service JOMR,20436,20611,6,12,0,1,40
-service AleM_LauA,20959,21087,6,13,0,1,41
-*SWITCH*,21135,21267,6,13,0,1,
-service AleM_LauA,21293,21521,6,14,0,1,42
-service JOMR,21831,22042,7,14,0,1,43
-end of set,0,0,7,15,0,2,
+match start - service JOMR,47,209,0,0,0,0,001
+service AleM_LauA,522,801,0,1,0,0,002
+service AleM_LauA,1114,1253,0,2,0,0,003
+service AleM_LauA,1436,1531,0,3,0,0,004
+service JOMR,1687,1796,1,3,0,0,005
+*SWITCH*,1851,2018,1,3,0,0,999
+service JOMR,2092,2233,2,3,0,0,006
+service AleM_LauA,2475,2670,2,4,0,0,007
+service AleM_LauA,2850,3002,2,5,0,0,008
+service AleM_LauA,3173,3336,2,6,0,0,009
+service JOMR,3576,3662,3,6,0,0,010
+*SWITCH*,3783,3941,3,6,0,0,999
+service AleM_LauA,3978,4331,3,7,0,0,011
+service AleM_LauA,4483,4724,3,8,0,0,012
+service JOMR,5021,5175,4,8,0,0,013
+service AleM_LauA,5410,5555,4,9,0,0,014
+service AleM_LauA,5765,6164,4,10,0,0,015
+*SWITCH*,6258,6478,4,10,0,0,999
+service AleM_LauA,6544,6706,4,11,0,0,016
+service JOMR,6884,7061,5,11,0,0,017
+service AleM_LauA,7293,7422,5,12,0,0,018
+service AleM_LauA,7591,7728,5,13,0,0,019
+Timeout,7977,8622,5,13,0,0,999
+service AleM_LauA,8764,8885,5,14,0,0,020
+*SWITCH*,9017,9335,5,14,0,0,999
+service JOMR,9378,9509,6,14,0,0,021
+end of set,0,0,6,15,0,1,999
+set start - service JOMR,10932,11012,0,0,0,1,022
+service AleM_LauA,11208,11475,0,1,0,1,023
+service JOMR,11740,12023,1,1,0,1,024
+service JOMR,12386,12490,2,1,0,1,025
+service JOMR,12655,13038,3,1,0,1,026
+*SWITCH*,12852,13038,3,1,0,1,999
+service AleM_LauA,13088,13454,3,2,0,1,027
+service AleM_LauA,13757,14008,3,3,0,1,028
+service AleM_LauA,14406,14751,3,4,0,1,029
+Timeout,15041,15737,3,4,0,1,999
+service AleM_LauA,15829,16062,3,5,0,1,030
+service AleM_LauA,16249,16427,3,6,0,1,031
+*SWITCH*,16571,16771,3,6,0,1,999
+service AleM_LauA,16856,17083,3,7,0,1,032
+service JOMR,17276,17442,4,7,0,1,033
+service JOMR,17670,17780,5,7,0,1,034
+service AleM_LauA,17947,18094,5,8,0,1,035
+service AleM_LauA,18272,18427,5,9,0,1,036
+*SWITCH*,18548,18718,5,9,0,1,999
+service AleM_LauA,18926,19039,5,10,0,1,037
+service AleM_LauA,19248,19771,5,11,0,1,038
+service AleM_LauA,20080,20237,5,12,0,1,039
+service JOMR,20436,20611,6,12,0,1,040
+service AleM_LauA,20959,21087,6,13,0,1,041
+*SWITCH*,21135,21267,6,13,0,1,999
+service AleM_LauA,21293,21521,6,14,0,1,042
+service JOMR,21831,22042,7,14,0,1,043
+end of set,0,0,7,15,0,2,999
