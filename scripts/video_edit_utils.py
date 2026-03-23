@@ -355,21 +355,11 @@ def extract_segments_from_df_gpu(
         # Only cut rows corresponding to played points
         # (not timeouts or other actions)
         if row[1]['point_index'] != '999':
-            print(
-                f"Cutting point {row[1]['point_index']}: "
-                f"frames {row[1]['start_frame']} - "
-                f"{row[1]['end_frame']}"
-            )
 
-            print(f'video_path: {video_path}')
-            print(f'start_frame: {row[1]["start_frame"]}')
-            print(f'end_frame: {row[1]["end_frame"]}')
-            print(f'output_dir: {output_dir}')
             output_video = os.path.join(
                 output_dir,
                 f"{game_id}_p{row[1]['point_index']}.mp4"
             )
-            print(f"output_video: {output_video}")
 
             cut_point_gpu(
                 video_path=video_path,
@@ -386,7 +376,8 @@ def cv2_point_segment_cut(
     video_path: str,
     play_speed: float = 1.0,
     team1_name: str = "JOMR",
-    team2_name: str = "adversaire"
+    team2_name: str = "adversaire",
+    start_frame: int = None,
 ) -> pd.DataFrame:
     """
     Create a DataFrame containing the point segments extracted
@@ -404,6 +395,8 @@ def cv2_point_segment_cut(
             Defaults to "JOMR".
         team2_name (str, optional): Name of team 2.
             Defaults to "adversaire".
+        start_frame (int, optional): Frame number to start processing from.
+            Defaults to None.
     Returns:
         DataFrame containing information about the extracted
         point segments, with the columns:
@@ -501,7 +494,7 @@ def cv2_point_segment_cut(
 
     # Retrieve FPS to convert frames to time
     cap.get(cv2.CAP_PROP_FPS)
-    frame_number = 0
+    frame_number = 0 if start_frame is None else start_frame
 
     # Pause and rotation state
     paused = False
@@ -1337,73 +1330,49 @@ def basic_action_grader(
 # -------------------------------------------------------------------
 
 def all_possession_game(
-        video_dir: str,
         game_id: str,
         indexed_df_points_csv_path: str,
-        team1_name: str = None,
-        team2_name: str = None,
-        output_video_name: str = None,
-        output_dir: str = None,
+        video_dir: str,
+        team1_name: str,
+        team2_name: str,
+        output_dir: str,
     ) -> None:
     """
     Do a montage of all the possessions of a game, based on the extracted
     points segments. If a CSV path is provided, it reads the indexed points 
     DataFrame from the CSV file and displays the score on the video output.
     """
-    # Check if the video directory is NOT the segmented points directory
-    if video_dir == SEGMENTED_POINTS_DIR:
-        raise ValueError("WARNING: The video directory cannot be the same as the segmented points directory.")
-
-    # Set the output directory to the video directory if not provided
-    output_dir = video_dir if output_dir is None else output_dir
 
     # Get all .mp4 files in the video directory
-    video_files = [
+    video_paths_list = list([
         os.path.join(video_dir, f) for f in os.listdir(video_dir)
-        if f.endswith('.mp4')
-    ]
-    # Rename files to ensure correct order in the montage (p1, p2, ..., p10, etc.)
-    replace_dict = {
-        'p1.mp4': 'p01.mp4',
-        'p2.mp4': 'p02.mp4',
-        'p3.mp4': 'p03.mp4',
-        'p4.mp4': 'p04.mp4',
-        'p5.mp4': 'p05.mp4',
-        'p6.mp4': 'p06.mp4',
-        'p7.mp4': 'p07.mp4',
-        'p8.mp4': 'p08.mp4',
-        'p9.mp4': 'p09.mp4',
-    }
-    for filename in video_files:
-        new_filename = filename
-        for old, new in replace_dict.items():
-            new_filename = new_filename.replace(old, new)
-        os.rename(filename, new_filename)
-    
+        if f.endswith('.mp4') and game_id in f
+    ])
+    # # [DEV DEBUG]
+    # print(video_paths_list)
+
     # Error message if no .mp4 files found in the directory 
-    if not video_files:
-        print(f"No .mp4 files found in {video_dir}")
+    if len(video_paths_list) == 0:
+        print(f"No .mp4 files matching {game_id} files found in {video_dir}")
         return
 
     # Open the first video to get properties
-    cap = cv2.VideoCapture(video_files[0])
+    cap = cv2.VideoCapture(video_paths_list[0])
     frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     cap.release()
 
     # Create VideoWriter for the output montage
-    if output_video_name is not None:
-        output_path = os.path.join(output_dir, output_video_name)
-    else:
-        output_path = os.path.join(output_dir, f'all_possessions_montage_{game_id}.mp4')
-    os.makedirs(output_dir, exist_ok=True)
+    output_video_name = f'all_possessions_montage_{team1_name}_vs_{team2_name}.mp4'
+    output_path = os.path.join(output_dir, output_video_name)
+
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height))
 
-
     # Load the indexed points DataFrame from the CSV file
     indexed_df_points = pd.DataFrame()
+    print(f"Loading indexed points DataFrame from: {indexed_df_points_csv_path}")
     indexed_df_points = pd.read_csv(indexed_df_points_csv_path)
     # Retrieve team names from the DataFrame columns
     team1_id = indexed_df_points.columns[3].replace('_score', '')
@@ -1412,28 +1381,24 @@ def all_possession_game(
     # Ensure the DataFrame is sorted by point_index
     indexed_df_points = indexed_df_points.sort_values(by='point_index').reset_index(drop=True)
     # Create a list of scores for each point index
-    test_score_list = list(zip(
+    score_list = list(zip(
         indexed_df_points[f'{team1_id}_score'],
         indexed_df_points[f'{team2_id}_score'],
         indexed_df_points[f'{team1_id}_sets'],
         indexed_df_points[f'{team2_id}_sets']
     ))
 
-    if game_id is not None:
-        output_video_name = f'all_possessions_montage_{team1_name}_vs_{team2_name}.mp4'
-    else:
-        output_video_name = f'all_possessions_montage_{game_id}.mp4'
-
     # Concatenate all videos, with the score overlay 
-    for i, video_file in enumerate(video_files):
+    for i, video_file in enumerate(video_paths_list):
         cap = cv2.VideoCapture(video_file)
-        score = test_score_list[i] if i < len(test_score_list) else (0, 0)
+        score = score_list[i] if i < len(score_list) else (0, 0)
         while True:
             ret, frame = cap.read()
             if not ret:
                 break
             # Overlay score on the frame
-            score_text = f"""{team1_id}: {score[0]} - {team2_id}: {score[1]}\nSets: {team1_id} {score[2]} - {team2_id} {score[3]}"""
+            score_text = f"""{team1_id}: {score[0]} - {team2_id}: {score[1]}"""
+            set_text = f'Sets: {team1_id} {score[2]} - {team2_id} {score[3]}'
 
             cv2.putText(
                 frame,
@@ -1445,16 +1410,20 @@ def all_possession_game(
                 2,
                 cv2.LINE_AA,
             )
+            cv2.putText(
+                frame,
+                set_text,
+                (30, 100),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                (0, 255, 0),
+                2,
+                cv2.LINE_AA,
+            )
             out.write(frame)
         cap.release()
 
     out.release()
-
-    # Remove the mp4 files in video_dir after montage is created
-    video_files = [os.path.join(video_dir, f) for f in os.listdir(video_dir)
-        if f.endswith('.mp4')]
-    for video_file in video_files:
-        os.remove(video_file)
 
     print(f"Montage saved to: {output_path}")
 
@@ -1462,10 +1431,50 @@ def all_possession_game(
 # -------------------------------------------------------------------
 # Testing in main script
 if __name__ == "__main__":
-    test_df = cv2_point_segment_cut(
-        video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\JOMR_mar26_VSG_01_started_rotated_270.mp4',
-        team1_name="JOMR",
-        team2_name="(adv)",
-        play_speed=2
+    # all_possession_game(
+    #     game_id='JOMR_mar26_VSG_01',
+    #     video_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented',
+    #     indexed_df_points_csv_path=r'C:\Users\habib\Documents\GitHub\DataBeach\indexed_df_points\indexed_df_points_JOMR_mar26_VSG_01.csv',
+    #     team1_name='JOMR',
+    #     team2_name='LeaS_MarG',
+    #     output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\all_possessions'
+    # )
+
+    game_id = 'JOMR_mar26_VSG_01'
+    video_dir = r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess'
+    video_path = video_dir + game_id + '.mp4'
+    actions_df = pd.read_csv(r'C:\Users\habib\Documents\GitHub\DataBeach\indexed_df_points\indexed_df_points_JOMR_mar26_VSG_01.csv',
+                             dtype={'point_index': 'string'})
+    output_dir = r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented'
+    
+    print(actions_df)
+
+    # for row in actions_df.iterrows():
+    #     # Only cut rows corresponding to played points
+    #     # (not timeouts or other actions)
+    #     if row[1]['point_index'] != '999':
+
+    #         output_video = os.path.join(
+    #             output_dir,
+    #             f"{game_id}_p{row[1]['point_index']}.mp4"
+    #         )
+
+    #         print(
+    #             f"Cutting point {row[1]['point_index']} from frame "
+    #             f"{row[1]['start_frame']} to frame {row[1]['end_frame']} "
+    #             f"into file: {output_video}"
+    #         )
+    #         cut_point_gpu(
+    #             video_path=video_path,
+    #             start_frame=int(row[1]["start_frame"]),
+    #             end_frame=int(row[1]["end_frame"]),
+    #             output_video=output_video,
+    #         )
+
+
+    extract_segments_from_df_gpu(
+        video_path=video_path,
+        actions_df=actions_df,
+        output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented',
     )
-    print(test_df)
+

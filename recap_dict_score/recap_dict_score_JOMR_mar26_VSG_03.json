@@ -1,0 +1,19 @@
+{
+    "teams": [
+        "JOMR",
+        "CecB_JulL"
+    ],
+    "match_format": "15 points per set",
+    "winner": "CecB_JulL",
+    "final_score": "0 - 2",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "12 - 15"
+        },
+        {
+            "set": 2,
+            "score": "12 - 15"
+        }
+    ]
+}

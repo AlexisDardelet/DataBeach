@@ -4,7 +4,12 @@
 
 import os
 import pandas as pd
+import dotenv
 
+dotenv.load_dotenv()
+INDEXED_DF_POINTS_DIR = os.getenv("INDEXED_DF_POINTS_DIR")
+
+# =============================================================
 
 def extract_transform_indexed_df_points_csv(
         game_id: str,
@@ -31,19 +36,17 @@ def extract_transform_indexed_df_points_csv(
 
     # Path to the CSV file containing the indexed points df for the specified game_id
     csv_path = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        "indexed_df_points",
+        INDEXED_DF_POINTS_DIR,
         f"indexed_df_points_{game_id}.csv",
     )
 
-    # Load the CSV file into a DataFrame
+    # Load the CSV file into a DataFrame 
+    # (with 'point_index' column as string to preserve leading zeros)
     df_points_formatted = pd.DataFrame()
     df_points_formatted = pd.read_csv(
         filepath_or_buffer=csv_path,
         keep_default_na=True,
-    )
-    df_points_formatted["point_index"] = df_points_formatted["point_index"].astype(
-        "Int64"
+        dtype={"point_index": "str"}, 
     )
 
     # Create the 'point_id' column based on 'game_id' and 'point_index'
@@ -55,9 +58,10 @@ def extract_transform_indexed_df_points_csv(
         ),
         axis=1,
     )
+    # Move 'point_id' to the first column
     df_points_formatted.insert(
         0, "point_id", df_points_formatted.pop("point_id")
-    )  # Move 'point_id' to the first column
+    )  
 
     # Columns dropped
     df_points_formatted.drop(
@@ -163,9 +167,9 @@ def extract_transform_indexed_df_points_csv(
 # =============================================================
 
 if __name__ == "__main__":
-    csv_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "indexed_df_points",
-        f"indexed_df_points_game_id.csv",
-        )
-    print(csv_path)
+    df_formatted = extract_transform_indexed_df_points_csv(
+        game_id='JOMR_jan26_MBV_04',
+        team_a_name='JOMR',
+        team_b_name='AleM_LauA',
+    )
+    print(df_formatted.head())

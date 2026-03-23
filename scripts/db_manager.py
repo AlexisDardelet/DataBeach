@@ -4,13 +4,15 @@ import sqlite3
 import csv
 import os
 import pandas as pd
+import dotenv
+
+dotenv.load_dotenv()
 
 # Local imports
 from etl_utils import extract_transform_indexed_df_points_csv
 
 # Environment variables and constants
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 class DBManager:
     """Manages all operations related to the SQLite database."""
@@ -27,6 +29,12 @@ class DBManager:
         self.conn.execute("PRAGMA foreign_keys = ON")
         self.cursor = self.conn.cursor()
         print(f"✅ Connection established: {self.DB_PATH}")
+        
+        # Directories for CSV and JSON files
+        self.indexed_df_points_dir = os.getenv("INDEXED_DF_POINTS_DIR")
+        self.recap_dict_score_dir = os.getenv("RECAP_DICT_SCORE_DIR")
+        self.actions_graded_dir = os.getenv("ACTIONS_GRADED_DIR")
+
 
     def close(self):
         """Closes the database connection."""
@@ -475,16 +483,11 @@ class DBManager:
         """
         # If no directory is provided, use the default 'indexed_df_points' directory
         if indexed_df_points_dir is None:
-            indexed_df_points_dir = os.path.join(
-                    os.path.dirname(
-                        os.path.dirname(
-                            os.path.abspath(__file__)
-                        )
-                    ),
-                    "indexed_df_points"
-                )
-        # DEV DEBUG - to be removed later
-        print(f"📋 [DEV] 📂 Looking for indexed points CSV files in '{indexed_df_points_dir}'...")
+            indexed_df_points_dir = self.indexed_df_points_dir
+        print(f"📂 Looking for indexed points CSV files in '{indexed_df_points_dir}'...")
+        
+        # # DEV DEBUG - to be removed later
+        # print(f"📋 [DEV] 📂 Looking for indexed points CSV files in '{indexed_df_points_dir}'...")
 
         # Get the list of game_ids from the CSV files in the indexed_df_points directory
         game_ids = []
@@ -517,14 +520,8 @@ class DBManager:
         """
         # If no directory is provided, use the default 'recap_dict_score' directory
         if action_graded_dir is None:
-            action_graded_dir = os.path.join(
-                os.path.dirname(
-                    os.path.dirname(
-                        os.path.abspath(__file__)
-                        )
-                ), "actions_graded"
-            )
-        print(f"📂 Looking for JSON files in '{action_graded_dir}' for action '{action_name}'...")
+            action_graded_dir = self.actions_graded_dir
+        print(f"📂 Looking for graded action JSON files in '{action_graded_dir}'...")
 
         # # Create the action table if it doesn't exist
         self.create_simple_actions_table(action_name)
@@ -639,7 +636,10 @@ if __name__ == "__main__":
         # db.false_aces_corrector()
         # db.reset_database(action_name_list=['serve'])
         # db.list_all_tables()
-        db.reset_database(action_name_list=['serve'])
+        # db.reset_database(action_name_list=['serve'])
+        table_serve_df = db.table_to_dataframe("table_serve")
+        print(table_serve_df.head())
+
 
 
 
