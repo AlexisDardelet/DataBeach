@@ -7,8 +7,11 @@ from dotenv import load_dotenv
 load_dotenv()
 INDEXED_DF_POINTS_DIR = os.getenv("INDEXED_DF_POINTS_DIR")
 RECAP_DICT_SCORE_DIR = os.getenv("RECAP_DICT_SCORE_DIR")
+SEGMENTED_POINTS_DIR = os.getenv("SEGMENTED_POINTS_DIR")
+ALL_POSSESSION_DIR = os.getenv("ALL_POSSESSION_DIR")
 
 # Local imports
+from db_manager import DBManager
 sys.path.append(os.path.join(os.path.dirname(__file__), "video_edit_utils"))
 from video_edit_utils import (
     montage_operations,
@@ -18,6 +21,7 @@ from video_edit_utils import (
     point_indexeer,
     score_checker,
     extract_segments_from_df_gpu,
+    all_possession_game
 )
 
 
@@ -50,6 +54,8 @@ class GameEditor:
 
         self.indexed_df_points_dir = INDEXED_DF_POINTS_DIR
         self.recap_dict_score_dir = RECAP_DICT_SCORE_DIR
+        self.segmented_point_dir = SEGMENTED_POINTS_DIR
+        self.all_possession_dir = ALL_POSSESSION_DIR
 
     # Method for pre-match editing of the videos
     # in a directory (rotation and pre-match cutting)
@@ -162,6 +168,7 @@ class GameEditor:
         team1_name: str,
         team2_name: str,
         rewrite_videos: bool = False,
+        temp_indexed_df_point : pd.DataFrame = None,
     ):
         """
         Pipeline from the preprocessed video to
@@ -180,6 +187,11 @@ class GameEditor:
                 output directory where the segmented
                 points videos will be stored.
         """
+        # If temp_indexed_df_point is provided, skip to the segment extraction step
+        if temp_indexed_df_point is not None:
+            print("Using provided temp_indexed_df_point for segment extraction.")
+            start_again_frame = int(temp_indexed_df_point['end_frame'].iloc[-2])
+
 
         # Validate that video_path is set
         if self.video_path is None:
@@ -187,7 +199,6 @@ class GameEditor:
                 "video_path is not set. Please provide a valid video_path "
                 "when initializing GameEditor."
             )
-        
 
         # Check if 'indexed_df_points' and 'recap_dict_score' directories exist
         if not os.path.exists(self.indexed_df_points_dir):
@@ -256,3 +267,62 @@ class GameEditor:
             actions_df=indexed_df_points,
             output_dir=self.output_dir,
         )
+
+    def all_possession_montage(
+        self,
+        game_id: str,
+        video_dir: str = None,
+        output_dir: str = None,
+    ) -> None:
+        """
+        Creates a montage video for all possessions of a game.
+        Args:
+            game_id (str): game_id of the game to create the montage for.
+                The game must previously have been segmented into points
+                using the game_to_segmented_points() method.
+        """
+        # Default video directory
+        video_dir = self.segmented_point_dir if video_dir is None else video_dir
+
+        # Default output directory
+        output_dir = self.all_possession_dir if output_dir is None else output_dir
+
+        # Validate that the game has been segmented
+        video_files = [
+            f for f in os.listdir(video_dir)
+            if f.startswith(f"{game_id}_p") and f.endswith(".mp4")
+        ]
+        # If no segmented point videos are found, print a message and return
+        if not video_files:
+            print(
+                f"No segmented point videos found for game_id '{game_id}' "
+                f"in directory '{video_dir}'."
+            )
+            return
+
+        ## Create the montage video with all_possession_game()
+        # Fetch the information in the database and in the indexed_df_points
+        indexed_df_points_csv_path = os.path.join(
+            self.indexed_df_points_dir, f"indexed_df_points_{game_id}.csv"
+        )
+        with DBManager() as db:
+            team1_name, team2_name = db.teams_names_from_game_id(
+                game_id=game_id
+                )
+        # Montage the full game
+        all_possession_game(
+            game_id=game_id,
+            video_dir=video_dir,
+            indexed_df_points_csv_path=indexed_df_points_csv_path,
+            team1_name=team1_name,
+            team2_name=team2_name,
+            output_dir=output_dir
+        )
+
+# -------------------------------------------------------------------
+
+if __name__ == "__main__":
+    editor = GameEditor()
+    editor.all_possession_montage(
+        game_id='JOMR_mar26_VSG_03'
+    )

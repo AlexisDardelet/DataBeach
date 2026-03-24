@@ -10,6 +10,7 @@ import sys
 
 from coach_overview import coach_overview
 from serve_focus import serve_focus
+from editor_interface import editor_interface
 
 # Pages import
 
@@ -24,6 +25,7 @@ from video_edit_utils import *
 # Listing the teams with players names for the dropdown menu in the sidebar
 with DBManager() as db:
     teams_list = db.list_teams_with_players_names()
+    st.session_state.update({"teams_list": teams_list})
 
 # Sidebar menu for navigation
 with st.sidebar:
@@ -46,6 +48,7 @@ with st.sidebar:
     with st.container(border=True):
         paire_name = st.selectbox("Select a team:", [team[1] for team in teams_list])
         paire_id = next((team[0] for team in teams_list if team[1] == paire_name), None)
+        st.session_state.update({"paire_id": paire_id})
 
     # Menu options for the coaching view
     if st.session_state.get("Coaching view", True):
@@ -76,15 +79,15 @@ with st.sidebar:
         )
 
 ## Page content based on the selected menu option
-# Coaching view pages
-if selected == "Coach overview":
-    coach_overview(paire_id)
-elif selected == "Serve focus":
-    serve_focus(paire_id)
+# # Coaching view pages
+if st.session_state.get("Coaching view", True):
+    if selected == "Coach overview":
+        coach_overview(paire_id)
+    elif selected == "Serve focus":
+        serve_focus(paire_id)
 
 # # Dev view pages
-# if st.session_state.get("Dev view", True):
-#     if selected == "Dev overview":
-#         st.title("Development overview")
-#         st.write("This page provides an overview of the development activities, including progress updates and upcoming milestones.")
+if st.session_state.get("Dev view", True):
+    if selected == "Game editor":
+        editor_interface()
 

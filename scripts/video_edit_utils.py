@@ -1431,50 +1431,25 @@ def all_possession_game(
 # -------------------------------------------------------------------
 # Testing in main script
 if __name__ == "__main__":
-    # all_possession_game(
-    #     game_id='JOMR_mar26_VSG_01',
-    #     video_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented',
-    #     indexed_df_points_csv_path=r'C:\Users\habib\Documents\GitHub\DataBeach\indexed_df_points\indexed_df_points_JOMR_mar26_VSG_01.csv',
-    #     team1_name='JOMR',
-    #     team2_name='LeaS_MarG',
-    #     output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\all_possessions'
-    # )
-
-    game_id = 'JOMR_mar26_VSG_01'
-    video_dir = r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess'
-    video_path = video_dir + game_id + '.mp4'
-    actions_df = pd.read_csv(r'C:\Users\habib\Documents\GitHub\DataBeach\indexed_df_points\indexed_df_points_JOMR_mar26_VSG_01.csv',
-                             dtype={'point_index': 'string'})
-    output_dir = r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented'
-    
-    print(actions_df)
-
-    # for row in actions_df.iterrows():
-    #     # Only cut rows corresponding to played points
-    #     # (not timeouts or other actions)
-    #     if row[1]['point_index'] != '999':
-
-    #         output_video = os.path.join(
-    #             output_dir,
-    #             f"{game_id}_p{row[1]['point_index']}.mp4"
-    #         )
-
-    #         print(
-    #             f"Cutting point {row[1]['point_index']} from frame "
-    #             f"{row[1]['start_frame']} to frame {row[1]['end_frame']} "
-    #             f"into file: {output_video}"
-    #         )
-    #         cut_point_gpu(
-    #             video_path=video_path,
-    #             start_frame=int(row[1]["start_frame"]),
-    #             end_frame=int(row[1]["end_frame"]),
-    #             output_video=output_video,
-    #         )
-
-
-    extract_segments_from_df_gpu(
-        video_path=video_path,
-        actions_df=actions_df,
-        output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented',
+    all_possession_game(
+        game_id='JOMR_mar26_VSG_02',
+        video_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented',
+        indexed_df_points_csv_path=r'C:\Users\habib\Documents\GitHub\DataBeach\indexed_df_points\indexed_df_points_JOMR_mar26_VSG_02.csv',
+        team1_name='JOMR',
+        team2_name='MarL_MarB',
+        output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\all_possessions'
     )
+
+    # ---------------------------
+
+    # video_path = r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\JOMR_mar26_VSG_03_started_rotated_270.mp4'
+    # actions_df = pd.read_csv(r'C:\Users\habib\Documents\GitHub\DataBeach\indexed_df_points\indexed_df_points_JOMR_mar26_VSG_03.csv',
+    #                          dtype={'point_index': 'string'})
+    # output_dir = r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented'
+    
+    # extract_segments_from_df_gpu(
+    #     video_path=video_path,
+    #     actions_df=actions_df,
+    #     output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented',
+    # )
 
