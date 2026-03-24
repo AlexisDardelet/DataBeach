@@ -90,4 +90,11 @@ if st.session_state.get("Coaching view", True):
 if st.session_state.get("Dev view", True):
     if selected == "Game editor":
         editor_interface()
-
+        # Move the selectbox to the sidebar
+        with st.sidebar:
+            editor_mode = st.selectbox(
+                "Select the editor mode:", 
+                ["Pre-processing", "Game-to-points", "All possessions"],
+                on_change=lambda: st.session_state.update({"editor_mode": st.session_state.editor_mode_select}),
+                key="editor_mode_select"
+            )
