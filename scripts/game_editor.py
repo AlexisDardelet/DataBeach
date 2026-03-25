@@ -322,7 +322,8 @@ class GameEditor:
 # -------------------------------------------------------------------
 
 if __name__ == "__main__":
-    editor = GameEditor()
-    editor.all_possession_montage(
-        game_id='JOMR_mar26_VSG_03'
+    editor = GameEditor(
+        video_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Alex&Co\(alex) raw games',
+        output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Alex&Co\(alex) preprocessed games'
     )
+    editor.pre_match_editing(play_speed=2.0)

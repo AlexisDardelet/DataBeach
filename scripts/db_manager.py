@@ -636,11 +636,7 @@ if __name__ == "__main__":
         # db.false_aces_corrector()
         # db.reset_database(action_name_list=['serve'])
         # db.list_all_tables()
-        # db.reset_database(action_name_list=['serve'])
-        table_serve_df = db.table_to_dataframe("table_serve")
-        print(table_serve_df.head())
-
-
-
-
+        db.reset_database(action_name_list=['serve'])
+        table_game_df = db.table_to_dataframe("table_game")
+        print(table_game_df.tail())
 

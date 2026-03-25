@@ -49,6 +49,16 @@ with st.sidebar:
         paire_name = st.selectbox("Select a team:", [team[1] for team in teams_list])
         paire_id = next((team[0] for team in teams_list if team[1] == paire_name), None)
         st.session_state.update({"paire_id": paire_id})
+        # Calling the db to get the game_ids for the selected team and storing them in session state
+        with DBManager() as db:
+            db.execute_query(
+                """SELECT game_id 
+                FROM table_game
+                WHERE team_a = ? OR team_b = ?""",
+                (paire_id, paire_id)
+                )
+            results = db.cursor.fetchall()
+            st.session_state.update({"game_ids": [result[0] for result in results]})
 
     # Menu options for the coaching view
     if st.session_state.get("Coaching view", True):
@@ -69,7 +79,6 @@ with st.sidebar:
         selected = option_menu(
             menu_title="Main Menu",
             options=[
-            "Dev overview",
             "Game editor",
             "Action grading",
             ],
