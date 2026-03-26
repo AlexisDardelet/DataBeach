@@ -31,6 +31,15 @@ def select_folder(default_path=ROOT_VIDEO_DIR):
     root.destroy()
     return folder
 
+# Function to assign a game_id to a raw video file and rename it accordingly
+def assign_game_id_to_video_name(
+    df = pd.DataFrame,
+    video_name = str,
+    game_id = str)-> pd.DataFrame:
+    df.loc[df['Raw video name'] == video_name, 'game_id associated'] = game_id
+    return df
+
+
 def editor_interface():
     # Fetch the paire_id from session state
     paire_id = st.session_state.get("paire_id", None)
@@ -42,14 +51,18 @@ def editor_interface():
 
         folder = st.session_state.get("video_dir", None)
         output_folder = st.session_state.get("output_dir", None)    
-
+    
         ###### Pre-processing mode (by default) ####################################
         if st.session_state.get("editor_mode", "Pre-processing") == "Pre-processing":
+
+            # Initiating variables
+            video_names_game_ids_df = None
 
             # Set up the layout with two columns for folder selection
             col1, col2 = st.columns([1, 2.5]) # First row for video_dir
             col3, col4 = st.columns([1, 2.5]) # Second row for output_dir
-            col5, col6 = st.columns([1, 1.5]) # Third row for pre-processing options and GameEditor initialization
+            col5, col6, col7 = st.columns([1, 1, 1]) 
+            col_dict_ids = st.columns([1])
 
             # Widgets to select the directory
             with col1: 
@@ -60,53 +73,23 @@ def editor_interface():
                     folder = select_folder()
                     if folder:
                         st.session_state["video_dir"] = folder
-                if "video_dir" in st.session_state:
-                    st.session_state["video_dir_list"] = list(os.listdir(st.session_state["video_dir"]))
-                    with col2:
-                        st.markdown(
-                            f"""
-                            <style>
-                            .small-success {{
-                                font-size: 15px;
-                                padding: 10px;
-                                background-color: #1e5631;
-                                border-radius: 10px;
-                                color: white;
-                            }}
-                            </style>
-                            <div class="small-success">✅ {st.session_state["video_dir"]}</div>
-                            """,
-                            unsafe_allow_html=True
-                        )
-            # Widget to assign a game_id into the preprocessed videos
-            with col5:
-                if st.session_state.get("video_dir_list", []):
-                    selected_raw_video = st.selectbox(
-                        "Raw video file", 
-                        st.session_state.video_dir_list,
-
-                        )
-                    game_id_to_assign = st.selectbox(
-                        "Assign to game_id", 
-                        game_ids
-                        )
-                    assign_button = st.button(
-                        "Assign/Rename game_id to video",
-                        use_container_width=True, 
-                        type="primary",
-                        )
-            with col6:
-                if st.session_state.get("video_dir_list", []):
-                    df = pd.DataFrame({
-                        'Raw video name': st.session_state.get("video_dir_list", []),
-                        'game_id associated': [''] * len(st.session_state.get("video_dir_list", []))
-                    },
-                    index=None)
-                    st.dataframe(df, use_container_width=True)
-
-
-
-
+            with col2:
+                    if "video_dir" in st.session_state:
+                            st.markdown(
+                                f"""
+                                <style>
+                                .small-success {{
+                                    font-size: 15px;
+                                    padding: 10px;
+                                    background-color: #1e5631;
+                                    border-radius: 10px;
+                                    color: white;
+                                }}
+                                </style>
+                                <div class="small-success">✅ {st.session_state["video_dir"]}</div>
+                                """,
+                                unsafe_allow_html=True
+                            )
 
             # Widgets to select the output directory
             with col3:
@@ -134,23 +117,64 @@ def editor_interface():
                             """,
                             unsafe_allow_html=True
                         )
-            # [DEV] Placeholders
-            # with col3:
-            #     st.write("Additional pre-processing options can go here.")
-            # with col4:
-            #     st.write("Initializing GameEditor in Pre-processing mode...")
+
+            # Widgets to assign game_ids to raw video files and initialize GameEditor
+            if "video_dir" in st.session_state and "output_dir" in st.session_state:
+
+
+                # Display dropdown to select a raw video file and assign a game_id
+                with col5:
+                    video_files = [video for video in os.listdir(st.session_state["video_dir"]) 
+                                   if video.endswith(('.mp4', '.avi', '.mov'))]
+                    
+                    # Initialize a dictionary to store the assigned game_ids for each video file
+                    if "assign_game_ids_dict" not in st.session_state:
+                        assign_game_ids_dict = {video: None for video in video_files}
+                        st.session_state["assign_game_ids_dict"] = assign_game_ids_dict
+                    else:
+                        assign_game_ids_dict = st.session_state["assign_game_ids_dict"]
+
+                    selected_raw_video = st.selectbox(
+                        label='Select a raw video file to assign a game_id:',
+                        options=video_files if video_files else ['No video files found in the selected folder'],
+                    )
+                # Display dropdown of game_ids available for paire_id
+                with col6:
+                    selected_game_id = st.selectbox(
+                        label='Select a game_id to assign to the selected video:',
+                        options=game_ids if game_ids else ['No game_ids found for the selected team'],
+                    )
+                with col7:
+                    if st.button("Assign game_id to selected video file",
+                                        use_container_width=True,
+                                        type="primary",
+                                        ):                             
+                        # Update the assign_game_ids_dict with the assigned game_id for the selected video file
+                        assign_game_ids_dict[selected_raw_video] = selected_game_id
+                        st.session_state["assign_game_ids_dict"] = assign_game_ids_dict
+
+
+                    with col_dict_ids[0]:
+                        st.write(assign_game_ids_dict)
+
+            
+            # if "output_dir" in st.session_state:
+            #         st.session_state["output_dir_list"] = list(os.listdir(st.session_state["output_dir"]))
+                
+
+
 
             # Initialize GameEditor and run pre-processing if both folders are selected
             game_editor = GameEditor(
                 video_dir=st.session_state.get("video_dir"),
                 output_dir=st.session_state.get("output_dir")
             )
-            if folder and output_folder:
-                # st.button("Run pre-processing",
-                #           use_container_width=True)
+            # if folder and output_folder:
+            #     st.button("Run pre-processing",
+            #               use_container_width=True)
 
-                if st.button("Run pre-processing"):
-                    game_editor.pre_match_editing(play_speed=2.0)
+            #     if st.button("Run pre-processing"):
+            #         game_editor.pre_match_editing(play_speed=2.0)
 
 
 
@@ -164,15 +188,4 @@ def editor_interface():
 
                 st.write("Initializing GameEditor in Game-to-points mode...")
 
-    # with col1:
-    #     paire_id = st.selectbox("Select a team:", [team[1] for team in st.session_state.teams_list])
-    # with col1:
-    #     with DBManager() as db:
-    #         db.execute_query(f"""SELECT game_id
-    #                         FROM table_game
-    #                         WHERE team_a = '{paire_id}' OR team_b = '{paire_id}'
-    #                         """)
-    #         results = db.cursor.fetchall()
-    #         st.session_state.game_ids = [result[0] for result in results]
 
-    #     selected_game_id = st.selectbox("Select a game:", st.session_state.game_ids)
