@@ -92,7 +92,7 @@ def video_rotation(
     if output_dir is None:
         output_path = (
             f'{os.path.splitext(video_path)[0]}'
-            f'_rotated_{rotation_state}.mp4'
+            f'_rotated.mp4'
         )
     else:
         base_name = os.path.splitext(
@@ -100,16 +100,14 @@ def video_rotation(
         )[0]
         output_path = os.path.join(
             output_dir,
-            f'{base_name}_rotated_{rotation_state}.mp4'
+            f'{base_name}_rotated.mp4'
         )
+    # Path to the ffmpeg build compiled with NVENC support
+    # for GPU-accelerated rotation
+    ffmpeg_path = FFMPEG_PATH
 
     # ffmpeg command to apply the rotation
     if filter_str is not None:
-
-        # Path to the ffmpeg build compiled with NVENC support
-        # for GPU-accelerated rotation
-        ffmpeg_path = FFMPEG_PATH
-
         command = [
             ffmpeg_path,
             '-y',
@@ -118,9 +116,18 @@ def video_rotation(
             '-c:a', 'copy',  # Copy the audio track without re-encoding
             output_path
         ]
+    else:
+        # If no rotation is needed, just copy the video
+        command = [
+            ffmpeg_path,
+            '-y',
+            '-i', video_path,
+            '-c', 'copy',
+            output_path
+        ]
 
-        # Run the ffmpeg command to apply the rotation
-        subprocess.run(command, check=True)
+    # Run the ffmpeg command to apply the rotation
+    subprocess.run(command, check=True)
 
 # -------------------------------------------------------------------
 # Record montage actions for video pre-processing via cv2
@@ -1431,14 +1438,19 @@ def all_possession_game(
 # -------------------------------------------------------------------
 # Testing in main script
 if __name__ == "__main__":
-    all_possession_game(
-        game_id='JOMR_mar26_VSG_02',
-        video_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented',
-        indexed_df_points_csv_path=r'C:\Users\habib\Documents\GitHub\DataBeach\indexed_df_points\indexed_df_points_JOMR_mar26_VSG_02.csv',
-        team1_name='JOMR',
-        team2_name='MarL_MarB',
-        output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\all_possessions'
-    )
+    # video_rotation(
+    #     video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs bruts\2026 mar - S2 250 M - OLB\Alex poule match 1.mp4',
+    #     rotation_state=0,
+    # )
+
+    # all_possession_game(
+    #     game_id='JOMR_mar26_VSG_02',
+    #     video_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented',
+    #     indexed_df_points_csv_path=r'C:\Users\habib\Documents\GitHub\DataBeach\indexed_df_points\indexed_df_points_JOMR_mar26_VSG_02.csv',
+    #     team1_name='JOMR',
+    #     team2_name='MarL_MarB',
+    #     output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\all_possessions'
+    # )
 
     # ---------------------------
 

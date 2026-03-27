@@ -9,6 +9,7 @@ import cv2
 import datetime
 import json
 import sys
+from pathlib import Path
 from dotenv import load_dotenv
 
 # Local import
@@ -56,13 +57,14 @@ def editor_interface():
         if st.session_state.get("editor_mode", "Pre-processing") == "Pre-processing":
 
             # Initiating variables
-            video_names_game_ids_df = None
+            launch_preprocessing = None
 
             # Set up the layout with two columns for folder selection
             col1, col2 = st.columns([1, 2.5]) # First row for video_dir
             col3, col4 = st.columns([1, 2.5]) # Second row for output_dir
             col5, col6, col7 = st.columns([1, 1, 1]) 
-            col_dict_ids = st.columns([1])
+            col_dict_ids,col_success = st.columns([3,1])
+
 
             # Widgets to select the directory
             with col1: 
@@ -121,7 +123,6 @@ def editor_interface():
             # Widgets to assign game_ids to raw video files and initialize GameEditor
             if "video_dir" in st.session_state and "output_dir" in st.session_state:
 
-
                 # Display dropdown to select a raw video file and assign a game_id
                 with col5:
                     video_files = [video for video in os.listdir(st.session_state["video_dir"]) 
@@ -154,21 +155,71 @@ def editor_interface():
                         st.session_state["assign_game_ids_dict"] = assign_game_ids_dict
 
 
-                    with col_dict_ids[0]:
+                    with col_dict_ids:
                         st.write(assign_game_ids_dict)
+                with col7:
+                    if assign_game_ids_dict and all(assign_game_ids_dict.values()):
+                        launch_preprocessing = st.button("Initialize GameEditor",
+                                    use_container_width=True,
+                                    type="secondary"
+                        )
+            # Initialize GameEditor and run pre-processing if both folders are selected
+            if launch_preprocessing:
+                game_editor = GameEditor(
+                            video_dir=st.session_state.get("video_dir"),
+                            output_dir=st.session_state.get("output_dir")
+                            )
+                game_editor.pre_match_editing(play_speed=2.0)
+                st.session_state["game_editor_initialized"] = True
+
+                with col_success:
+                    if st.session_state.get("game_editor_initialized", True):
+                        st.success("GameEditor initialized and pre-processing completed successfully!")
+
+
+                
+            # Identifying video names to rename in output_dir 
+            # based on the assigned game_ids in assign_game_ids_dict
+            video_names_to_rename_list = list(st.session_state["assign_game_ids_dict"].keys())
+            video_names_to_rename_list = [os.path.splitext(video)[0] for video in video_names_to_rename_list]
+            output_dir_files_list = list(
+                    os.listdir(st.session_state.get("output_dir", "")) if st.session_state.get("output_dir") else []
+                    )
+            st.write(f"Output directory files: {output_dir_files_list}")
+            # for output_file in output_dir_files_list:
+
+
+            st.write(f"Video files in output directory: {', '.join(video_names_to_rename_list)}")
+
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            # output_path = Path(st.session_state["output_dir"]) / video_file
+                            # output_path = output_path.as_posix()
+                            
+                            # new_filename = f"{game_id}_started_rotated.mp4"
+                            # new_output_path = Path(st.session_state["output_dir"]) / new_filename
+                            # new_output_path = new_output_path.as_posix()
+
+                            
+                            # st.write(f"output_path: {output_path}")
+                            # st.write(f"output_dir: {st.session_state['output_dir']}")
+
+                            # os.rename(output_path, new_output_path)
+                            # dev_new_video_names_dict[temp_name] = new_filename
+                    # [DEV]
+
+
 
             
-            # if "output_dir" in st.session_state:
-            #         st.session_state["output_dir_list"] = list(os.listdir(st.session_state["output_dir"]))
-                
 
 
 
-            # Initialize GameEditor and run pre-processing if both folders are selected
-            game_editor = GameEditor(
-                video_dir=st.session_state.get("video_dir"),
-                output_dir=st.session_state.get("output_dir")
-            )
+
             # if folder and output_folder:
             #     st.button("Run pre-processing",
             #               use_container_width=True)
@@ -184,8 +235,6 @@ def editor_interface():
 
         # Game-to-points mode
         elif st.session_state.get("editor_mode", "Pre-processing") == "Game-to-points":
-            with col1:
-
-                st.write("Initializing GameEditor in Game-to-points mode...")
+            st.write("Initializing GameEditor in Game-to-points mode...")
 
 

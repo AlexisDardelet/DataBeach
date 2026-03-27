@@ -168,7 +168,7 @@ class GameEditor:
         team1_name: str,
         team2_name: str,
         rewrite_videos: bool = False,
-        temp_indexed_df_point : pd.DataFrame = None,
+        # temp_indexed_df_point : pd.DataFrame = None,
     ):
         """
         Pipeline from the preprocessed video to
@@ -187,10 +187,10 @@ class GameEditor:
                 output directory where the segmented
                 points videos will be stored.
         """
-        # If temp_indexed_df_point is provided, skip to the segment extraction step
-        if temp_indexed_df_point is not None:
-            print("Using provided temp_indexed_df_point for segment extraction.")
-            start_again_frame = int(temp_indexed_df_point['end_frame'].iloc[-2])
+        # # If temp_indexed_df_point is provided, skip to the segment extraction step
+        # if temp_indexed_df_point is not None:
+        #     print("Using provided temp_indexed_df_point for segment extraction.")
+        #     start_again_frame = int(temp_indexed_df_point['end_frame'].iloc[-2])
 
 
         # Validate that video_path is set

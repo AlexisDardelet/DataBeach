@@ -166,10 +166,37 @@ def extract_transform_indexed_df_points_csv(
 
 # =============================================================
 
+def video_file_renamer(
+        rename_dict: dict,
+        output_dir: str,
+    ) -> None:
+    """Rename video files based on a provided mapping of old names to new names.
+    The dict should have the format {old_name: game_id}"""
+
+    # Warning if any key in the rename_dict does not end with '.mp4'
+    if not all(key.endswith('.mp4') for key in rename_dict.keys()):
+        raise ValueError("All keys in the rename_dict should end with '.mp4'")
+    
+    # Temp dict matching the format strings of GameEditor.preprocess()
+    temp_rename_dict = {key.replace('.mp4','_started_rotated.mp4'): value for key, value in rename_dict.items()}
+    
+    # Renaming the video files in output_dir based on the temp_rename_dict mapping
+    for new_name, game_id in temp_rename_dict.items():
+        if new_name in os.listdir(output_dir):
+            old_path = os.path.join(output_dir, new_name)
+            new_path = os.path.join(output_dir, f"{game_id}_started_rotated.mp4")
+            # print(f"Renaming from {old_path} to {new_path}")
+            os.rename(old_path, new_path)
+
+# =============================================================
+
+test_dict = {
+    'Alex poule match 1.mp4': 'game_id_1',
+    'AleD-RonP_mar26_session_01.mp4': 'game_id_2',
+}
+
 if __name__ == "__main__":
-    df_formatted = extract_transform_indexed_df_points_csv(
-        game_id='JOMR_jan26_MBV_04',
-        team_a_name='JOMR',
-        team_b_name='AleM_LauA',
+    video_file_renamer(
+        rename_dict=test_dict,
+        output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess'
     )
-    print(df_formatted.head())
