@@ -141,6 +141,7 @@ class GameEditor:
                 start_frame=int(row["starting_game_frame"]),
                 end_frame=int(row["last_game_frame"]),
                 output_video=output_video,
+                mov_file=True if row["video_path"].lower().endswith(".mov") else False
             )
 
         # Apply video_rotation() to each row of

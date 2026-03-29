@@ -173,9 +173,9 @@ def video_file_renamer(
     """Rename video files based on a provided mapping of old names to new names.
     The dict should have the format {old_name: game_id}"""
 
-    # Warning if any key in the rename_dict does not end with '.mp4'
-    if not all(key.endswith('.mp4') for key in rename_dict.keys()):
-        raise ValueError("All keys in the rename_dict should end with '.mp4'")
+    # # Warning if any key in the rename_dict does not end with '.mp4' or '.mov'
+    # if not all(key.endswith(('.mp4', '.mov')) for key in rename_dict.keys()):
+    #     raise ValueError("All keys in the rename_dict should end with '.mp4' or '.mov'")
     
     # Temp dict matching the format strings of GameEditor.preprocess()
     temp_rename_dict = {key.replace('.mp4','_started_rotated.mp4'): value for key, value in rename_dict.items()}

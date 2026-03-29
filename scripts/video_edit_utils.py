@@ -18,7 +18,8 @@ def cut_point_gpu(
     video_path: str,
     start_frame: int,
     end_frame: int,
-    output_video: str
+    output_video: str,
+    mov_file: bool = False
 ):
     """
     Extract a frame-accurate segment using CUDA + NVENC via
@@ -30,32 +31,53 @@ def cut_point_gpu(
         start_frame: first frame of the segment to extract
         end_frame: last frame of the segment to extract
         output_video: path for the generated segment video
+        mov_file: if True, the video input file in .mov format, 
+            which requires a specific ffmpeg input option
     """
-
-    # Video filter to select frames between start_frame and
-    # end_frame, and reset timestamps starting from 0
-    vf = (
-        f"select='between(n,{start_frame},{end_frame})',"
-        f"setpts=PTS-STARTPTS"
-    )
 
     # Path to the ffmpeg build compiled with NVENC support
     # for GPU-accelerated extraction
     ffmpeg_path = FFMPEG_PATH
 
-    # ffmpeg command to extract the segment using the GPU
-    cmd = [
-        ffmpeg_path, "-y",
-        "-hwaccel", "cuda",
-        "-i", video_path,
-        "-vf", vf,
-        "-an",
-        "-c:v", "h264_nvenc",
-        "-preset", "p4",
-        "-rc", "constqp",
-        "-qp", "18",
-        output_video
-    ]
+    if mov_file is False:
+        # Video filter to select frames between start_frame and
+        # end_frame, and reset timestamps starting from 0
+        vf = (
+            f"select='between(n,{start_frame},{end_frame})',"
+            f"setpts=PTS-STARTPTS"
+        )
+        # ffmpeg command to extract the segment using the GPU
+        cmd = [
+            ffmpeg_path, "-y",
+            "-hwaccel", "cuda",
+            "-i", video_path,
+            "-vf", vf,
+            "-an",
+            "-c:v", "h264_nvenc",
+            "-preset", "p4",
+            "-rc", "constqp",
+            "-qp", "18",
+            output_video
+        ]
+    else:
+        # For .mov files, specific input option
+        vf = (
+            f"select='between(n,{start_frame},{end_frame})',"
+            f"setpts=PTS-STARTPTS,"
+            f"format=yuv420p"  # Conversion du 10bit → 8bit compatible NVENC
+        )
+        # ffmpeg command with specific input options for .mov files
+        cmd = [
+            ffmpeg_path, "-y",
+            "-i", video_path,
+            "-vf", vf,
+            "-an",
+            "-c:v", "h264_nvenc",
+            "-preset", "p4",
+            "-rc", "constqp",
+            "-qp", "18",
+            output_video
+        ]
 
     # Run the ffmpeg command to extract the segment using the GPU
     subprocess.run(cmd, check=True)
@@ -135,13 +157,15 @@ def video_rotation(
 # -------------------------------------------------------------------
 def montage_operations(
     video_path: str,
-    play_speed: float = 1.0
+    play_speed: float = 1.0,
+    mov_file: bool = False
 ) -> dict:
     """
     Records the montage actions for video pre-processing.
 
     Args:
         play_speed (float): Video playback speed. Defaults to 1.0.
+        mov_file (bool): Whether the video file is in .mov format. Defaults to False.
 
     Returns:
         dict: Dictionary with keys 'start_frame',
@@ -1437,27 +1461,11 @@ def all_possession_game(
 
 # -------------------------------------------------------------------
 # Testing in main script
-# if __name__ == "__main__":
-
-
-    # all_possession_game(
-    #     game_id='JOMR_mar26_VSG_02',
-    #     video_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented',
-    #     indexed_df_points_csv_path=r'C:\Users\habib\Documents\GitHub\DataBeach\indexed_df_points\indexed_df_points_JOMR_mar26_VSG_02.csv',
-    #     team1_name='JOMR',
-    #     team2_name='MarL_MarB',
-    #     output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\all_possessions'
-    # )
-
-    # ---------------------------
-
-    # video_path = r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\JOMR_mar26_VSG_03_started_rotated_270.mp4'
-    # actions_df = pd.read_csv(r'C:\Users\habib\Documents\GitHub\DataBeach\indexed_df_points\indexed_df_points_JOMR_mar26_VSG_03.csv',
-    #                          dtype={'point_index': 'string'})
-    # output_dir = r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented'
-    
-    # extract_segments_from_df_gpu(
-    #     video_path=video_path,
-    #     actions_df=actions_df,
-    #     output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented',
-    # )
+if __name__ == "__main__":
+    cut_point_gpu(
+    video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs bruts\(dev) 2026 mar - S2 250 M - OLB\AlexRonan vs LoloMatis - S2 OLB - mar 2026 - poules.mov',
+    start_frame=10,
+    end_frame=30,
+    output_video=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs bruts\(dev) 2026 mar - S2 250 M - OLB\test_cut.mov',
+    mov_file=True
+    )
