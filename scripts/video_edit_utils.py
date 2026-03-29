@@ -1437,11 +1437,8 @@ def all_possession_game(
 
 # -------------------------------------------------------------------
 # Testing in main script
-if __name__ == "__main__":
-    # video_rotation(
-    #     video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs bruts\2026 mar - S2 250 M - OLB\Alex poule match 1.mp4',
-    #     rotation_state=0,
-    # )
+# if __name__ == "__main__":
+
 
     # all_possession_game(
     #     game_id='JOMR_mar26_VSG_02',
@@ -1464,4 +1461,3 @@ if __name__ == "__main__":
     #     actions_df=actions_df,
     #     output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\points_segmented',
     # )
-

@@ -17,7 +17,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__f
 from db_manager import DBManager
 from game_editor import GameEditor
 from video_grader import VideoGrader
-from etl_utils import *
+from etl_utils import video_file_renamer
 from video_edit_utils import *
 
 load_dotenv()
@@ -176,65 +176,15 @@ def editor_interface():
                     if st.session_state.get("game_editor_initialized", True):
                         st.success("GameEditor initialized and pre-processing completed successfully!")
 
-
-                
-            # Identifying video names to rename in output_dir 
-            # based on the assigned game_ids in assign_game_ids_dict
-            video_names_to_rename_list = list(st.session_state["assign_game_ids_dict"].keys())
-            video_names_to_rename_list = [os.path.splitext(video)[0] for video in video_names_to_rename_list]
-            output_dir_files_list = list(
-                    os.listdir(st.session_state.get("output_dir", "")) if st.session_state.get("output_dir") else []
+            # Renaming the video files in the output directory based on the assigned game_ids
+            with col7:
+                if st.button("Rename preprocessed games",
+                            use_container_width=True,
+                            type="primary"):
+                    video_file_renamer(
+                        rename_dict=st.session_state.get("assign_game_ids_dict"),
+                        output_dir=st.session_state.get("output_dir")
                     )
-            st.write(f"Output directory files: {output_dir_files_list}")
-            # for output_file in output_dir_files_list:
 
-
-            st.write(f"Video files in output directory: {', '.join(video_names_to_rename_list)}")
-
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            # output_path = Path(st.session_state["output_dir"]) / video_file
-                            # output_path = output_path.as_posix()
-                            
-                            # new_filename = f"{game_id}_started_rotated.mp4"
-                            # new_output_path = Path(st.session_state["output_dir"]) / new_filename
-                            # new_output_path = new_output_path.as_posix()
-
-                            
-                            # st.write(f"output_path: {output_path}")
-                            # st.write(f"output_dir: {st.session_state['output_dir']}")
-
-                            # os.rename(output_path, new_output_path)
-                            # dev_new_video_names_dict[temp_name] = new_filename
-                    # [DEV]
-
-
-
-            
-
-
-
-
-            # if folder and output_folder:
-            #     st.button("Run pre-processing",
-            #               use_container_width=True)
-
-            #     if st.button("Run pre-processing"):
-            #         game_editor.pre_match_editing(play_speed=2.0)
-
-
-
-
-
-
-
-        # Game-to-points mode
-        elif st.session_state.get("editor_mode", "Pre-processing") == "Game-to-points":
-            st.write("Initializing GameEditor in Game-to-points mode...")
 
 
