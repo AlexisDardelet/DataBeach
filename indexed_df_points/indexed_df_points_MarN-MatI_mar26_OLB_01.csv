@@ -1,0 +1,42 @@
+service_side,start_frame,end_frame,MarN_MatI_score,NicM_HugJ_score,MarN_MatI_sets,NicM_HugJ_sets,point_index
+match start - service MarN_MatI,182,518,4,1,0,0,006
+service NicM_HugJ,860,1001,4,2,0,0,007
+*SWITCH*,1082,1169,4,2,0,0,999
+service NicM_HugJ,1408,1649,4,3,0,0,008
+service MarN_MatI,2059,2227,5,3,0,0,009
+service NicM_HugJ,2511,2887,5,4,0,0,010
+service NicM_HugJ,3233,3373,5,5,0,0,011
+service MarN_MatI,3627,4002,6,5,0,0,012
+service NicM_HugJ,4325,4701,6,6,0,0,013
+service NicM_HugJ,5043,5183,6,7,0,0,014
+service MarN_MatI,5672,6167,7,7,0,0,015
+service NicM_HugJ,6589,6855,7,8,0,0,016
+service MarN_MatI,7212,7446,8,8,0,0,017
+service MarN_MatI,7818,8016,9,8,0,0,018
+service MarN_MatI,8333,9115,10,8,0,0,019
+service NicM_HugJ,9882,10151,10,9,0,0,020
+service MarN_MatI,10720,10901,11,9,0,0,021
+*SWITCH*,11010,11654,11,9,0,0,999
+service MarN_MatI,11489,11654,12,9,0,0,022
+service NicM_HugJ,11945,12360,12,10,0,0,023
+service NicM_HugJ,12871,13041,12,11,0,0,024
+service MarN_MatI,13469,13672,13,11,0,0,025
+service NicM_HugJ,14061,14185,13,12,0,0,026
+service MarN_MatI,14569,14875,14,12,0,0,027
+Timeout,15211,15388,14,12,0,0,999
+service MarN_MatI,16965,17295,15,12,0,0,028
+*SWITCH*,17456,17548,15,12,0,0,999
+service NicM_HugJ,17677,18052,15,13,0,0,029
+service MarN_MatI,18355,18826,16,13,0,0,030
+service MarN_MatI,19215,19458,17,13,0,0,031
+service NicM_HugJ,19895,20050,17,14,0,0,032
+service NicM_HugJ,20648,20863,17,15,0,0,033
+service NicM_HugJ,21229,21706,17,16,0,0,034
+Timeout,22464,22587,17,16,0,0,999
+service NicM_HugJ,24273,24556,17,17,0,0,035
+*SWITCH*,24869,25318,17,17,0,0,999
+service MarN_MatI,25045,25318,18,17,0,0,036
+service MarN_MatI,25669,25923,19,17,0,0,037
+service NicM_HugJ,26428,26662,19,18,0,0,038
+service MarN_MatI,27056,27497,20,18,0,0,039
+end of set,0,0,21,18,1,0,999

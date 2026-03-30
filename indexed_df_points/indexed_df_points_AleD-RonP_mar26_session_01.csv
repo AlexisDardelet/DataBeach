@@ -1,43 +1,43 @@
 service_side,start_frame,end_frame,AleD_RonP_score,MarB_JerD_score,AleD_RonP_sets,MarB_JerD_sets,point_index
-match start - service AleD_RonP,76,372,0,0,0,0,001
-service MarB_JerD,924,1024,0,1,0,0,002
-service MarB_JerD,1421,1817,0,2,0,0,003
-service AleD_RonP,2424,2654,1,2,0,0,004
-service AleD_RonP,3098,3350,2,2,0,0,005
-service MarB_JerD,3767,4008,2,3,0,0,006
-service MarB_JerD,4306,4715,2,4,0,0,007
-service AleD_RonP,5289,5384,3,4,0,0,008
-service MarB_JerD,5775,6400,3,5,0,0,009
-service MarB_JerD,6844,7046,3,6,0,0,010
-service MarB_JerD,7366,7501,3,7,0,0,011
-service AleD_RonP,7986,8345,4,7,0,0,012
-service MarB_JerD,8687,9152,4,8,0,0,013
-service AleD_RonP,9709,9894,5,8,0,0,014
-*SWITCH*,10090,10389,5,8,0,0,999
-service AleD_RonP,10521,10912,6,8,0,0,015
-service AleD_RonP,11319,11579,7,8,0,0,016
-service MarB_JerD,11888,12236,7,9,0,0,017
-service AleD_RonP,12747,13036,8,9,0,0,018
-service MarB_JerD,13592,13799,8,10,0,0,019
-service AleD_RonP,14276,14406,9,10,0,0,020
-service AleD_RonP,14810,15114,10,10,0,0,021
-*SWITCH*,15395,15455,10,10,0,0,999
-service MarB_JerD,15881,16211,10,11,0,0,022
-service MarB_JerD,16656,17367,10,12,0,0,023
-service AleD_RonP,17873,18216,11,12,0,0,024
-service AleD_RonP,18824,19433,12,12,0,0,025
-service AleD_RonP,20070,20326,13,12,0,0,026
-*SWITCH*,20594,20779,13,12,0,0,999
-service MarB_JerD,21072,21430,13,13,0,0,027
-service MarB_JerD,21889,21989,13,14,0,0,028
-service AleD_RonP,22502,22752,14,14,0,0,029
-service AleD_RonP,23159,23399,15,14,0,0,030
-service AleD_RonP,23694,23940,16,14,0,0,031
-service MarB_JerD,24534,24809,16,15,0,0,032
-service AleD_RonP,25164,25553,17,15,0,0,033
-service AleD_RonP,26019,26236,18,15,0,0,034
-service AleD_RonP,26828,27214,19,15,0,0,035
-service MarB_JerD,27784,28306,19,16,0,0,036
-service MarB_JerD,28658,28990,19,17,0,0,037
-service MarB_JerD,29340,29507,19,18,0,0,038
-end of set,0,0,20,18,1,0,999
+match start - service AleD_RonP,47,312,0,0,0,0,001
+service MarB_JerD,924,1034,0,1,0,0,002
+service MarB_JerD,1423,1817,0,2,0,0,003
+service AleD_RonP,2447,2662,1,2,0,0,004
+service AleD_RonP,3038,3369,2,2,0,0,005
+service MarB_JerD,3757,3997,2,3,0,0,006
+service MarB_JerD,4305,4701,2,4,0,0,007
+*SWITCH*,4858,4980,2,4,0,0,999
+service AleD_RonP,5296,5375,3,4,0,0,008
+service MarB_JerD,5672,6382,3,5,0,0,009
+service MarB_JerD,6791,7045,3,6,0,0,010
+service MarB_JerD,7330,7501,3,7,0,0,011
+service AleD_RonP,7990,8309,4,7,0,0,012
+service MarB_JerD,8646,9153,4,8,0,0,013
+service AleD_RonP,9755,9913,5,8,0,0,014
+*SWITCH*,10099,10172,5,8,0,0,999
+service AleD_RonP,10523,10926,6,8,0,0,015
+service AleD_RonP,11313,11609,7,8,0,0,016
+service MarB_JerD,11849,12280,7,9,0,0,017
+service AleD_RonP,12683,13067,8,9,0,0,018
+service MarB_JerD,13455,13819,8,10,0,0,019
+service AleD_RonP,14265,14426,9,10,0,0,020
+service AleD_RonP,14793,15120,10,10,0,0,021
+service MarB_JerD,15866,16248,10,11,0,0,022
+service AleD_RonP,16655,17388,11,11,0,0,023
+service AleD_RonP,17839,18217,12,11,0,0,024
+service AleD_RonP,19023,19446,13,11,0,0,025
+service AleD_RonP,20055,20321,14,11,0,0,026
+service MarB_JerD,21077,21442,14,12,0,0,027
+service MarB_JerD,21851,22006,14,13,0,0,028
+service AleD_RonP,22445,22746,15,13,0,0,029
+service AleD_RonP,23159,23399,16,13,0,0,030
+service AleD_RonP,23694,23932,17,13,0,0,031
+service MarB_JerD,24535,24795,17,14,0,0,032
+service AleD_RonP,25171,25556,18,14,0,0,033
+service AleD_RonP,25996,26248,19,14,0,0,034
+service AleD_RonP,26822,27217,20,14,0,0,035
+*SWITCH*,27363,27679,20,14,0,0,999
+service MarB_JerD,27786,28305,20,15,0,0,036
+service MarB_JerD,28689,28979,20,16,0,0,037
+service MarB_JerD,29317,29579,20,17,0,0,038
+end of set,0,0,21,17,1,0,999

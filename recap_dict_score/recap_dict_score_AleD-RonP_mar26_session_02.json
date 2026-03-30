@@ -1,15 +1,15 @@
 {
     "teams": [
         "AleD_RonP",
-        "MarB_JerD"
+        "DavC_AndP"
     ],
-    "match_format": "21 points per set",
+    "match_format": "(to be checked manually)",
     "winner": "AleD_RonP",
     "final_score": "1 - 0",
     "score_by_set": [
         {
             "set": 1,
-            "score": "21 - 17"
+            "score": "12 - 8"
         }
     ]
 }
