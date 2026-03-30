@@ -52,7 +52,7 @@ def assign_game_id_to_video_name(
 
 
 def editor_interface():
-    """Main editor interface function."""
+    """Main editor interface function with two workflow modes."""
     paire_id = st.session_state.get("paire_id", None)
     game_ids = st.session_state.get("game_ids", [])
 
@@ -62,6 +62,7 @@ def editor_interface():
 
         ########################################################
         # Pre-processing mode (by default) #####################
+        # Raw video ingestion and initial file organization   #
         ########################################################
         if st.session_state.get(
             "editor_mode", "Pre-processing"
@@ -89,6 +90,7 @@ def editor_interface():
                     if folder:
                         st.session_state["video_dir"] = folder
 
+            # Display selected raw games folder path
             with col2:
                 if "video_dir" in st.session_state:
                     st.markdown(
@@ -109,7 +111,7 @@ def editor_interface():
                         unsafe_allow_html=True
                     )
 
-            # Select preprocessed folder
+            # Select preprocessed output folder
             with col3:
                 if st.button(
                     label="➡️📁 Select preprocessed folder",
@@ -120,6 +122,7 @@ def editor_interface():
                     if output_folder:
                         st.session_state["output_dir"] = output_folder
 
+            # Display selected preprocessed folder path
             if "output_dir" in st.session_state:
                 with col4:
                     st.markdown(
@@ -140,18 +143,20 @@ def editor_interface():
                         unsafe_allow_html=True
                     )
 
-            # Assign game_ids to raw video files
+            # Assign game_ids to raw video files - interface for mapping videos to games
             if (
                 "video_dir" in st.session_state
                 and "output_dir" in st.session_state
             ):
                 with col5:
+                    # Get list of video files from the selected directory
                     video_files = [
                         video
                         for video in os.listdir(st.session_state["video_dir"])
                         if video.endswith(('.mp4', '.avi', '.mov'))
                     ]
 
+                    # Initialize dictionary to track game_id assignments
                     if "assign_game_ids_dict" not in st.session_state:
                         assign_game_ids_dict = {
                             video: None for video in video_files
@@ -164,6 +169,7 @@ def editor_interface():
                             "assign_game_ids_dict"
                         ]
 
+                    # Dropdown to select raw video file
                     selected_raw_video = st.selectbox(
                         label='Select a raw video file to assign a game_id:',
                         options=(
@@ -173,7 +179,7 @@ def editor_interface():
                         ),
                     )
 
-                # Select game_id to assign
+                # Select game_id to assign to the video
                 with col6:
                     selected_game_id = st.selectbox(
                         label='Select a game_id to assign to the video:',
@@ -184,6 +190,7 @@ def editor_interface():
                         ),
                     )
 
+                # Button to assign selected game_id to video
                 with col7:
                     if st.button(
                         "Assign game_id to selected video file",
@@ -197,9 +204,11 @@ def editor_interface():
                             assign_game_ids_dict
                         )
 
+                    # Display current assignments
                     with col_dict_ids:
                         st.write(assign_game_ids_dict)
 
+                # Initialize preprocessing only if all videos have been assigned game_ids
                 with col7:
                     if (
                         assign_game_ids_dict
@@ -211,7 +220,7 @@ def editor_interface():
                             type="secondary"
                         )
 
-            # Initialize GameEditor and run pre-processing
+            # Initialize GameEditor and run pre-processing on all videos
             if launch_preprocessing:
                 game_editor = GameEditor(
                     video_dir=st.session_state.get("video_dir"),
@@ -227,7 +236,7 @@ def editor_interface():
                             "pre-processing completed successfully!"
                         )
 
-            # Rename the video files in the output directory
+            # Rename preprocessed video files using game_id assignments
             with col7:
                 if st.button(
                     "Rename preprocessed games",
@@ -243,6 +252,7 @@ def editor_interface():
 
         ########################################################
         # Game-to-points mode ##################################
+        # Segment preprocessed videos into individual points   #
         ########################################################
         if st.session_state.get(
             "editor_mode", "Game-to-points"
@@ -253,14 +263,13 @@ def editor_interface():
                 anchor="game_to_points_mode",
                 )
              
-             
-
+            # Column set up for game-to-points workflow
             col1, col2 = st.columns([1, 4])
             col3, col4 = st.columns([1, 4])
             col5, col6, col7 = st.columns([1, 1, 1])
 
 
-            # Listing game_ids ready for the game-to-points mode 
+            # Select preprocessed folder containing ready-to-segment games
             with col1:
                 if st.button(
                     label="🎬 Preprocessed folder",
@@ -271,6 +280,7 @@ def editor_interface():
                     if preprocessed_folder:
                         st.session_state["preprocessed_folder"] = preprocessed_folder
 
+            # Extract and display list of available preprocessed game_ids
             if "preprocessed_folder" in st.session_state:
                 preprocessed_game_ids_list = list(
                     os.listdir(st.session_state["preprocessed_folder"])
@@ -300,6 +310,7 @@ def editor_interface():
                         unsafe_allow_html=True
                     )
 
+            # Select output folder for segmented point videos
             with col3:
                 if st.button(
                     label="✂️ Segmented folder",
@@ -310,6 +321,7 @@ def editor_interface():
                     if segmented:
                         st.session_state["segmented_folder"] = segmented
 
+            # Display selected segmented folder path
             if "segmented_folder" in st.session_state:
 
                 with col4:
@@ -331,7 +343,7 @@ def editor_interface():
                         unsafe_allow_html=True
                     )
                 
-                # Isolating game_ids that are present in segmented folder
+                # Extract unique game_ids from existing segmented files
                 segmented_points_list = list(
                     os.listdir(st.session_state["segmented_folder"])
                     )
@@ -341,9 +353,8 @@ def editor_interface():
                     temp_list.append(game_id)
                 unique_game_ids_list = list(set(temp_list))
                 st.session_state["segmented_game_ids"] = unique_game_ids_list
-                # st.write(st.session_state["segmented_game_ids"])
 
-            # Select a game_id to edit (all preprocessed games availables)
+            # Dropdown to select a game for segmentation
             with col5:
                 selected_game_id = st.selectbox(
                     label='All preprocessed games :',
@@ -355,23 +366,44 @@ def editor_interface():
                 )
                 if selected_game_id != 'None':
                     st.session_state["selected_game_id"] = selected_game_id
-                    # Initialize GameEditor for the selected game_id
+                    # Fetch team information from database for selected game
                     if st.button(
                         "Fetching datas for the selected game",
                         use_container_width=True,
                         type="secondary"
                     ):
-                        # Fetching the data for that game_id
+                        # Query database for team names associated with this game_id
                         with DBManager() as db:
                             team_a, team_b = db.teams_names_from_game_id(
                                 st.session_state["selected_game_id"])
+                            
                             st.session_state["team_a"] = team_a
                             st.session_state["team_b"] = team_b
-                        st.write(f"Selected game: {st.session_state['selected_game_id']}")
-                        st.write(f"Team A: {st.session_state['team_a']}")
-                        st.write(f"Team B: {st.session_state['team_b']}")
+                            
+                            # Player names for team A
+                            db.execute_query(
+                                """SELECT player_a, player_b
+                                FROM table_player
+                                WHERE paire_id = ?""",
+                                (st.session_state["team_a"])
+                                )
+                            results_a = db.cursor.fetchall()
+                            st.session_state["team_a_players"] = results_a[0] if results_a else ("(No player found)", "(No player found)")
+                            # Player names for team B
+                            db.execute_query(
+                                """SELECT player_a, player_b
+                                FROM table_player
+                                WHERE paire_id = ?""",
+                                (st.session_state["team_b"])
+                                )
+                            results_b = db.cursor.fetchall()
+                            st.session_state["team_b_players"] = results_b[0] if results_b else ("(No player found)", "(No player found)")
 
-                        # Checking if game_id is already present in segmented folder
+                        st.write(f"Selected game: {st.session_state['selected_game_id']}")
+                        st.write(f"Team A: {st.session_state['team_a_players'][0]} & {st.session_state['team_a_players'][1]}")
+                        st.write(f"Team B: {st.session_state['team_b_players'][0]} & {st.session_state['team_b_players'][1]}")
+
+                        # Warn user if game_id already has segmented files (overwrite risk)
                         if "segmented_folder" in st.session_state:
                             temp_list = list(
                                 os.listdir(st.session_state["segmented_folder"]))
@@ -383,6 +415,7 @@ def editor_interface():
                                     "Initializing GameEditor will overwrite the existing segmented files for this game_id."
                                 )
 
+            # Execute game-to-points segmentation on selected game
             with col6:
                 if st.button(
                     "Run game-to-points segmentation",
@@ -403,10 +436,3 @@ def editor_interface():
                     st.success(
                         "Game-to-points segmentation completed successfully!"
                     )
-
-                
-        
-
-
-
-

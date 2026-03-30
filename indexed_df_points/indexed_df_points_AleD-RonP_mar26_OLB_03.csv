@@ -1,0 +1,48 @@
+service_side,start_frame,end_frame,AleD_RonP_score,LauM_MatR_score,AleD_RonP_sets,LauM_MatR_sets,point_index
+match start - service LauM_MatR,41,1119,0,0,0,0,001
+service AleD_RonP,1898,2431,1,0,0,0,002
+service AleD_RonP,3066,3311,2,0,0,0,003
+service AleD_RonP,3795,3948,3,0,0,0,004
+service LauM_MatR,4265,4656,3,1,0,0,005
+service LauM_MatR,5306,5846,3,2,0,0,006
+service LauM_MatR,6325,6895,3,3,0,0,007
+*SWITCH*,7109,7126,3,3,0,0,999
+service LauM_MatR,7558,8017,3,4,0,0,008
+service LauM_MatR,8629,8955,3,5,0,0,009
+service AleD_RonP,9624,9966,4,5,0,0,010
+service AleD_RonP,10206,10374,5,5,0,0,011
+service AleD_RonP,11044,11431,6,5,0,0,012
+service LauM_MatR,12052,12736,6,6,0,0,013
+service AleD_RonP,13253,13809,7,6,0,0,014
+*SWITCH*,14221,14307,7,6,0,0,999
+service AleD_RonP,14687,14957,8,6,0,0,015
+service LauM_MatR,15568,15809,8,7,0,0,016
+service LauM_MatR,16081,16422,8,8,0,0,017
+service LauM_MatR,16668,16968,8,9,0,0,018
+service AleD_RonP,17442,17821,9,9,0,0,019
+service LauM_MatR,18450,19355,9,10,0,0,020
+Timeout,20197,20389,9,10,0,0,999
+service LauM_MatR,21809,22094,9,11,0,0,021
+service AleD_RonP,22818,23123,10,11,0,0,022
+service AleD_RonP,23556,23842,11,11,0,0,023
+service LauM_MatR,24298,24958,11,12,0,0,024
+service LauM_MatR,25244,25619,11,13,0,0,025
+service LauM_MatR,26095,26291,11,14,0,0,026
+service AleD_RonP,26661,26794,12,14,0,0,027
+service LauM_MatR,27159,27447,12,15,0,0,028
+*SWITCH*,27775,27820,12,15,0,0,999
+service AleD_RonP,28150,28665,13,15,0,0,029
+service AleD_RonP,29042,29327,14,15,0,0,030
+service LauM_MatR,29889,30075,14,16,0,0,031
+service AleD_RonP,30575,30876,15,16,0,0,032
+service AleD_RonP,31288,31589,16,16,0,0,033
+service AleD_RonP,32133,32698,17,16,0,0,034
+Timeout,33350,33564,17,16,0,0,999
+service AleD_RonP,34837,36258,18,16,0,0,035
+*SWITCH*,36818,36842,18,16,0,0,999
+service LauM_MatR,36947,37361,18,17,0,0,036
+service LauM_MatR,37670,37949,18,18,0,0,037
+service LauM_MatR,38280,38668,18,19,0,0,038
+service AleD_RonP,39231,39571,19,19,0,0,039
+service AleD_RonP,39931,40326,20,19,0,0,040
+end of set,0,0,21,19,1,0,999

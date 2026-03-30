@@ -1,0 +1,42 @@
+service_side,start_frame,end_frame,AleD_RonP_score,EmiJ_EdgC_score,AleD_RonP_sets,EmiJ_EdgC_sets,point_index
+match start - service AleD_RonP,27,81,0,0,0,0,001
+service EmiJ_EdgC,525,661,0,1,0,0,002
+service EmiJ_EdgC,940,1276,0,2,0,0,003
+service AleD_RonP,1603,1836,1,2,0,0,004
+service EmiJ_EdgC,2120,2510,1,3,0,0,005
+service EmiJ_EdgC,2996,3395,1,4,0,0,006
+service EmiJ_EdgC,3888,4239,1,5,0,0,007
+*SWITCH*,4657,4668,1,5,0,0,999
+service EmiJ_EdgC,4774,5383,1,6,0,0,008
+service AleD_RonP,5759,6010,2,6,0,0,009
+service EmiJ_EdgC,6415,6843,2,7,0,0,010
+service AleD_RonP,7517,7676,3,7,0,0,011
+service EmiJ_EdgC,7979,8316,3,8,0,0,012
+service EmiJ_EdgC,8717,9005,3,9,0,0,013
+service AleD_RonP,9427,9970,4,9,0,0,014
+*SWITCH*,10298,10312,4,9,0,0,999
+service EmiJ_EdgC,10721,10970,4,10,0,0,015
+service EmiJ_EdgC,11338,11570,4,11,0,0,016
+service AleD_RonP,11996,12271,5,11,0,0,017
+service EmiJ_EdgC,12737,12962,5,12,0,0,018
+service EmiJ_EdgC,13233,13642,5,13,0,0,019
+service AleD_RonP,13959,14107,6,13,0,0,020
+service EmiJ_EdgC,14368,14822,6,14,0,0,021
+*SWITCH*,14936,14953,6,14,0,0,999
+service AleD_RonP,15423,15807,7,14,0,0,022
+service EmiJ_EdgC,16226,16564,7,15,0,0,023
+service AleD_RonP,16875,17112,8,15,0,0,024
+service EmiJ_EdgC,17696,17975,8,16,0,0,025
+Timeout,18602,18957,8,16,0,0,999
+service EmiJ_EdgC,20362,20638,8,17,0,0,026
+service EmiJ_EdgC,21165,21221,8,18,0,0,027
+service AleD_RonP,21586,22012,9,18,0,0,028
+*SWITCH*,22258,22319,9,18,0,0,999
+service AleD_RonP,22775,23095,10,18,0,0,029
+service EmiJ_EdgC,23624,23782,10,19,0,0,030
+service AleD_RonP,24322,24600,11,19,0,0,031
+service EmiJ_EdgC,25141,25499,11,20,0,0,032
+service AleD_RonP,25894,26150,12,20,0,0,033
+service AleD_RonP,26497,26872,13,20,0,0,034
+service AleD_RonP,27192,27491,14,20,0,0,035
+end of set,0,0,14,21,0,1,999

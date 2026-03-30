@@ -158,14 +158,15 @@ def video_rotation(
 def montage_operations(
     video_path: str,
     play_speed: float = 1.0,
-    mov_file: bool = False
+    display_size: tuple = (960, 540),
 ) -> dict:
     """
     Records the montage actions for video pre-processing.
 
     Args:
+        video_path (str): Path to the video to process.
         play_speed (float): Video playback speed. Defaults to 1.0.
-        mov_file (bool): Whether the video file is in .mov format. Defaults to False.
+        display_size (tuple): Size of the display window. Defaults to (960, 540).
 
     Returns:
         dict: Dictionary with keys 'start_frame',
@@ -221,6 +222,11 @@ def montage_operations(
     )
     print(f"Last frame index: {last_game_frame}")
 
+    # Resize the display window to the specified size
+    win_name = f'{video_path}'
+    cv2.namedWindow(win_name, cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(win_name, display_size[0], display_size[1])
+
     # Helper to adjust waitKey delay based on current
     # playback speed
     def _wait_key_fast(ms):
@@ -266,7 +272,14 @@ def montage_operations(
                         frame,
                         cv2.ROTATE_90_COUNTERCLOCKWISE,
                     )
-
+                
+                # Resize the frame to fit the display window
+                frame = cv2.resize(
+                    frame,
+                    display_size,
+                    interpolation=cv2.INTER_AREA,
+                )
+                
                 # Overlay playback speed indicator on the frame
                 cv2.putText(
                     frame,
@@ -409,6 +422,7 @@ def cv2_point_segment_cut(
     team1_name: str = "JOMR",
     team2_name: str = "adversaire",
     start_frame: int = None,
+    display_size: tuple = (960, 540)
 ) -> pd.DataFrame:
     """
     Create a DataFrame containing the point segments extracted
@@ -513,6 +527,11 @@ def cv2_point_segment_cut(
     # Open the video
     cap = cv2.VideoCapture(video_path)
 
+    # Resize the display window to the specified size
+    win_name = f'{video_path}'
+    cv2.namedWindow(win_name, cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(win_name, display_size[0], display_size[1])
+
     def _wait_key_fast(ms):
         # Reduce the delay proportionally to the speed
         # (at least 1 ms)
@@ -542,6 +561,13 @@ def cv2_point_segment_cut(
                 if not ret:
                     print("End of video or read error.")
                     break
+
+                # Resize the window before display
+                frame = cv2.resize(
+                    frame,
+                    display_size,
+                    interpolation=cv2.INTER_AREA,
+                )
 
                 # Increment the frame counter
                 frame_number += 1
@@ -1461,11 +1487,12 @@ def all_possession_game(
 
 # -------------------------------------------------------------------
 # Testing in main script
+
+
+
 if __name__ == "__main__":
-    cut_point_gpu(
-    video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs bruts\(dev) 2026 mar - S2 250 M - OLB\AlexRonan vs LoloMatis - S2 OLB - mar 2026 - poules.mov',
-    start_frame=10,
-    end_frame=30,
-    output_video=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs bruts\(dev) 2026 mar - S2 250 M - OLB\test_cut.mov',
-    mov_file=True
+    test_dict = montage_operations(
+        video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs bruts\(dev) 2026 mar - S2 250 M - OLB\AlexRonan vs LoloMatis - S2 OLB - mar 2026 - poules.mov',
+        play_speed=2.0,
     )
+    print(test_dict)

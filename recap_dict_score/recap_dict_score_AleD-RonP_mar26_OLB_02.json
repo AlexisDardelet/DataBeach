@@ -1,0 +1,15 @@
+{
+    "teams": [
+        "AleD_RonP",
+        "RomT_AleS"
+    ],
+    "match_format": "21 points per set",
+    "winner": "RomT_AleS",
+    "final_score": "0 - 1",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "17 - 21"
+        }
+    ]
+}

@@ -269,6 +269,8 @@ class GameEditor:
             output_dir=self.output_dir,
         )
 
+    # ----------------------------------------------------------------
+
     def all_possession_montage(
         self,
         game_id: str,
@@ -323,8 +325,22 @@ class GameEditor:
 # -------------------------------------------------------------------
 
 if __name__ == "__main__":
+    game_id = "AleD-RonP_mar26_OLB_02"
+    video_path = r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\AleD-RonP_mar26_OLB_02_started_rotated.mp4'
+
+    with DBManager() as db:
+        team1_name, team2_name = db.teams_names_from_game_id(
+            game_id=game_id
+            )
+
+    print(f"Processing game_id: {game_id} with teams {team1_name} vs {team2_name}")
+
     editor = GameEditor(
-        video_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Alex&Co\(alex) raw games',
-        output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Alex&Co\(alex) preprocessed games'
+        video_path=video_path,
+        output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\points_segmented'
     )
-    editor.pre_match_editing(play_speed=2.0)
+    editor.game_to_segmented_points(
+        team1_name=team1_name,
+        team2_name=team2_name,
+        rewrite_videos=False
+    )
