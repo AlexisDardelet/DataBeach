@@ -33,6 +33,7 @@ from video_edit_utils import *
 # Environment variables
 load_dotenv()
 ROOT_VIDEO_DIR = os.getenv("ROOT_VIDEO_DIR")
+SEGMENTED_POINTS_DIR = os.getenv("SEGMENTED_POINTS_DIR")
 
 ######################################################################
 
@@ -53,7 +54,7 @@ def editor_interface():
     ) == "Pre-processing":
         
         st.title(
-            body="🪨➡️🎞️ Preprocessing ↩️🏷️🔢",
+            body="🪨➡️🎞️ Preprocessing mode ↩️🏷️🔢",
             )
 
         launch_preprocessing = None
@@ -445,9 +446,9 @@ def editor_interface():
                         game_id_to_run
                     ) + '_started_rotated.mp4')
 
-                    # ── CORRECTION : subprocess bien indenté dans le else ──
+                    # Subprocess to run segmentation script with streamlit opened 
                     run_script_path = os.path.join(
-                        os.path.dirname(os.path.abspath(__file__)),  # dossier du fichier Streamlit actuel
+                        os.path.dirname(os.path.abspath(__file__)),
                         "run_segmentation.py"
                     )
                     subprocess.Popen(
@@ -460,6 +461,126 @@ def editor_interface():
                             st.session_state.get("team_b", "team_b"),
                         ]
                     )
-                    st.toast("Segmentation lancée dans une fenêtre séparée !", icon="🎬")
-                    # ───────────────────────────────────────────────────────
+                    st.toast("Point segmentation started", icon="🎬")
+
+    ########################################################
+    # All possession mode ##################################
+    # Individual points into condensed game video ##########
+    ########################################################
+    elif st.session_state.get(
+        "editor_mode", "All possessions"
+    ) == "All possessions":
+        st.title(
+            body="🏐✂️🏐➡️ All possessions mode ⚡🎞️",
+            anchor="all_possessions_mode",
+            )
+        
+        # # Default folders for all possessions workflow
+        # st.session_state["segmented_folder"] = SEGMENTED_POINTS_DIR
+
+        # Column set up for all possessions workflow
+        col1, col2, col3 = st.columns([1, 1.2, 4])
+        col4, col5, col6 = st.columns([1.2,1,2])
+
+        # Toggle to use default segmented folder or select a different one
+        with col1:
+            st.toggle(label="Default folder",
+                      value=True,
+                      key="toggle_default_all_possessions_folder",
+                      )
+            if st.session_state.get("toggle_default_all_possessions_folder", True) is False:
+                with col2:
+                    if st.button(
+                        label="✂️ Segmented folder",
+                        use_container_width=True,
+                        type="secondary",
+                    ):
+                        segmented_folder = select_folder()
+                        if segmented_folder:
+                            st.session_state["segmented_folder"] = segmented_folder
+                            with col3:
+                                st.markdown(
+                                    f"""
+                                    <style>
+                                    .small-success {{
+                                        font-size: 15px;
+                                        padding: 10px;
+                                        background-color: #1e5631;
+                                        border-radius: 10px;
+                                        color: white;
+                                    }}
+                                    </style>
+                                    <div class="small-success">
+                                    ✅ {st.session_state["segmented_folder"]}
+                                    </div>
+                                    """,
+                                    unsafe_allow_html=True
+                                )
+        # Display selected segmented folder path
+        if st.session_state.get("toggle_default_all_possessions_folder", True) is True:
+            # Default folders for all possessions workflow
+            st.session_state["segmented_folder"] = SEGMENTED_POINTS_DIR
+
+        # Dropdown to select game_id for all possessions video creation
+        with col4:
+            # Extract unique game_ids from segmented files in the segmented folder
+            segmented_points_list = list(
+                os.listdir(st.session_state.get("segmented_folder", ""))
+                )
+            temp_list = []
+            for filename in segmented_points_list:
+                game_id = filename.split('_p')[0]
+                temp_list.append(game_id)
+            unique_game_ids_list = sorted(list(set(temp_list)))
+
+            selected_game_id_all_possessions = st.selectbox(
+                label='Select a game to edit:',
+                label_visibility="collapsed",
+                options=(
+                    ['None'] + unique_game_ids_list
+                    if unique_game_ids_list
+                    else ['None']
+                ),
+            )
+        # Button to run all possessions montage creation for the selected game_id
+        with col5:
+            if st.button(
+                "Create all possessions video",
+                use_container_width=True,
+                type="primary"
+            ):
+                if selected_game_id_all_possessions == 'None':
+                    st.error("No game_id selected. Please select a valid game_id")
+                else:
+                    segmented_points_folder = st.session_state.get("segmented_folder", "")
+                    # DEV
+                    st.write(f'game id : {selected_game_id_all_possessions}')
+
+                    # Subprocess to run segmentation script with streamlit opened 
+                    run_script_path = os.path.join(
+                        os.path.dirname(os.path.abspath(__file__)),
+                        "run_all_possession.py"
+                    )
+                    process = subprocess.Popen(
+                        [
+                            sys.executable,
+                            run_script_path,
+                            selected_game_id_all_possessions,
+                        ]
+                    )
+                    process.wait()  # Wait for the subprocess to finish before showing success message
+                    st.toast("All possessions video creation started", icon="🎬")
+
+                    with col6:
+                        st.success(
+                            body='All possessions video created successfully!')
+
+
+                    
+
+
+
+
+
+
 

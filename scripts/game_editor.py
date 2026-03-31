@@ -170,7 +170,7 @@ class GameEditor:
         team2_name: str,
         rewrite_videos: bool = False,
         # temp_indexed_df_point : pd.DataFrame = None,
-    ):
+    ) -> int:
         """
         Pipeline from the preprocessed video to
         segmented points videos, with the associated
@@ -187,6 +187,10 @@ class GameEditor:
             output_dir (str): Absolute path to the
                 output directory where the segmented
                 points videos will be stored.
+        Returns :
+            int: the number of segmented points to be created,
+                which corresponds to the value of last point_index 
+                in the indexed_df_points DataFrame.
         """
         # # If temp_indexed_df_point is provided, skip to the segment extraction step
         # if temp_indexed_df_point is not None:

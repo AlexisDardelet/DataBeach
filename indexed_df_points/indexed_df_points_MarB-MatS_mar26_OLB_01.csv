@@ -1,0 +1,41 @@
+service_side,start_frame,end_frame,MarB_MatS_score,IbaD_SamG_score,MarB_MatS_sets,IbaD_SamG_sets,point_index
+match start - service IbaD_SamG,36,590,0,0,0,0,001
+service MarB_MatS,919,1159,1,0,0,0,002
+service MarB_MatS,1527,1957,2,0,0,0,003
+service IbaD_SamG,2475,2778,2,1,0,0,004
+service IbaD_SamG,3129,3827,2,2,0,0,005
+service MarB_MatS,4466,4791,3,2,0,0,006
+service IbaD_SamG,5106,5454,3,3,0,0,007
+*SWITCH*,5632,5683,3,3,0,0,999
+service MarB_MatS,6111,6593,4,3,0,0,008
+service MarB_MatS,7178,7549,5,3,0,0,009
+service IbaD_SamG,7947,8163,5,4,0,0,010
+service MarB_MatS,8481,9092,6,4,0,0,011
+service MarB_MatS,9404,9966,7,4,0,0,012
+service IbaD_SamG,10350,11027,7,5,0,0,013
+service MarB_MatS,11665,12019,8,5,0,0,014
+*SWITCH*,12563,12890,8,5,0,0,999
+service IbaD_SamG,13528,14027,8,6,0,0,015
+service MarB_MatS,14764,14913,9,6,0,0,016
+service MarB_MatS,15263,15551,10,6,0,0,017
+service IbaD_SamG,15858,16127,10,7,0,0,018
+service MarB_MatS,16701,16948,11,7,0,0,019
+service MarB_MatS,17292,17745,12,7,0,0,020
+service MarB_MatS,18132,18469,13,7,0,0,021
+*SWITCH*,18873,18908,13,7,0,0,999
+service MarB_MatS,19054,19355,14,7,0,0,022
+service IbaD_SamG,19814,20083,14,8,0,0,023
+service IbaD_SamG,20592,20838,14,9,0,0,024
+service MarB_MatS,21248,21517,15,9,0,0,025
+service MarB_MatS,21915,22072,16,9,0,0,026
+service IbaD_SamG,22427,22744,16,10,0,0,027
+service MarB_MatS,23232,23489,17,10,0,0,028
+*SWITCH*,23837,23921,17,10,0,0,999
+service IbaD_SamG,24185,24427,17,11,0,0,029
+service MarB_MatS,24898,25046,18,11,0,0,030
+service IbaD_SamG,25284,25512,18,12,0,0,031
+service MarB_MatS,25837,26060,19,12,0,0,032
+service IbaD_SamG,26460,26583,19,13,0,0,033
+service IbaD_SamG,26936,27545,19,14,0,0,034
+service MarB_MatS,27901,28191,20,14,0,0,035
+end of set,0,0,21,14,1,0,999

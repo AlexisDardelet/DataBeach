@@ -1,0 +1,66 @@
+service_side,start_frame,end_frame,MarN_MatI_score,GasV_BasO_score,MarN_MatI_sets,GasV_BasO_sets,point_index
+match start - service MarN_MatI,31,445,0,0,0,0,001
+service MarN_MatI,920,1205,1,0,0,0,002
+service GasV_BasO,1549,1680,1,1,0,0,003
+service GasV_BasO,1969,2231,1,2,0,0,004
+service GasV_BasO,2579,2874,1,3,0,0,005
+*SWITCH*,3030,3097,1,3,0,0,999
+service MarN_MatI,3426,3653,2,3,0,0,006
+service MarN_MatI,4171,4443,3,3,0,0,007
+service GasV_BasO,5138,5639,3,4,0,0,008
+service GasV_BasO,5996,6231,3,5,0,0,009
+service GasV_BasO,6569,6799,3,6,0,0,010
+*SWITCH*,7016,7048,3,6,0,0,999
+service GasV_BasO,7346,7475,3,7,0,0,011
+service MarN_MatI,7835,8332,4,7,0,0,012
+service GasV_BasO,8663,8847,4,8,0,0,013
+service GasV_BasO,9553,9706,4,9,0,0,014
+Timeout,10311,10657,4,9,0,0,999
+service GasV_BasO,11252,11488,4,10,0,0,015
+*SWITCH*,11773,11800,4,10,0,0,999
+service MarN_MatI,12072,12349,5,10,0,0,016
+service GasV_BasO,12824,13420,5,11,0,0,017
+service MarN_MatI,13744,13985,6,11,0,0,018
+service MarN_MatI,14400,14579,7,11,0,0,019
+service GasV_BasO,14870,15215,7,12,0,0,020
+*SWITCH*,15414,15460,7,12,0,0,999
+service MarN_MatI,15733,16015,8,12,0,0,021
+service GasV_BasO,16373,16731,8,13,0,0,022
+service GasV_BasO,17062,17324,8,14,0,0,023
+service MarN_MatI,17695,17963,9,14,0,0,024
+end of set,0,0,9,15,0,1,999
+set start - service GasV_BasO,21418,21719,0,0,0,1,025
+service GasV_BasO,21956,22333,0,1,0,1,026
+service GasV_BasO,22640,22784,0,2,0,1,027
+service MarN_MatI,23015,23244,1,2,0,1,028
+service GasV_BasO,23558,23907,1,3,0,1,029
+*SWITCH*,24128,24283,1,3,0,1,999
+service MarN_MatI,24396,24739,2,3,0,1,030
+service GasV_BasO,25032,25179,2,4,0,1,031
+service MarN_MatI,25441,25578,3,4,0,1,032
+service GasV_BasO,25814,26075,3,5,0,1,033
+service MarN_MatI,26359,26540,4,5,0,1,034
+*SWITCH*,26789,26833,4,5,0,1,999
+service GasV_BasO,26963,27381,4,6,0,1,035
+service MarN_MatI,27800,28011,5,6,0,1,036
+service GasV_BasO,28314,28645,5,7,0,1,037
+service GasV_BasO,29076,29406,5,8,0,1,038
+service MarN_MatI,29652,29942,6,8,0,1,039
+*SWITCH*,30205,30253,6,8,0,1,999
+service GasV_BasO,30453,30660,6,9,0,1,040
+service GasV_BasO,30914,31518,6,10,0,1,041
+service MarN_MatI,32099,32437,7,10,0,1,042
+service GasV_BasO,33066,33532,7,11,0,1,043
+service MarN_MatI,34075,34345,8,11,0,1,044
+*SWITCH*,34610,34703,8,11,0,1,999
+service MarN_MatI,34982,35262,9,11,0,1,045
+Timeout,36001,36448,9,11,0,1,999
+service MarN_MatI,36736,37358,10,11,0,1,046
+service MarN_MatI,37766,38352,11,11,0,1,047
+service GasV_BasO,38706,39035,11,12,0,1,048
+service MarN_MatI,39419,39804,12,12,0,1,049
+*SWITCH*,40221,40264,12,12,0,1,999
+Timeout,40733,41519,12,12,0,1,999
+service GasV_BasO,41791,42449,12,13,0,1,050
+service GasV_BasO,42969,43248,12,14,0,1,051
+end of set,0,0,12,15,0,2,999
