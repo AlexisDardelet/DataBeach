@@ -11,6 +11,7 @@ if __name__ == "__main__":
     output_dir  = sys.argv[2]
     team1_name  = sys.argv[3]
     team2_name  = sys.argv[4]
+    rewrite_videos = sys.argv[5]
 
     game_editor = GameEditor(
         video_path=video_path,
@@ -19,4 +20,5 @@ if __name__ == "__main__":
     game_editor.game_to_segmented_points(
         team1_name=team1_name,
         team2_name=team2_name,
+        rewrite_videos=rewrite_videos
     )

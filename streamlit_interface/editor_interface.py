@@ -343,7 +343,7 @@ def editor_interface():
             with col7:
                 st.toggle(
                     label="Only non-segmented games",
-                    value=False,
+                    value=True,
                     key="toggle_show_non_segmented_only"
                 )
                 # Display only non-segmented game_ids in dropdown if toggle is on
@@ -451,7 +451,7 @@ def editor_interface():
                         os.path.dirname(os.path.abspath(__file__)),
                         "run_segmentation.py"
                     )
-                    subprocess.Popen(
+                    process = subprocess.Popen(
                         [
                             sys.executable,
                             run_script_path,
@@ -459,9 +459,16 @@ def editor_interface():
                             st.session_state.get("segmented_folder", ""),
                             st.session_state.get("team_a", "team_a"),
                             st.session_state.get("team_b", "team_b"),
+                            str('True' if st.session_state.get("toggle_show_non_segmented_only", False) else str('False'))
                         ]
                     )
                     st.toast("Point segmentation started", icon="🎬")
+
+                    process.wait()  # Wait for the subprocess to finish before showing success message
+
+                    with col6:
+                        st.success(
+                            body='Segmentated points created successfully!')
 
     ########################################################
     # All possession mode ##################################
