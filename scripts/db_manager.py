@@ -637,6 +637,6 @@ if __name__ == "__main__":
         # db.reset_database(action_name_list=['serve'])
         # db.list_all_tables()
         db.reset_database(action_name_list=['serve'])
-        table_game_df = db.table_to_dataframe("table_game")
-        print(table_game_df.tail())
+        table_point_df = db.table_to_dataframe("table_point")
+        print(table_point_df.tail())
 

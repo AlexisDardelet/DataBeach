@@ -451,6 +451,17 @@ def cv2_point_segment_cut(
     # Initialize variables
     temp_list = []
     last_action = None
+    color_map = dict({
+        'black': (0, 0, 0),
+        'green': (0, 255, 0),
+        'blue': (255, 0, 0),
+        'red': (0, 0, 255),
+        'white': (255, 255, 255)
+    })
+    color_map_keys = list(color_map.keys())
+    last_action_color_index = 0
+    score_color_index = 0
+    help_color_index = 0
 
     # Map keys to actions
     key_action_map = {
@@ -492,7 +503,7 @@ def cv2_point_segment_cut(
                     (x, y + i * 15),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.3,
-                    (255, 255, 255),
+                    color_map[color_map_keys[help_color_index]],
                     1,
                     cv2.LINE_AA,
                 )
@@ -516,7 +527,7 @@ def cv2_point_segment_cut(
                 (score_x, score_y),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.7,
-                (0, 0, 0),
+                color_map[color_map_keys[score_color_index]],
                 2,
                 cv2.LINE_AA,
             )
@@ -580,7 +591,7 @@ def cv2_point_segment_cut(
                     (30, 40),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     1,
-                    (0, 0, 0),
+                    color_map[color_map_keys[last_action_color_index]],
                     2,
                     cv2.LINE_AA,
                 )
@@ -593,7 +604,7 @@ def cv2_point_segment_cut(
                     (30, 80),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     1,
-                    (0, 0, 255),
+                    color_map['red'],
                     2,
                     cv2.LINE_AA,
                 )
@@ -604,6 +615,15 @@ def cv2_point_segment_cut(
 
             # Handle keyboard input
             key = _wait_key_fast(30) & 0xFF
+            if key == ord('h'):
+                help_color_index = (help_color_index + 1) % len(color_map_keys)
+                continue
+            if key == ord('g'):
+                last_action_color_index = (last_action_color_index + 1) % len(color_map_keys)
+                continue
+            if key == ord('j'):
+                score_color_index = (score_color_index + 1) % len(color_map_keys)
+                continue
             if key == ord('q'):
                 # Quit
                 break
@@ -928,7 +948,7 @@ def cv2_point_segment_cut(
                 df_points.at[
                     idx, f'{team2_name}_score'
                 ] += 1
-
+    
     return df_points
 
 # -------------------------------------------------------------------
