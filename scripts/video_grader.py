@@ -93,7 +93,7 @@ class VideoGrader:
                     )
                 elif serie_id is not None:  # All games in the serie to grade
                     db.cursor.execute(
-                        """SELECT point_id, service_side 
+                        """SELECT point_id, service_side
                         FROM table_point
                         WHERE game_id IN
                             (SELECT GAME_ID
@@ -118,7 +118,7 @@ class VideoGrader:
                     )
                 elif serie_id is not None:  # All games in the series to grade
                     db.cursor.execute(
-                        """SELECT point_id, service_side 
+                        """SELECT point_id, service_side
                         FROM table_point
                         WHERE game_id IN
                             (SELECT GAME_ID
@@ -129,6 +129,21 @@ class VideoGrader:
                     )
                 # Fetching the results and storing the point_ids in a list
                 points_ids = [row[0] for row in db.cursor.fetchall()]
+
+        # If existing, create a dict with the previous grade, with point_id as keys
+        previous_grades_dict = dict()
+        with DBManager() as db:
+            placeholders = ",".join(["?"] * len(points_ids))
+            db.cursor.execute(
+                f"""SELECT point_id, previous_grade
+                FROM table_{serve_or_pass}
+                WHERE point_id IN ({placeholders})""",
+                points_ids,
+            )
+            results = db.cursor.fetchall()
+            for point_id, previous_grade in results:
+                previous_grades_dict[point_id] = previous_grade
+
 
         # Fetching the player names in table_player for the game_id or serie_id provided
         with DBManager() as db:
@@ -149,26 +164,9 @@ class VideoGrader:
         # Create the table if it doesn't exist in the database
         with DBManager() as db:
             db.create_simple_actions_table(serve_or_pass)
-        
-        # Fetching the previous grades for the points to grade, to be able to display them during the grading and to decide whether to rewrite the database or not
-        with DBManager() as db:
-            db.cursor.execute(
-                f"""SELECT previous_grade
-                FROM table_{serve_or_pass} 
-                WHERE point_id IN ({','.join('?' for _ in points_ids)})""",
-                points_ids,
-            )
-            previous_grades = db.cursor.fetchall()
-            # Build a lookup using only the fetched `previous_grade` values
-            # (query returns one column: previous_grade)
-            previous_grades_dict = {}
-            for point_id, row in zip(points_ids, previous_grades):
-                grade = row[0]
-                previous_grades_dict[(point_id, player_a, serve_or_pass)] = grade
-                previous_grades_dict[(point_id, player_b, serve_or_pass)] = grade
 
         # Looping through the points to grade and applying the basic_action_grader
-        for point_id in points_ids:
+        for point_id in previous_grades_dict.keys():
             if quit_grading:
                 break
             # Constructing the path to the segmented video for the point
@@ -185,7 +183,7 @@ class VideoGrader:
                 player_a=player_a,
                 player_b=player_b,
                 action_to_grade=serve_or_pass,
-                previous_grade=previous_grades_dict.get((point_id, player_a, serve_or_pass)) or previous_grades_dict.get((point_id, player_b, serve_or_pass)),
+                previous_grade=previous_grades_dict.get(point_id, None),
             )
             # Appending the grades for the current action to the main list
             actions_grades_list.append(action_grades)
@@ -221,7 +219,7 @@ class VideoGrader:
                     INSERT INTO table_{serve_or_pass} (
                         point_id, paire_id, player, action, grade
                     ) VALUES (?, ?, ?, ?, ?)
-                    ON CONFLICT(point_id, player, action) 
+                    ON CONFLICT(point_id, player, action, grade) 
                     DO {"UPDATE SET action=excluded.action, grade=excluded.grade, player=excluded.player" if rewrite_db else "NOTHING"}
                     """
                 )
@@ -319,7 +317,7 @@ if __name__ == "__main__":
         # serie_id='MBV_S2-500_F_nov25',
         game_id='JOMR_jan26_MBV_01',
         serve_or_pass='serve',
-        rewrite_db=False,
+        rewrite_db=True,
         )
     # grader.missing_games_to_grade(action_to_grade='serve')
 

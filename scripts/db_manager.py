@@ -199,7 +199,6 @@ class DBManager:
             grade TEXT NOT NULL,
             previous_grade TEXT,
             point_won BOOLEAN,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE (point_id, player, action),
             FOREIGN KEY (point_id) REFERENCES table_point(point_id),
             FOREIGN KEY (paire_id) REFERENCES table_player(paire_id)
@@ -491,32 +490,33 @@ class DBManager:
         SET previous_grade = grade"""
         self.execute_query(update_query)
 
-        # DEV - output the whole table to a json file for backup and traceability purposes
-        # Query to retrieve the updated table data
-        output_query = f"""SELECT point_id, paire_id, player, action, grade, previous_grade, point_won 
-        FROM table_{action_name}"""
-        self.cursor.execute(output_query)
-        rows = self.cursor.fetchall()
-        output_data = [
-            {
-                "point_id": row[0],
-                "paire_id": row[1],
-                "player": row[2],
-                "action": row[3],
-                "grade": row[4],
-                "previous_grade": row[5],
-                "point_won": row[6]
-            }
-            for row in rows
-        ]
+        # # DEV - output the whole table to a json file for backup and traceability purposes
+        # # Query to retrieve the updated table data
+        # output_query = f"""SELECT point_id, paire_id, player, action, grade, previous_grade, point_won 
+        # FROM table_{action_name}"""
+        # self.cursor.execute(output_query)
+        # rows = self.cursor.fetchall()
+        # output_data = [
+        #     {
+        #         "point_id": row[0],
+        #         "paire_id": row[1],
+        #         "player": row[2],
+        #         "action": row[3],
+        #         "grade": row[4],
+        #         "previous_grade": row[5],
+        #         "point_won": row[6]
+        #     }
+        #     for row in rows
+        # ]
 
-        # Save the updated data to a JSON file in actions_graded directory
-        output_filename = f"list_grades_{action_name}_updated_{datetime.datetime.now().strftime('%Y-%m-%d')}.json"
-        output_path = os.path.join(ACTIONS_GRADED_DIR, output_filename)
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(output_data, f, ensure_ascii=False, indent=2)
+        # # Save the updated data to a JSON file in actions_graded directory
+        # DEV - need to be kept?
+        # output_filename = f"list_grades_{action_name}_updated_{datetime.datetime.now().strftime('%Y-%m-%d')}.json"
+        # output_path = os.path.join(ACTIONS_GRADED_DIR, output_filename)
+        # with open(output_path, "w", encoding="utf-8") as f:
+        #     json.dump(output_data, f, ensure_ascii=False, indent=2)
 
-        print(f"✅ previous_grade column updated for all '{action_name}' actions. Output saved to '{output_filename}'.")
+        # print(f"✅ previous_grade column updated for all '{action_name}' actions. Output saved to '{output_filename}'.")
 
     # ---------------------------------------------------------------------------
 
@@ -560,6 +560,7 @@ class DBManager:
             self.load_indexed_df_points_csv_to_db(game_id)
 
     # ---------------------------------------------------------------------------
+
 
     def load_json_actions(self,
         action_name: str,
@@ -687,12 +688,19 @@ class DBManager:
 
 if __name__ == "__main__":
     with DBManager() as db:
-        # db.load_json_actions(action_name='serve',rewrite_db=True)
-        # db.false_aces_corrector()
-        # db.reset_database(action_name_list=['serve'])
-        # db.list_all_tables()
-        # db.reset_database(action_name_list=['serve'])
-        table_serve_df = db.table_to_dataframe("table_serve")
+        db.reset_database(action_name_list=['serve'])
         db.update_grade_to_previous_grade(action_name='serve')
-        print(table_serve_df.head())
+        table_serve_df = db.table_to_dataframe("table_serve")
+        print(table_serve_df.head(10))
+
+
+
+
+
+
+
+
+
+
+
 
