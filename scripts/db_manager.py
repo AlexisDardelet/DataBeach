@@ -5,8 +5,10 @@ import csv
 import os
 import pandas as pd
 import dotenv
+import datetime
 
 dotenv.load_dotenv()
+ACTIONS_GRADED_DIR = os.getenv("ACTIONS_GRADED_DIR")
 
 # Local imports
 from etl_utils import extract_transform_indexed_df_points_csv
@@ -195,6 +197,7 @@ class DBManager:
             player TEXT NOT NULL,
             action TEXT NOT NULL,
             grade TEXT NOT NULL,
+            previous_grade TEXT,
             point_won BOOLEAN,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE (point_id, player, action),
@@ -466,6 +469,57 @@ class DBManager:
 
     # ---------------------------------------------------------------------------
 
+    def update_grade_to_previous_grade(
+            self,
+            action_name: str
+            ) -> None:
+        """ Saves the current grade of each action in a table into previous_grade
+        It is useful in the dev phase and/or when grading correction are needed.
+        It ouput a json file of the whole table updated for backup and traceability purposes.
+        Args : 
+        action_name (str): the name of the action for which to update the previous_grade column"""
+
+        # DEV - to be updated with further actions
+        action_list_available = ['serve', 'pass']
+        if action_name not in action_list_available:
+            print(f"⚠️  Action '{action_name}' not recognized : need to be one of {action_list_available}.")
+            return
+
+        # Query to update the previous_grade column with the current grade
+        update_query = f""" 
+        UPDATE table_{action_name}
+        SET previous_grade = grade"""
+        self.execute_query(update_query)
+
+        # DEV - output the whole table to a json file for backup and traceability purposes
+        # Query to retrieve the updated table data
+        output_query = f"""SELECT point_id, paire_id, player, action, grade, previous_grade, point_won 
+        FROM table_{action_name}"""
+        self.cursor.execute(output_query)
+        rows = self.cursor.fetchall()
+        output_data = [
+            {
+                "point_id": row[0],
+                "paire_id": row[1],
+                "player": row[2],
+                "action": row[3],
+                "grade": row[4],
+                "previous_grade": row[5],
+                "point_won": row[6]
+            }
+            for row in rows
+        ]
+
+        # Save the updated data to a JSON file in actions_graded directory
+        output_filename = f"list_grades_{action_name}_updated_{datetime.datetime.now().strftime('%Y-%m-%d')}.json"
+        output_path = os.path.join(ACTIONS_GRADED_DIR, output_filename)
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(output_data, f, ensure_ascii=False, indent=2)
+
+        print(f"✅ previous_grade column updated for all '{action_name}' actions. Output saved to '{output_filename}'.")
+
+    # ---------------------------------------------------------------------------
+
     def load_all_indexed_df_points_csv_to_db(
             self,
             indexed_df_points_dir: str = None
@@ -540,8 +594,8 @@ class DBManager:
             # Insert the grades into the action table
             insert_query = f"""
                 INSERT INTO table_{action_name} (
-                    point_id, paire_id, player, action, grade
-                ) VALUES (?, ?, ?, ?, ?)
+                    point_id, paire_id, player, action, grade,previous_grade
+                ) VALUES (?, ?, ?, ?, ?, ?)
                 ON CONFLICT(point_id, player, action) 
                 DO {"UPDATE SET grade=excluded.grade" if rewrite_db else "NOTHING"}
             """
@@ -552,6 +606,7 @@ class DBManager:
                     action_grade["player"],
                     action_grade["action"],
                     action_grade["grade"],
+                    action_grade.get("previous_grade")  # Use .get() to avoid KeyError if not present
                 )
                 for action_grade in actions_grades_list
             ]
@@ -598,7 +653,7 @@ class DBManager:
         # Correct false 'ace' grades where point_won is 0
         false_aces_query = str("""
         UPDATE table_serve
-        SET grade = 'error'
+        SET grade = 'serve error'
         WHERE grade = 'ace' AND point_won = 0
         """)
         self.execute_query(false_aces_query)
@@ -607,7 +662,7 @@ class DBManager:
         false_errors_query = str("""
         UPDATE table_serve
         SET grade = 'ace'
-        WHERE grade = 'error' AND point_won = 1
+        WHERE grade = 'serve error' AND point_won = 1
         """)
         self.execute_query(false_errors_query)
 
@@ -636,7 +691,8 @@ if __name__ == "__main__":
         # db.false_aces_corrector()
         # db.reset_database(action_name_list=['serve'])
         # db.list_all_tables()
-        db.reset_database(action_name_list=['serve'])
-        table_point_df = db.table_to_dataframe("table_point")
-        print(table_point_df.tail())
+        # db.reset_database(action_name_list=['serve'])
+        table_serve_df = db.table_to_dataframe("table_serve")
+        db.update_grade_to_previous_grade(action_name='serve')
+        print(table_serve_df.head())
 

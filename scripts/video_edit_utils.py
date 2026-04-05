@@ -1194,7 +1194,9 @@ def basic_action_grader(
         player_a: str,
         player_b: str,
         action_to_grade: str ="serve" or "pass",
+        previous_grade: str = None,
         play_speed: float = 1.0,
+        display_size: tuple = (1152, 648),
 ) -> dict:
     """
     Grade a specific action for a given player across a points of,
@@ -1209,7 +1211,11 @@ def basic_action_grader(
         player_b (str): Name of the second player whose actions are to be graded.
         action_to_grade (str): Type of action to grade (e.g.,
             'service', 'attack').
+        previous_grade (str, optional): Previous grade assigned to the
+            action, if any. Defaults to None.
         play_speed (float, optional): Video playback speed
+        display_size (tuple, optional): Size of the video display window
+            (width, height). Defaults to (1152, 648).
     Returns:
         dict: Dictionary containing the action graded for a player
     """
@@ -1219,24 +1225,40 @@ def basic_action_grader(
     grade = str()
     video_loop_active = bool(True)
     quit_grading = bool(False)
+    color_map = dict({
+        'black': (0, 0, 0),
+        'green': (0, 255, 0),
+        'blue': (255, 0, 0),
+        'red': (0, 0, 255),
+        'white': (255, 255, 255),
+        'yellow': (0, 255, 255),
+    })
+    color_map_keys = list(color_map.keys())
+    keys_colors_index = 0
+    grades_color_index = 0
+    scale_x = float(1.0)
+    scale_y = float(1.0)
+    font_scale = float(1.0)
 
     # Define the grading options for serve and pass
     dict_grades_result=dict({
         'serve': {
             0: 'undetermined',
-            1: 'error',
-            2: 'good pass',
-            3: 'average pass',
-            4: 'out-of-system pass',
-            5: 'ace'
+            1: 'serve error',
+            2: 'excellent pass (++)',
+            3: 'good pass (+)',
+            4: 'average pass (0)',
+            5: 'bad pass (-)',
+            6: 'ace'
         },
         'pass': {
             0: 'undetermined',
-            1: 'error',
-            2: 'out-of-system pass',
-            3: 'average pass',
-            4: 'good pass',
-            5: '<NA>'
+            1: 'serve error',
+            2: 'excellent pass (++)',
+            3: 'good pass (+)',
+            4: 'average pass (0)',
+            5: 'bad pass (-)',
+            6: 'ace'
         }
     })
 
@@ -1251,7 +1273,8 @@ def basic_action_grader(
         ord('2'): dict_grades_result[action_to_grade][2],
         ord('3'): dict_grades_result[action_to_grade][3],
         ord('4'): dict_grades_result[action_to_grade][4],
-        ord('5'): dict_grades_result[action_to_grade][5]
+        ord('5'): dict_grades_result[action_to_grade][5],
+        ord('6'): dict_grades_result[action_to_grade][6],
     })
 
     # Display available keys as an overlay on the video
@@ -1264,6 +1287,7 @@ def basic_action_grader(
         f"3 : {dict_grades_result[action_to_grade][3]}",
         f"4 : {dict_grades_result[action_to_grade][4]}",
         f"5 : {dict_grades_result[action_to_grade][5]}",
+        f"6 : {dict_grades_result[action_to_grade][6]}",
     ])
     
     # Override cv2.imshow to add help overlay and scores
@@ -1272,25 +1296,38 @@ def basic_action_grader(
     def _imshow_with_help(winname, frame):
         if frame is not None:
             # Display help in the top-left corner
-            x, y = 30, 120
+            x, y = int(30 * scale_x), int(150 * scale_y)
             for i, line in enumerate(help_lines):
                 cv2.putText(
-                    frame,
-                    line,
-                    (x, y + i * 25),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.6,
-                    (0, 0, 0),
-                    2,
-                    cv2.LINE_AA,
-                )
+                    img=frame, 
+                    text=line, 
+                    org=(x, y + i * int(25 * scale_y)),
+                    fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                    fontScale=0.7 * font_scale,
+                    color=color_map[color_map_keys[keys_colors_index]], 
+                    thickness=1, 
+                    lineType=cv2.LINE_AA
+                    )
+
 
         _orig_imshow(winname, frame)
 
     cv2.imshow = _imshow_with_help
 
-    # Open the video
+    # Open the video and and scale factors for display
     cap = cv2.VideoCapture(video_path)
+    video_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    video_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    scale_x = video_width / display_size[0]
+    scale_y = video_height / display_size[1]
+    font_scale = min(scale_x, scale_y)
+
+    # Resize the display window to the specified size
+    win_name = f'{video_path}'
+    cv2.namedWindow(win_name, cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(win_name, display_size[0], display_size[1])
+    cv2.moveWindow(win_name, 0, 0)
+
 
     def _wait_key_fast(ms):
         # Reduce the delay proportionally to the speed
@@ -1327,26 +1364,41 @@ def basic_action_grader(
 
             # Display the player being graded and the grade assigned
             if action_to_grade and ret:
+                # Player to grade overlay
                 cv2.putText(
-                    frame,
-                    f"player: {player_to_grade}",
-                    (30, 40),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    1,
-                    (255, 0, 0),
-                    2,
-                    cv2.LINE_AA,
-                )
+                    img=frame,
+                    text=f"player: {player_to_grade}",
+                    org=(int(30 * scale_x), int(40 * scale_y)),
+                    fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                    fontScale=1 * font_scale,
+                    color=color_map[color_map_keys[grades_color_index]],
+                    thickness=2,
+                    lineType=cv2.LINE_AA
+                    )
+                # Grade overlay
                 cv2.putText(
-                    frame,
-                    f"{action_to_grade} grade: {grade}",
-                    (30, 70),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    1,
-                    (255, 0, 0),
-                    2,
-                    cv2.LINE_AA,
-                )
+                    img=frame,
+                    text=f"{action_to_grade} grade: {grade}",
+                    org=(int(30 * scale_x), int(70 * scale_y)),
+                    fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                    fontScale=1 * font_scale,
+                    color=color_map[color_map_keys[grades_color_index]], 
+                    thickness=2, 
+                    lineType=cv2.LINE_AA
+                    )
+            # Diplay the previous grade for this action if it exists
+            if previous_grade and ret:
+                # Previous grade overlay
+                cv2.putText(
+                    img=frame,
+                    text=f"previous grade: {previous_grade}",
+                    org=(int(30 * scale_x), int(100 * scale_y)),
+                    fontFace=cv2.FONT_HERSHEY_SIMPLEX, 
+                    fontScale=1 * font_scale,
+                    color=color_map[color_map_keys[grades_color_index]], 
+                    thickness=1, 
+                    lineType=cv2.LINE_AA
+                    )
 
             # Display the current frame
             if ret:
@@ -1358,6 +1410,14 @@ def basic_action_grader(
                 # Stop the whole grading process and exit
                 quit_grading = True
                 break
+            if key == ord('h'):
+                # Change the color of the keys display
+                keys_colors_index = (keys_colors_index + 1) % len(color_map_keys)
+                continue
+            if key == ord('g'):
+                # Change the color of the grade display
+                grades_color_index = (grades_color_index + 1) % len(color_map_keys)
+                continue
             if key == ord('8') and player_to_grade and grade:
                 # Confirm the grade and exit
                 video_loop_active = False
@@ -1509,10 +1569,15 @@ def all_possession_game(
 # Testing in main script
 
 
-
 if __name__ == "__main__":
-    test_dict = montage_operations(
-        video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs bruts\(dev) 2026 mar - S2 250 M - OLB\AlexRonan vs LoloMatis - S2 OLB - mar 2026 - poules.mov',
-        play_speed=2.0,
+    test_dict = basic_action_grader(
+        video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\points_segmented\JOMR_jan26_MBV_01_p014.mp4',
+        point_id='test_point_id',
+        paire_id='test_paire_id',
+        player_a='test_player_a',
+        player_b='test_player_b',
+        action_to_grade='serve',
+        previous_grade='good pass (+)',
+        play_speed=1.0,
     )
     print(test_dict)

@@ -149,6 +149,23 @@ class VideoGrader:
         # Create the table if it doesn't exist in the database
         with DBManager() as db:
             db.create_simple_actions_table(serve_or_pass)
+        
+        # Fetching the previous grades for the points to grade, to be able to display them during the grading and to decide whether to rewrite the database or not
+        with DBManager() as db:
+            db.cursor.execute(
+                f"""SELECT previous_grade
+                FROM table_{serve_or_pass} 
+                WHERE point_id IN ({','.join('?' for _ in points_ids)})""",
+                points_ids,
+            )
+            previous_grades = db.cursor.fetchall()
+            # Build a lookup using only the fetched `previous_grade` values
+            # (query returns one column: previous_grade)
+            previous_grades_dict = {}
+            for point_id, row in zip(points_ids, previous_grades):
+                grade = row[0]
+                previous_grades_dict[(point_id, player_a, serve_or_pass)] = grade
+                previous_grades_dict[(point_id, player_b, serve_or_pass)] = grade
 
         # Looping through the points to grade and applying the basic_action_grader
         for point_id in points_ids:
@@ -168,6 +185,7 @@ class VideoGrader:
                 player_a=player_a,
                 player_b=player_b,
                 action_to_grade=serve_or_pass,
+                previous_grade=previous_grades_dict.get((point_id, player_a, serve_or_pass)) or previous_grades_dict.get((point_id, player_b, serve_or_pass)),
             )
             # Appending the grades for the current action to the main list
             actions_grades_list.append(action_grades)
@@ -295,14 +313,14 @@ class VideoGrader:
 #######################################################################################
 # Main script for testing the VideoGrader class 
 
-# if __name__ == "__main__":
-    # grader = VideoGrader(paire_id='JOMR')
-    # # grader.service_passing_grading(
-    # #     serie_id='MBV_S2-500_F_nov25',
-    # #     # game_id='JOMR_nov24_Leuven_01',
-    # #     serve_or_pass='serve',
-    # #     rewrite_db=False,
-    # #     )
+if __name__ == "__main__":
+    grader = VideoGrader(paire_id='JOMR')
+    grader.service_passing_grading(
+        # serie_id='MBV_S2-500_F_nov25',
+        game_id='JOMR_jan26_MBV_01',
+        serve_or_pass='serve',
+        rewrite_db=False,
+        )
     # grader.missing_games_to_grade(action_to_grade='serve')
 
 
