@@ -23,11 +23,12 @@ def serve_focus(
     # Colour dictionary for the grades
     grade_color_dict = {
         'undetermined': 'gray',
-        'error': 'red',
-        'good pass': 'orange',
-        'average pass': 'blue',
-        'out-of-system pass': 'lightgreen',
-        'ace': 'green'
+        'serve error': 'darkred',
+        'excellent pass (++)': 'red',
+        'good pass (+)': 'orange',
+        'average pass (0)': 'lightgray',
+        'bad pass (-)': 'green',
+        'ace': 'darkgreen'
     }
 
     # Filters box above the barplots
@@ -96,30 +97,34 @@ def serve_focus(
     for game_id in game_ids:
         total_serves = total_serves_per_game[game_id]
         undetermined_count = results_df[(results_df['game_id'] == game_id) & (results_df['grade'] == 'undetermined')].shape[0]
-        error_count = results_df[(results_df['game_id'] == game_id) & (results_df['grade'] == 'error')].shape[0]
-        easy_count = results_df[(results_df['game_id'] == game_id) & (results_df['grade'] == 'good pass')].shape[0]
-        average_count = results_df[(results_df['game_id'] == game_id) & (results_df['grade'] == 'average pass')].shape[0]
-        oos_count = results_df[(results_df['game_id'] == game_id) & (results_df['grade'] == 'out-of-system pass')].shape[0]
+        error_count = results_df[(results_df['game_id'] == game_id) & (results_df['grade'] == 'serve error')].shape[0]
+        excellent_pass_count = results_df[(results_df['game_id'] == game_id) & (results_df['grade'] == 'excellent pass (++)')].shape[0]
+        good_pass_count = results_df[(results_df['game_id'] == game_id) & (results_df['grade'] == 'good pass (+)')].shape[0]
+        average_pass_count = results_df[(results_df['game_id'] == game_id) & (results_df['grade'] == 'average pass (0)')].shape[0]
+        bad_pass_count = results_df[(results_df['game_id'] == game_id) & (results_df['grade'] == 'bad pass (-)')].shape[0]
         ace_count = results_df[(results_df['game_id'] == game_id) & (results_df['grade'] == 'ace')].shape[0]
         undetermined_ratio = undetermined_count / total_serves if total_serves > 0 else 0
         error_ratio = error_count / total_serves if total_serves > 0 else 0
-        easy_ratio = easy_count / total_serves if total_serves > 0 else 0
-        average_ratio = average_count / total_serves if total_serves > 0 else 0
-        oos_ratio = oos_count / total_serves if total_serves > 0 else 0
+        excellent_pass_ratio = excellent_pass_count / total_serves if total_serves > 0 else 0
+        good_pass_ratio = good_pass_count / total_serves if total_serves > 0 else 0
+        average_pass_ratio = average_pass_count / total_serves if total_serves > 0 else 0
+        bad_pass_ratio = bad_pass_count / total_serves if total_serves > 0 else 0
         ace_ratio = ace_count / total_serves if total_serves > 0 else 0
         serve_grade_ratios[game_id] = {
             'total_serves': total_serves,
             'undetermined_count': undetermined_count,
             'error_count': error_count,
-            'easy_count': easy_count,
-            'average_count': average_count,
-            'oos_count': oos_count,
+            'exc_count': excellent_pass_count,
+            'good_pass_count': good_pass_count,
+            'average_count': average_pass_count,
+            'bad_pass_count': bad_pass_count,
             'ace_count': ace_count,
             'undetermined_ratio': undetermined_ratio,
             'error_ratio': error_ratio,
-            'easy_ratio': easy_ratio,
-            'average_ratio': average_ratio,
-            'oos_ratio': oos_ratio,
+            'excellent_pass_ratio': excellent_pass_ratio,
+            'good_pass_ratio': good_pass_ratio,
+            'average_ratio': average_pass_ratio,
+            'bad_pass_ratio': bad_pass_ratio,
             'ace_ratio': ace_ratio
         }
     serve_grade_ratios_df = pd.DataFrame.from_dict(serve_grade_ratios, orient='index')
@@ -138,10 +143,11 @@ def serve_focus(
     # Barplot of the serve grade ratios per game
     fig = go.Figure(data=[
         go.Bar(name='Undetermined', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['undetermined_ratio'], marker_color=grade_color_dict['undetermined']),
-        go.Bar(name='Error', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['error_ratio'], marker_color=grade_color_dict['error']),
-        go.Bar(name='Good pass', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['easy_ratio'], marker_color=grade_color_dict['good pass']),
-        go.Bar(name='Average pass', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['average_ratio'], marker_color=grade_color_dict['average pass']),
-        go.Bar(name='Out-of-system pass', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['oos_ratio'], marker_color=grade_color_dict['out-of-system pass']),
+        go.Bar(name='Serve error', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['error_ratio'], marker_color=grade_color_dict['serve error']),
+        go.Bar(name='Excellent pass (++)', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['excellent_pass_ratio'], marker_color=grade_color_dict['excellent pass (++)']),
+        go.Bar(name='Good pass (+)', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['good_pass_ratio'], marker_color=grade_color_dict['good pass (+)']),
+        go.Bar(name='Average pass (0)', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['average_ratio'], marker_color=grade_color_dict['average pass (0)']),
+        go.Bar(name='Bad pass (-)', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['bad_pass_ratio'], marker_color=grade_color_dict['bad pass (-)']),
         go.Bar(name='Ace', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['ace_ratio'], marker_color=grade_color_dict['ace'])
     ])
     fig.update_layout(barmode='stack', title='Serve Grade Ratios per Game', xaxis_title='Game ID', yaxis_title='Ratio')

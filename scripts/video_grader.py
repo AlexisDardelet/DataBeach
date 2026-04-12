@@ -315,7 +315,7 @@ if __name__ == "__main__":
     grader = VideoGrader(paire_id='JOMR')
     grader.service_passing_grading(
         # serie_id='MBV_S2-500_F_nov25',
-        game_id='JOMR_jan26_MBV_01',
+        game_id='JOMR_nov25_BSD_02',
         serve_or_pass='serve',
         rewrite_db=True,
         )

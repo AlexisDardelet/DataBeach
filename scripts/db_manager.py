@@ -688,10 +688,20 @@ class DBManager:
 
 if __name__ == "__main__":
     with DBManager() as db:
-        db.reset_database(action_name_list=['serve'])
-        db.update_grade_to_previous_grade(action_name='serve')
-        table_serve_df = db.table_to_dataframe("table_serve")
-        print(table_serve_df.head(10))
+        # db.reset_database(action_name_list=['serve'])
+        # db.update_grade_to_previous_grade(action_name='serve')
+        # table_serve_df = db.table_to_dataframe("table_serve")
+        # print(table_serve_df[table_serve_df['game_id'] == 'JOMR_jan26_MBV_02'])
+        # print(table_serve_df['grade'].unique())
+        db.execute_query(f"""
+                        SELECT ts.point_id, ts.grade, ts.previous_grade, tp.point_id, tp.game_id
+                        FROM table_serve AS ts
+                        LEFT JOIN table_point AS tp ON ts.point_id = tp.point_id
+                        WHERE tp.game_id = 'JOMR_jan26_MBV_02'
+                         """)
+        results = db.cursor.fetchall()
+        for row in results:
+            print(row)
 
 
 
