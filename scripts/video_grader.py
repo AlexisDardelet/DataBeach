@@ -144,6 +144,7 @@ class VideoGrader:
             for point_id, previous_grade in results:
                 previous_grades_dict[point_id] = previous_grade
 
+        print(f'previous_grades_dict: {previous_grades_dict}')
 
         # Fetching the player names in table_player for the game_id or serie_id provided
         with DBManager() as db:
@@ -166,7 +167,7 @@ class VideoGrader:
             db.create_simple_actions_table(serve_or_pass)
 
         # Looping through the points to grade and applying the basic_action_grader
-        for point_id in previous_grades_dict.keys():
+        for point_id in points_ids:
             if quit_grading:
                 break
             # Constructing the path to the segmented video for the point
@@ -174,6 +175,8 @@ class VideoGrader:
                 self.segmented_points_dir,
                 f"{point_id}.mp4",
             )
+
+            print(f"Grading point_id: {point_id} with video path: {video_path}")
 
             # Grading the action in the video and storing the results in a list
             action_grades, quit_grading = basic_action_grader(
@@ -211,55 +214,56 @@ class VideoGrader:
             with open(json_filepath, "w") as f:
                 json.dump(actions_grades_list, f, indent=2)
 
-            # Entering the grades in the database
-            with DBManager() as db:
-                # Insert the grades into the action table
-                insert_query = (
-                    f"""
-                    INSERT INTO table_{serve_or_pass} (
-                        point_id, paire_id, player, action, grade
-                    ) VALUES (?, ?, ?, ?, ?)
-                    ON CONFLICT(point_id, player, action, grade) 
-                    DO {"UPDATE SET action=excluded.action, grade=excluded.grade, player=excluded.player" if rewrite_db else "NOTHING"}
-                    """
-                )
-                rows_to_insert = [
-                    (
-                        action_grade["point_id"],
-                        action_grade["paire_id"],
-                        action_grade["player"],
-                        action_grade["action"],
-                        action_grade["grade"],
-                    )
-                    for action_grade in actions_grades_list
-                ]
-                try:
-                    with db.conn:
-                        db.cursor.executemany(insert_query, rows_to_insert)
-                    print(
-                        f"""{len(actions_grades_list)} grades for {serve_or_pass} actions have been {'updated' if rewrite_db else 'inserted'} in the database."""
-                    )
-                except Exception as e:
-                    print(f"❌ Error inserting grades into the database: {e}")
+        # NEED TO FIX THE DB UPDATE : QUERY PROBLEM WITH THE ON CONFLICT CLAUSE, NOT UPDATING THE ROWS AS EXPECTED
+        #     # Entering the grades in the database
+        #     with DBManager() as db:
+        #         # Insert the grades into the action table
+        #         insert_query = (
+        #             f"""
+        #             INSERT INTO table_{serve_or_pass} (
+        #                 point_id, paire_id, player, action, grade
+        #             ) VALUES (?, ?, ?, ?, ?)
+        #             ON CONFLICT(point_id, player, action, grade) 
+        #             DO {"UPDATE SET action=excluded.action, grade=excluded.grade, player=excluded.player" if rewrite_db else "NOTHING"}
+        #             """
+        #         )
+        #         rows_to_insert = [
+        #             (
+        #                 action_grade["point_id"],
+        #                 action_grade["paire_id"],
+        #                 action_grade["player"],
+        #                 action_grade["action"],
+        #                 action_grade["grade"],
+        #             )
+        #             for action_grade in actions_grades_list
+        #         ]
+        #         try:
+        #             with db.conn:
+        #                 db.cursor.executemany(insert_query, rows_to_insert)
+        #             print(
+        #                 f"""{len(actions_grades_list)} grades for {serve_or_pass} actions have been {'updated' if rewrite_db else 'inserted'} in the database."""
+        #             )
+        #         except Exception as e:
+        #             print(f"❌ Error inserting grades into the database: {e}")
 
-        # poin_won querry update according to the grades for serve or pass
-        # and false_aces_corrector() [ONLY FOR SERVE GRADING]
-        if serve_or_pass == 'serve':
-            with DBManager() as db:
-                point_won_query = """
-                UPDATE table_serve
-                SET point_won = CASE
-                    WHEN paire_id = (
-                        SELECT tp.point_winner
-                        FROM table_point AS tp
-                        WHERE tp.point_id = table_serve.point_id
-                    ) THEN 1
-                    ELSE 0
-                END
-                """
-                db.execute_query(point_won_query)
-                # False aces and direct serve errors correction
-                db.false_aces_corrector()
+        # # poin_won querry update according to the grades for serve or pass
+        # # and false_aces_corrector() [ONLY FOR SERVE GRADING]
+        # if serve_or_pass == 'serve':
+        #     with DBManager() as db:
+        #         point_won_query = """
+        #         UPDATE table_serve
+        #         SET point_won = CASE
+        #             WHEN paire_id = (
+        #                 SELECT tp.point_winner
+        #                 FROM table_point AS tp
+        #                 WHERE tp.point_id = table_serve.point_id
+        #             ) THEN 1
+        #             ELSE 0
+        #         END
+        #         """
+        #         db.execute_query(point_won_query)
+        #         # False aces and direct serve errors correction
+        #         db.false_aces_corrector()
 
     # -----------------------------------------------------------------------
     # Missing games to grade for serve and pass
@@ -311,20 +315,16 @@ class VideoGrader:
 #######################################################################################
 # Main script for testing the VideoGrader class 
 
+
+
 if __name__ == "__main__":
     grader = VideoGrader(paire_id='JOMR')
     grader.service_passing_grading(
-        # serie_id='MBV_S2-500_F_nov25',
-        game_id='JOMR_nov25_BSD_02',
+        serie_id='MON_S2-1000_F_mar26',
         serve_or_pass='serve',
         rewrite_db=True,
         )
-    # grader.missing_games_to_grade(action_to_grade='serve')
+    # games_to_grade_list = grader.missing_games_to_grade(action_to_grade='serve')
 
 
-    # actions_graded_dir = os.path.join(os.path.dirname(
-    # os.path.dirname(__file__)
-    # ),
-    #     "actions_graded",
-    # )
-    # print(f"Actions graded directory: {actions_graded_dir}")
+

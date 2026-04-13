@@ -1,72 +1,72 @@
-service_side,start_frame,end_frame,JOMR_score,(adv)_score,JOMR_sets,(adv)_sets,point_index
+service_side,start_frame,end_frame,JOMR_score,LauC_VicB_score,JOMR_sets,LauC_VicB_sets,point_index
 match start - service JOMR,19,128,0,0,0,0,001
 service JOMR,258,406,1,0,0,0,002
 service JOMR,612,745,2,0,0,0,003
-service (adv),855,1066,2,1,0,0,004
+service LauC_VicB,855,1066,2,1,0,0,004
 service JOMR,1133,1205,3,1,0,0,005
 *SWITCH*,1257,1294,3,1,0,0,999
-service (adv),1391,1487,3,2,0,0,006
-service (adv),1657,1856,3,3,0,0,007
+service LauC_VicB,1391,1487,3,2,0,0,006
+service LauC_VicB,1657,1856,3,3,0,0,007
 service JOMR,1993,2124,4,3,0,0,008
-service (adv),2251,2415,4,4,0,0,009
-service (adv),2655,2743,4,5,0,0,010
+service LauC_VicB,2251,2415,4,4,0,0,009
+service LauC_VicB,2655,2743,4,5,0,0,010
 *SWITCH*,2773,2796,4,5,0,0,999
 service JOMR,3002,3137,5,5,0,0,011
 service JOMR,3310,3449,6,5,0,0,012
-service (adv),3723,3822,6,6,0,0,013
-service (adv),4086,4231,6,7,0,0,014
+service LauC_VicB,3723,3822,6,6,0,0,013
+service LauC_VicB,4086,4231,6,7,0,0,014
 service JOMR,4476,4639,7,7,0,0,015
 *SWITCH*,4794,4825,7,7,0,0,999
 service JOMR,5123,5313,8,7,0,0,016
 Timeout,5416,5459,8,7,0,0,999
 service JOMR,6326,6431,9,7,0,0,017
-service (adv),6606,6916,9,8,0,0,018
+service LauC_VicB,6606,6916,9,8,0,0,018
 service JOMR,7084,7247,10,8,0,0,019
-service (adv),7468,7804,10,9,0,0,020
+service LauC_VicB,7468,7804,10,9,0,0,020
 *SWITCH*,7890,7916,10,9,0,0,999
-service (adv),8254,8425,10,10,0,0,021
+service LauC_VicB,8254,8425,10,10,0,0,021
 service JOMR,8607,8719,11,10,0,0,022
-service (adv),8854,9036,11,11,0,0,023
+service LauC_VicB,8854,9036,11,11,0,0,023
 service JOMR,9199,9379,12,11,0,0,024
 service JOMR,9602,9671,13,11,0,0,025
 *SWITCH*,9732,9757,13,11,0,0,999
-service (adv),9938,10181,13,12,0,0,026
-service (adv),10421,10596,13,13,0,0,027
-service (adv),10822,10914,13,14,0,0,028
+service LauC_VicB,9938,10181,13,12,0,0,026
+service LauC_VicB,10421,10596,13,13,0,0,027
+service LauC_VicB,10822,10914,13,14,0,0,028
 service JOMR,11055,11479,14,14,0,0,029
-service (adv),11789,12030,14,15,0,0,030
+service LauC_VicB,11789,12030,14,15,0,0,030
 *SWITCH*,12161,12174,14,15,0,0,999
 service JOMR,12325,12544,15,15,0,0,031
 Timeout,12828,12886,15,15,0,0,999
-service (adv),13650,13866,15,16,0,0,032
+service LauC_VicB,13650,13866,15,16,0,0,032
 end of set,0,0,15,17,0,1,999
-set start - service (adv),15394,15719,0,0,0,1,033
+set start - service LauC_VicB,15394,15719,0,0,0,1,033
 service JOMR,16008,16282,1,0,0,1,034
-service (adv),16504,16880,1,1,0,1,035
+service LauC_VicB,16504,16880,1,1,0,1,035
 service JOMR,17100,17262,2,1,0,1,036
-service (adv),17578,17791,2,2,0,1,037
+service LauC_VicB,17578,17791,2,2,0,1,037
 *SWITCH*,17858,17882,2,2,0,1,999
 service JOMR,18110,18269,3,2,0,1,038
-service (adv),18617,18872,3,3,0,1,039
+service LauC_VicB,18617,18872,3,3,0,1,039
 service JOMR,19097,19244,4,3,0,1,040
 service JOMR,19434,19567,5,3,0,1,041
-service (adv),19652,19786,5,4,0,1,042
+service LauC_VicB,19652,19786,5,4,0,1,042
 *SWITCH*,19883,19912,5,4,0,1,999
 service JOMR,20050,20346,6,4,0,1,043
-service (adv),20608,20859,6,5,0,1,044
-service (adv),21147,21372,6,6,0,1,045
+service LauC_VicB,20608,20859,6,5,0,1,044
+service LauC_VicB,21147,21372,6,6,0,1,045
 service JOMR,21504,21602,7,6,0,1,046
-service (adv),21740,21847,7,7,0,1,047
+service LauC_VicB,21740,21847,7,7,0,1,047
 *SWITCH*,21888,21922,7,7,0,1,999
-service (adv),22151,22292,7,8,0,1,048
-service (adv),22443,22579,7,9,0,1,049
+service LauC_VicB,22151,22292,7,8,0,1,048
+service LauC_VicB,22443,22579,7,9,0,1,049
 Timeout,22826,22965,7,9,0,1,999
-service (adv),23881,24180,7,10,0,1,050
-service (adv),24428,24557,7,11,0,1,051
+service LauC_VicB,23881,24180,7,10,0,1,050
+service LauC_VicB,24428,24557,7,11,0,1,051
 service JOMR,24934,25084,8,11,0,1,052
 *SWITCH*,25134,25174,8,11,0,1,999
-service (adv),25337,25597,8,12,0,1,053
-service (adv),25797,26155,8,13,0,1,054
-service (adv),26364,26570,8,14,0,1,055
+service LauC_VicB,25337,25597,8,12,0,1,053
+service LauC_VicB,25797,26155,8,13,0,1,054
+service LauC_VicB,26364,26570,8,14,0,1,055
 service JOMR,26803,26986,9,14,0,1,056
 end of set,0,0,9,15,0,2,999

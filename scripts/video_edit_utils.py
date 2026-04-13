@@ -1571,7 +1571,7 @@ def all_possession_game(
 
 if __name__ == "__main__":
     test_dict = basic_action_grader(
-        video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\points_segmented\JOMR_jan26_MBV_01_p014.mp4',
+        video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\points_segmented\JOMR_mar26_VSG_01_p072.mp4',
         point_id='test_point_id',
         paire_id='test_paire_id',
         player_a='test_player_a',

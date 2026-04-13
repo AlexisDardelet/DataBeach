@@ -25,8 +25,8 @@ def serve_focus(
         'undetermined': 'gray',
         'serve error': 'darkred',
         'excellent pass (++)': 'red',
-        'good pass (+)': 'orange',
-        'average pass (0)': 'lightgray',
+        'good pass (+)': 'darkorange',
+        'average pass (0)': 'yellow',
         'bad pass (-)': 'green',
         'ace': 'darkgreen'
     }
