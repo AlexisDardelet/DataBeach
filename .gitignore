@@ -1,0 +1,44 @@
+# ========================
+# Cookies
+# ========================
+cookies_alexis.txt
+
+# ========================
+# Key Firestore
+# ========================
+
+*firebase-adminsdk*.json
+
+# ========================
+# Base de données SQLite
+# ========================
+.db
+*.sqlite
+*.sqlite3
+
+# ========================
+# Python
+# ========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environnements virtuels
+venv/
+env/
+.env/
+.venv/
+
+# Variables d'environnement
+.env
+.env.local
+
+# ========================
+# Éditeurs & OS
+# ========================
+
+Thumbs.db
+.vscode/
+.idea/

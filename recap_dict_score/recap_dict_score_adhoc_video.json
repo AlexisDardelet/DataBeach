@@ -1,0 +1,15 @@
+{
+    "teams": [
+        "JOMR",
+        "MarL_MarB"
+    ],
+    "match_format": "15 points per set",
+    "winner": "MarL_MarB",
+    "final_score": "0 - 1",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "3 - 6"
+        }
+    ]
+}
