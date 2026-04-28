@@ -4,6 +4,12 @@
 cookies_alexis.txt
 
 # ========================
+# Key Firestore
+# ========================
+
+*firebase-adminsdk*.json
+
+# ========================
 # Base de données SQLite
 # ========================
 .db
@@ -33,6 +39,6 @@ env/
 # Éditeurs & OS
 # ========================
 
-Thumbs.db       # Windows
+Thumbs.db
 .vscode/
 .idea/
