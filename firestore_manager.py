@@ -5,7 +5,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-KEY_PATH = os.path.join(BASE_DIR, "data-beach-fd370-firebase-adminsdk-fbsvc-322b1f0788.json")
+KEY PATH (to be updated.json")
 
 _COLUMNS_SERVE_DF = [
     'point_id', 'player', 'grade', 'point_won',
