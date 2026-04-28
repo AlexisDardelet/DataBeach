@@ -7,7 +7,7 @@ from datetime import datetime
 
 # ── Chemins ───────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-KEY_PATH = os.path.join(BASE_DIR, "..", "data-beach-fd370-firebase-adminsdk-fbsvc-322b1f0788.json")
+KEY_PATH = os.path.join(BASE_DIR, "..", ".json")
 DB_PATH = os.path.join(BASE_DIR, "..", "database", "databeach_base.db")
 
 # ── Init Firebase ──────────────────────────────────────────────
