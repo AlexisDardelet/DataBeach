@@ -692,9 +692,10 @@ if __name__ == "__main__":
     with DBManager() as db:
         db.reset_database(action_name_list=['serve'])
         db.update_grade_to_previous_grade(action_name='serve')
-        table_serve_df = db.table_to_dataframe("table_serve")
-        print(table_serve_df)
-
+        # table_serve_df = db.table_to_dataframe("table_serve")
+        # print(table_serve_df)
+        table_game_df = db.table_to_dataframe("table_game")
+        print(table_game_df.tail(15))
 
 
 
