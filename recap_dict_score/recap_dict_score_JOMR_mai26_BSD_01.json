@@ -1,0 +1,19 @@
+{
+    "teams": [
+        "JOMR",
+        "MarL_MarB"
+    ],
+    "match_format": "21 points per set",
+    "winner": "MarL_MarB",
+    "final_score": "0 - 2",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "17 - 21"
+        },
+        {
+            "set": 2,
+            "score": "18 - 21"
+        }
+    ]
+}

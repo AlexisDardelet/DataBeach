@@ -1,0 +1,23 @@
+{
+    "teams": [
+        "JOMR",
+        "MarV_LauA"
+    ],
+    "match_format": "(to be checked manually)",
+    "winner": "MarV_LauA",
+    "final_score": "1 - 2",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "12 - 21"
+        },
+        {
+            "set": 2,
+            "score": "21 - 17"
+        },
+        {
+            "set": 3,
+            "score": "10 - 15"
+        }
+    ]
+}
