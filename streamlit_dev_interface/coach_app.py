@@ -28,12 +28,16 @@ from video_edit_utils import *
 #     teams_list = db.list_teams_with_players_names()
 #     st.session_state.update({"teams_list": teams_list})
 ## [TESTING VERSION] Comment the following code to fetch the teams list from the database
+st.set_page_config(layout="wide")
+
 teams_list = [
     ('JOMR', 'OFFREDI Jade - RANC Mathilde'),
 ]
 
 # Sidebar menu for navigation
 with st.sidebar:
+
+    ### [PREVIOUS APP VERSION]
     # # Coaching view and Dev view buttons
     # col1, col2 = st.columns(2)
     # with col1:
@@ -65,40 +69,43 @@ with st.sidebar:
             results = db.cursor.fetchall()
             st.session_state.update({"game_ids": [result[0] for result in results]})
 
-    # Menu options for the coaching view
-    if st.session_state.get("Coaching view", True):
+    # [PREVIOUS APP VERSION]
+    # # Menu options for the coaching view
+    # if st.session_state.get("Coaching view", True):
+    #     selected = option_menu(
+    #         menu_title="Coaching pages",
+    #         options=[
+    #         "Coach overview",
+    #         "Serve focus",
+    #         "Side-out focus", 
+    #         "Block-defense focus",
+    #         "Specific plays focus",
+    #         ],
+    #         icons=["house","arrow-up-right", "arrow-left", "bricks", "eyeglasses"],
+    #         menu_icon="cast",
+    #         default_index=0,
+    #     )
+
+        # Menu options for the dev view    
         selected = option_menu(
-            menu_title="Coaching pages",
-            options=[
-            "Coach overview",
-            "Serve focus",
-            "Side-out focus", 
-            "Block-defense focus",
-            "Specific plays focus",
-            ],
-            icons=["house","arrow-up-right", "arrow-left", "bricks", "eyeglasses"],
-            menu_icon="cast",
-            default_index=0,
-        )
-    elif st.session_state.get("Dev pages", True):
-        selected = option_menu(
-            menu_title="Main Menu",
+            menu_title="Dev pages",
             options=[
             "Game editor",
             "Action grading",
             ],
-            # icons=["house", "arrow-right", "arrow-left", "eyeglasses", "pencil", "check"],
             menu_icon="cast",
             default_index=0,
         )
 
 ## Page content based on the selected menu option
-# # Coaching view pages
-if st.session_state.get("Coaching view", True):
-    if selected == "Coach overview":
-        coach_overview(paire_id)
-    elif selected == "Serve focus":
-        serve_focus(paire_id)
+
+## [PREVIOUS APP VERSION] Uncomment the following code to display the coaching view pages
+# # # Coaching view pages
+# if st.session_state.get("Coaching view", True):
+#     if selected == "Coach overview":
+#         coach_overview(paire_id)
+#     elif selected == "Serve focus":
+#         serve_focus(paire_id)
 
 # # Dev view pages
 if st.session_state.get("Dev view", True):

@@ -39,7 +39,6 @@ SEGMENTED_POINTS_DIR = os.getenv("SEGMENTED_POINTS_DIR")
 ######################################################################
 
 def editor_interface():
-    """Main editor interface function with two workflow modes."""
     paire_id = st.session_state.get("paire_id", None)
     game_ids = st.session_state.get("game_ids", [])
 
