@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(git mv *)",
-      "PowerShell(Rename-Item -Path \"c:\\\\Users\\\\habib\\\\Documents\\\\GitHub\\\\DataBeach\\\\streamlit_interface\" -NewName \"streamlit_dev_interface\")",
-      "Bash(git add *)"
-    ]
-  }
-}
