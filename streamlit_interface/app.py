@@ -23,26 +23,31 @@ from etl_utils import *
 from video_edit_utils import *
 
 # Listing the teams with players names for the dropdown menu in the sidebar
-with DBManager() as db:
-    teams_list = db.list_teams_with_players_names()
-    st.session_state.update({"teams_list": teams_list})
+## [FULL SCALE VERSION] Uncomment the following code to fetch the teams list from the database
+# with DBManager() as db:
+#     teams_list = db.list_teams_with_players_names()
+#     st.session_state.update({"teams_list": teams_list})
+## [TESTING VERSION] Comment the following code to fetch the teams list from the database
+teams_list = [
+    ('JOMR', 'OFFREDI Jade - RANC Mathilde'),
+]
 
 # Sidebar menu for navigation
 with st.sidebar:
-    # Coaching view and Dev view buttons
-    col1, col2 = st.columns(2)
-    with col1:
-        st.button("Coaching view",
-                  use_container_width=True,
-                  type="primary",
-                  on_click=lambda: st.session_state.update({"Coaching view": True, "Dev view": False}),
-                  )
-    with col2:
-        st.button("Dev view", 
-                  use_container_width=True,
-                  type="secondary",
-                  on_click=lambda: st.session_state.update({"Coaching view": False, "Dev view": True})
-                  )
+    # # Coaching view and Dev view buttons
+    # col1, col2 = st.columns(2)
+    # with col1:
+    #     st.button("Coaching view",
+    #               use_container_width=True,
+    #               type="primary",
+    #               on_click=lambda: st.session_state.update({"Coaching view": True, "Dev view": False}),
+    #               )
+    # with col2:
+    #     st.button("Dev view", 
+    #               use_container_width=True,
+    #               type="secondary",
+    #               on_click=lambda: st.session_state.update({"Coaching view": False, "Dev view": True})
+    #               )
     
     # Select team dropdown menu
     with st.container(border=True):

@@ -694,8 +694,10 @@ if __name__ == "__main__":
         # db.update_grade_to_previous_grade(action_name='serve')
         # table_serve_df = db.table_to_dataframe("table_serve")
         # print(table_serve_df)
-        table_game_df = db.table_to_dataframe("table_game")
-        print(table_game_df.tail(15))
+        # table_game_df = db.table_to_dataframe("table_game")
+        # print(table_game_df.tail(15))
+        teams_list = db.list_teams_with_players_names()
+        print(teams_list[0])
 
 
 
