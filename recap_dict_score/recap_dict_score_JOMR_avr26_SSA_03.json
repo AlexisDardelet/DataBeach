@@ -1,0 +1,23 @@
+{
+    "teams": [
+        "JOMR",
+        "NarC_FloA"
+    ],
+    "match_format": "15 points per set",
+    "winner": "NarC_FloA",
+    "final_score": "1 - 2",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "12 - 15"
+        },
+        {
+            "set": 2,
+            "score": "15 - 9"
+        },
+        {
+            "set": 3,
+            "score": "3 - 11"
+        }
+    ]
+}

@@ -1,0 +1,3 @@
+service_side,start_frame,end_frame,JOMR_score,AliP_ReiY_score,JOMR_sets,AliP_ReiY_sets,point_index
+match start - service JOMR,392,648,0,0,0,0,001
+end of set,0,0,0,0,0,0,999

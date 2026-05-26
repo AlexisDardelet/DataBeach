@@ -1,0 +1,37 @@
+service_side,start_frame,end_frame,JOMR_score,LilB_EvyR_score,JOMR_sets,LilB_EvyR_sets,point_index
+match start - service LilB_EvyR,54,484,0,0,0,0,001
+service JOMR,745,1099,1,0,0,0,002
+service JOMR,1454,1681,2,0,0,0,003
+service JOMR,1885,2254,3,0,0,0,004
+service LilB_EvyR,2655,2956,3,1,0,0,005
+service JOMR,3370,3505,4,1,0,0,006
+*SWITCH*,3681,3736,4,1,0,0,999
+service JOMR,3937,4187,5,1,0,0,007
+service JOMR,4374,4814,6,1,0,0,008
+service JOMR,5190,5317,7,1,0,0,009
+service JOMR,5646,5862,8,1,0,0,010
+service JOMR,6153,6555,9,1,0,0,011
+service JOMR,6986,7137,10,1,0,0,012
+service JOMR,7819,8072,11,1,0,0,013
+service LilB_EvyR,8587,8967,11,2,0,0,014
+service LilB_EvyR,9167,9385,11,3,0,0,015
+service LilB_EvyR,9595,9734,11,4,0,0,016
+service JOMR,9959,10331,12,4,0,0,017
+service JOMR,10625,10713,13,4,0,0,018
+service LilB_EvyR,10943,11073,13,5,0,0,019
+service JOMR,11271,11452,14,5,0,0,020
+service LilB_EvyR,11672,11755,14,6,0,0,021
+*SWITCH*,11880,11917,14,6,0,0,999
+service JOMR,12763,12977,15,6,0,0,022
+service LilB_EvyR,13126,13300,15,7,0,0,023
+service JOMR,13420,13503,16,7,0,0,024
+service LilB_EvyR,13623,13753,16,8,0,0,025
+service JOMR,13953,14076,17,8,0,0,026
+service JOMR,14203,14347,18,8,0,0,027
+service LilB_EvyR,14509,14710,18,9,0,0,028
+*SWITCH*,14798,14875,18,9,0,0,999
+service JOMR,14882,15283,19,9,0,0,029
+service LilB_EvyR,15541,15779,19,10,0,0,030
+service JOMR,15964,16105,20,10,0,0,031
+service LilB_EvyR,16256,16551,20,11,0,0,032
+end of set,0,0,21,11,1,0,999

@@ -1,0 +1,25 @@
+service_side,start_frame,end_frame,JOMR_score,AleN_EmP_score,JOMR_sets,AleN_EmP_sets,point_index
+match start - service JOMR,162,608,0,0,0,0,001
+service AleN_EmP,1102,1554,0,1,0,0,002
+service AleN_EmP,2072,2336,0,2,0,0,003
+service JOMR,2658,2903,1,2,0,0,004
+service AleN_EmP,3076,3357,1,3,0,0,005
+*SWITCH*,3419,3445,1,3,0,0,999
+service AleN_EmP,3525,3818,1,4,0,0,006
+service AleN_EmP,4023,4277,1,5,0,0,007
+service AleN_EmP,4586,4770,1,6,0,0,008
+service AleN_EmP,4956,5469,1,7,0,0,009
+service JOMR,5850,6344,2,7,0,0,010
+*SWITCH*,6488,6551,2,7,0,0,999
+service AleN_EmP,6803,7097,2,8,0,0,011
+service JOMR,7412,7793,3,8,0,0,012
+service AleN_EmP,8025,8520,3,9,0,0,013
+service JOMR,8841,9142,4,9,0,0,014
+service AleN_EmP,9486,9810,4,10,0,0,015
+*SWITCH*,9928,9994,4,10,0,0,999
+service JOMR,10233,10652,5,10,0,0,016
+service AleN_EmP,10847,11679,5,11,0,0,017
+service AleN_EmP,12012,12337,5,12,0,0,018
+Timeout,12823,13251,5,12,0,0,999
+service AleN_EmP,14334,14543,5,13,0,0,019
+end of set,0,0,5,14,0,1,999

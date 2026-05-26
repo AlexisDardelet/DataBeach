@@ -1,0 +1,19 @@
+{
+    "teams": [
+        "JOMR",
+        "MaeG_MarB"
+    ],
+    "match_format": "15 points per set",
+    "winner": "MaeG_MarB",
+    "final_score": "0 - 2",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "10 - 15"
+        },
+        {
+            "set": 2,
+            "score": "11 - 15"
+        }
+    ]
+}

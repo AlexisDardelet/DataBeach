@@ -1,4 +1,4 @@
-## Main page for the Streamlit interface of DataBeach
+## Editor interface for the Streamlit interface of DataBeach
 import streamlit as st
 from streamlit_option_menu import option_menu
 import tkinter as tk
@@ -33,6 +33,7 @@ from video_edit_utils import *
 # Environment variables
 load_dotenv()
 ROOT_VIDEO_DIR = os.getenv("ROOT_VIDEO_DIR")
+PREPROCESSED_VIDEO_DIR = os.getenv("PREPROCESSED_VIDEO_DIR")
 SEGMENTED_POINTS_DIR = os.getenv("SEGMENTED_POINTS_DIR")
 
 ######################################################################
@@ -59,12 +60,21 @@ def editor_interface():
 
         launch_preprocessing = None
 
-        col1, col2 = st.columns([1, 2.5])
-        col3, col4 = st.columns([1, 2.5])
+        # Column set up for pre-processing workflow
+        col_default_folders = st.columns([1, 1]) # default directory toggle 
+        col1, col2 = st.columns([1, 2.5]) # raw video folder selection and display
+        col3, col4 = st.columns([1, 2.5]) # preprocessed video folder selection and display
         col5, col6, col7 = st.columns([1, 1, 1])
         col_dict_ids, col_success = st.columns([4, 1])
 
-        # Select raw games folder
+        # Toggle widget to use default folders for raw videos and preprocessed output
+        with col_default_folders[0]:
+            st.toggle(label="Default preprocessed games folder",
+                      value=True,
+                      key="toggle_default_preprocessing_folders",
+                      )
+
+        # Selecting the raw video folder
         with col1:
             if st.button(
                 label="📁➡️ Select raw games folder",
@@ -74,7 +84,6 @@ def editor_interface():
                 folder = select_folder()
                 if folder:
                     st.session_state["video_dir"] = folder
-
         # Display selected raw games folder path
         with col2:
             if "video_dir" in st.session_state:
@@ -96,16 +105,31 @@ def editor_interface():
                     unsafe_allow_html=True
                 )
 
+        ## Select raw games folder
+        # If toggle is on, use default PREPROCESSED_VIDEO_DIR as output dir from .env, 
+        # otherwise allow user to select folder
+        if st.session_state.get("toggle_default_preprocessing_folders", True) is True:
+            st.session_state["output_dir"] = PREPROCESSED_VIDEO_DIR
+            with col3:
+                if st.button(
+                    label="➡️📁 Select preprocessed folder",
+                    use_container_width=True,
+                    type="secondary",
+                ):
+                    output_folder = select_folder()
+                    if output_folder:
+                        st.session_state["output_dir"] = output_folder
+        else:
         # Select preprocessed output folder
-        with col3:
-            if st.button(
-                label="➡️📁 Select preprocessed folder",
-                use_container_width=True,
-                type="secondary",
-            ):
-                output_folder = select_folder()
-                if output_folder:
-                    st.session_state["output_dir"] = output_folder
+            with col3:
+                if st.button(
+                    label="➡️📁 Select preprocessed folder",
+                    use_container_width=True,
+                    type="secondary",
+                ):
+                    output_folder = select_folder()
+                    if output_folder:
+                        st.session_state["output_dir"] = output_folder
 
         # Display selected preprocessed folder path
         if "output_dir" in st.session_state:
@@ -128,7 +152,7 @@ def editor_interface():
                     unsafe_allow_html=True
                 )
 
-        # Assign game_ids to raw video files - interface for mapping videos to games
+        ## Assign game_ids to raw video files - interface for mapping videos to games
         if (
             "video_dir" in st.session_state
             and "output_dir" in st.session_state

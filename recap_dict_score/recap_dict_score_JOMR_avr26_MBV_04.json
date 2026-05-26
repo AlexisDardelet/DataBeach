@@ -1,0 +1,15 @@
+{
+    "teams": [
+        "JOMR",
+        "AleN_EmP"
+    ],
+    "match_format": "15 points per set",
+    "winner": "AleN_EmP",
+    "final_score": "0 - 1",
+    "score_by_set": [
+        {
+            "set": 1,
+            "score": "5 - 14"
+        }
+    ]
+}
