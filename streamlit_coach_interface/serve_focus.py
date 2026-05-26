@@ -50,41 +50,46 @@ def serve_focus(
     with filter_col2:
         selected_player = st.selectbox(
             label="Sélection d'un joueur :",
-            options=[player_a, player_b, 'Total paire'],
-            width='stretch')
+            options=['Total paire',player_a, player_b],
+            width='stretch',
+            )
 
     # Fetching the data for the selected team
     with DBManager() as db:
         # Fetching the serve data
         subquery = f"""
-            SELECT tp.point_id, tg.game_id, tp.team_a_score, tp.team_a_score_diff, tg.team_a, tg.team_b, tg.serie
+            SELECT tp.point_id, tg.game_id, tp.team_a_score, tp.team_a_score_diff, tg.team_a, tg.team_b, tg.serie, tsr.serie_name, tpl.paire_name
             FROM table_game AS tg
             LEFT JOIN table_point AS tp ON tg.game_id = tp.game_id
+            LEFT JOIN table_serie AS tsr ON tg.serie = tsr.serie_id
+            LEFT JOIN table_player AS tpl ON tg.team_b = tpl.paire_id
             WHERE tg.team_a = '{paire_id}'"""
-    
+
         if selected_player != 'Total paire':
-            db.execute_query(f"""SELECT ts.point_id, ts.player, ts.grade, ts.point_won, sub.game_id, sub.team_a_score, sub.team_a_score_diff, sub.team_b, sub.serie
+            db.execute_query(f"""SELECT ts.point_id, ts.player, ts.grade, ts.point_won, sub.game_id, sub.team_a_score, sub.team_a_score_diff, sub.team_b, sub.serie, sub.serie_name, sub.paire_name
                             FROM table_serve AS ts
                             LEFT JOIN ({subquery}) AS sub
                             ON ts.point_id = sub.point_id
-                            WHERE ts.paire_id = '{paire_id}' AND ts.player = '{selected_player}' 
+                            WHERE ts.paire_id = '{paire_id}' AND ts.player = '{selected_player}'
                             """)
         else:
-            db.execute_query(f"""SELECT ts.point_id, ts.player, ts.grade, ts.point_won, sub.game_id, sub.team_a_score, sub.team_a_score_diff, sub.team_b, sub.serie
+            db.execute_query(f"""SELECT ts.point_id, ts.player, ts.grade, ts.point_won, sub.game_id, sub.team_a_score, sub.team_a_score_diff, sub.team_b, sub.serie, sub.serie_name, sub.paire_name
                             FROM table_serve AS ts
                             LEFT JOIN ({subquery}) AS sub
                             ON ts.point_id = sub.point_id
-                            WHERE ts.paire_id = '{paire_id}' 
+                            WHERE ts.paire_id = '{paire_id}'
                             """)
         results = db.cursor.fetchall()
     results_df = pd.DataFrame(results, columns=[desc[0] for desc in db.cursor.description])
 
     # Filter button on 'serie' above the barplot
     with filter_col1:
-        unique_series = results_df['serie'].unique()
-        selected_serie = st.selectbox("Sélection d'une série :", unique_series, width='stretch')
-    filtered_results_df = results_df[results_df['serie'] == selected_serie]
-
+        unique_series_names_list = sorted(results_df['serie_name'].unique())
+        selected_serie = st.selectbox("Sélection d'une série :", 
+                                      unique_series_names_list, 
+                                      width='stretch'
+                                      )
+    filtered_results_df = results_df[results_df['serie_name'] == selected_serie]
 
     # Create the total serve per game column
     game_ids = results_df['game_id'].unique()
@@ -110,7 +115,9 @@ def serve_focus(
         average_pass_ratio = average_pass_count / total_serves if total_serves > 0 else 0
         bad_pass_ratio = bad_pass_count / total_serves if total_serves > 0 else 0
         ace_ratio = ace_count / total_serves if total_serves > 0 else 0
+        paire_name = results_df[results_df['game_id'] == game_id]['paire_name'].iloc[0].replace(' - ', '<br>')
         serve_grade_ratios[game_id] = {
+            'paire_name': paire_name,
             'total_serves': total_serves,
             'undetermined_count': undetermined_count,
             'error_count': error_count,
@@ -141,20 +148,34 @@ def serve_focus(
 
 
     # Barplot of the serve grade ratios per game
+    ## [ENGLISH VERSION] ##
+    # fig = go.Figure(data=[
+    #     go.Bar(name='Undetermined', x=serve_grade_ratios_df['paire_name'], y=serve_grade_ratios_df['undetermined_ratio'], marker_color=grade_color_dict['undetermined']),
+    #     go.Bar(name='Serve error', x=serve_grade_ratios_df['paire_name'], y=serve_grade_ratios_df['error_ratio'], marker_color=grade_color_dict['serve error']),
+    #     go.Bar(name='Excellent pass (++)', x=serve_grade_ratios_df['paire_name'], y=serve_grade_ratios_df['excellent_pass_ratio'], marker_color=grade_color_dict['excellent pass (++)']),
+    #     go.Bar(name='Good pass (+)', x=serve_grade_ratios_df['paire_name'], y=serve_grade_ratios_df['good_pass_ratio'], marker_color=grade_color_dict['good pass (+)']),
+    #     go.Bar(name='Average pass (0)', x=serve_grade_ratios_df['paire_name'], y=serve_grade_ratios_df['average_ratio'], marker_color=grade_color_dict['average pass (0)']),
+    #     go.Bar(name='Bad pass (-)', x=serve_grade_ratios_df['paire_name'], y=serve_grade_ratios_df['bad_pass_ratio'], marker_color=grade_color_dict['bad pass (-)']),
+    #     go.Bar(name='Ace', x=serve_grade_ratios_df['paire_name'], y=serve_grade_ratios_df['ace_ratio'], marker_color=grade_color_dict['ace'])
+    # ])
+    # fig.update_layout(barmode='stack', title='Serve Grade Ratios per Game', xaxis_title='Game ID', yaxis_title='Ratio')
+    # col1.plotly_chart(fig, use_container_width=True)
+    # [FRENCH VERSION] ##
     fig = go.Figure(data=[
-        go.Bar(name='Undetermined', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['undetermined_ratio'], marker_color=grade_color_dict['undetermined']),
-        go.Bar(name='Serve error', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['error_ratio'], marker_color=grade_color_dict['serve error']),
-        go.Bar(name='Excellent pass (++)', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['excellent_pass_ratio'], marker_color=grade_color_dict['excellent pass (++)']),
-        go.Bar(name='Good pass (+)', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['good_pass_ratio'], marker_color=grade_color_dict['good pass (+)']),
-        go.Bar(name='Average pass (0)', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['average_ratio'], marker_color=grade_color_dict['average pass (0)']),
-        go.Bar(name='Bad pass (-)', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['bad_pass_ratio'], marker_color=grade_color_dict['bad pass (-)']),
-        go.Bar(name='Ace', x=serve_grade_ratios_df.index, y=serve_grade_ratios_df['ace_ratio'], marker_color=grade_color_dict['ace'])
+        go.Bar(name='Indéterminé', x=serve_grade_ratios_df['paire_name'], y=serve_grade_ratios_df['undetermined_ratio'], marker_color=grade_color_dict['undetermined']),
+        go.Bar(name='Faute de service', x=serve_grade_ratios_df['paire_name'], y=serve_grade_ratios_df['error_ratio'], marker_color=grade_color_dict['serve error']),
+        go.Bar(name='Récep. parfaite (++)', x=serve_grade_ratios_df['paire_name'], y=serve_grade_ratios_df['excellent_pass_ratio'], marker_color=grade_color_dict['excellent pass (++)']),
+        go.Bar(name='Récep. bonne (+)', x=serve_grade_ratios_df['paire_name'], y=serve_grade_ratios_df['good_pass_ratio'], marker_color=grade_color_dict['good pass (+)']),
+        go.Bar(name='Récep. moyenne (0)', x=serve_grade_ratios_df['paire_name'], y=serve_grade_ratios_df['average_ratio'], marker_color=grade_color_dict['average pass (0)']),
+        go.Bar(name='Récep. mauvaise (-)', x=serve_grade_ratios_df['paire_name'], y=serve_grade_ratios_df['bad_pass_ratio'], marker_color=grade_color_dict['bad pass (-)']),
+        go.Bar(name='Ace', x=serve_grade_ratios_df['paire_name'], y=serve_grade_ratios_df['ace_ratio'], marker_color=grade_color_dict['ace'])
     ])
-    fig.update_layout(barmode='stack', title='Serve Grade Ratios per Game', xaxis_title='Game ID', yaxis_title='Ratio')
+    fig.update_layout(
+        barmode='stack',
+        title='Qualité de service, par rapport à la réception adverse', 
+        # xaxis_title='match vs.',
+        yaxis_title='Ratio')
     col1.plotly_chart(fig, use_container_width=True)
 
-
-
-
-    # # [DEV] Displaying the data 
-    # full_width_container.dataframe(results_df.head())
+    # [DEV] Displaying the data 
+    full_width_container.dataframe(results_df.head())

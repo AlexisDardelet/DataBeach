@@ -60,7 +60,7 @@ with st.sidebar:
             ],
             icons=["house","arrow-up-right", "arrow-left", "bricks", "eyeglasses"],
             menu_icon="cast",
-            default_index=0,
+            default_index=1,
         )
 
 

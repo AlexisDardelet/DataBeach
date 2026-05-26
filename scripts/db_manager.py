@@ -63,10 +63,11 @@ class DBManager:
         self.cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS table_player (
-                paire_id        TEXT PRIMARY KEY,
-                player_a TEXT NOT NULL,
-                player_b TEXT NOT NULL,
-                genre        TEXT NOT NULL
+                paire_id   TEXT PRIMARY KEY,
+                player_a   TEXT NOT NULL,
+                player_b   TEXT NOT NULL,
+                genre      TEXT NOT NULL,
+                paire_name TEXT GENERATED ALWAYS AS (player_a || ' - ' || player_b) STORED
             )
         """
         )
@@ -75,11 +76,12 @@ class DBManager:
         self.cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS table_serie (
-                serie_id TEXT PRIMARY KEY,
-                club  TEXT NOT NULL,
-                type  TEXT NOT NULL,
-                genre TEXT NOT NULL,
-                date  DATE NOT NULL
+                serie_id   TEXT PRIMARY KEY,
+                club       TEXT NOT NULL,
+                type       TEXT NOT NULL,
+                genre      TEXT NOT NULL,
+                date       DATE NOT NULL,
+                serie_name TEXT
             )
         """
         )
@@ -252,7 +254,7 @@ class DBManager:
     # -----------------------------------------------------------------------
 
     def new_beach_serie(
-        self, serie_id: str, club: str, serie_type: str, genre: str, date: str
+        self, serie_id: str, club: str, serie_type: str, genre: str, date: str, serie_name: str = None
     ) -> None:
         """Inserts a new beach series into table_serie."""
         # Check if the serie_id already exists
@@ -273,13 +275,13 @@ class DBManager:
             return
 
         query = """
-            INSERT OR IGNORE INTO table_serie (serie_id, club, type, genre, date)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT OR IGNORE INTO table_serie (serie_id, club, type, genre, date, serie_name)
+            VALUES (?, ?, ?, ?, ?, ?)
         """
-        self.execute_query(query, (serie_id, club, serie_type, genre, date))
+        self.execute_query(query, (serie_id, club, serie_type, genre, date, serie_name))
         print(
             f"✅ New series added: "
-            f"{serie_id} - {club} - {serie_type} - {genre} - {date}"
+            f"{serie_id} - {club} - {serie_type} - {genre} - {date} - {serie_name}"
         )
 
     # -----------------------------------------------------------------------------------
@@ -690,14 +692,12 @@ class DBManager:
 if __name__ == "__main__":
 
     with DBManager() as db:
-        # db.reset_database(action_name_list=['serve'])
-        # db.update_grade_to_previous_grade(action_name='serve')
+        db.reset_database(action_name_list=['serve'])
+        db.update_grade_to_previous_grade(action_name='serve')
         # table_serve_df = db.table_to_dataframe("table_serve")
         # print(table_serve_df)
         # table_game_df = db.table_to_dataframe("table_game")
         # print(table_game_df.tail(15))
-        teams_list = db.list_teams_with_players_names()
-        print(teams_list[0])
 
 
 

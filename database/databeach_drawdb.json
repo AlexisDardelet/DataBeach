@@ -1,0 +1,174 @@
+{
+  "author": "",
+  "title": "DataBeach",
+  "date": "2026-05-26",
+  "tables": [
+    {
+      "id": 0,
+      "name": "table_player",
+      "x": 50,
+      "y": 200,
+      "color": "#175e7a",
+      "comment": "",
+      "indices": [],
+      "fields": [
+        { "id": 0,  "name": "paire_id",  "type": "TEXT",    "primary": true,  "unique": true,  "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 1,  "name": "player_a",  "type": "TEXT",    "primary": false, "unique": false, "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 2,  "name": "player_b",  "type": "TEXT",    "primary": false, "unique": false, "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 3,  "name": "genre",     "type": "TEXT",    "primary": false, "unique": false, "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "table_serie",
+      "x": 50,
+      "y": 550,
+      "color": "#175e7a",
+      "comment": "",
+      "indices": [],
+      "fields": [
+        { "id": 4,  "name": "serie_id",  "type": "TEXT",    "primary": true,  "unique": true,  "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 5,  "name": "club",      "type": "TEXT",    "primary": false, "unique": false, "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 6,  "name": "type",      "type": "TEXT",    "primary": false, "unique": false, "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 7,  "name": "genre",     "type": "TEXT",    "primary": false, "unique": false, "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 8,  "name": "date",      "type": "DATE",    "primary": false, "unique": false, "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "table_game",
+      "x": 480,
+      "y": 300,
+      "color": "#175e7a",
+      "comment": "",
+      "indices": [],
+      "fields": [
+        { "id": 9,  "name": "game_id",        "type": "TEXT",    "primary": true,  "unique": true,  "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 10, "name": "serie",           "type": "TEXT",    "primary": false, "unique": false, "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 11, "name": "stage",           "type": "TEXT",    "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 12, "name": "team_a",          "type": "TEXT",    "primary": false, "unique": false, "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 13, "name": "team_b",          "type": "TEXT",    "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 14, "name": "victory",         "type": "TEXT",    "primary": false, "unique": false, "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 15, "name": "set1_score",      "type": "INTEGER", "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 16, "name": "set2_score",      "type": "INTEGER", "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 17, "name": "set3_score",      "type": "INTEGER", "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 18, "name": "set1_score_adv",  "type": "INTEGER", "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 19, "name": "set2_score_adv",  "type": "INTEGER", "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 20, "name": "set3_score_adv",  "type": "INTEGER", "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "table_point",
+      "x": 920,
+      "y": 300,
+      "color": "#175e7a",
+      "comment": "",
+      "indices": [],
+      "fields": [
+        { "id": 21, "name": "point_id",         "type": "TEXT",    "primary": true,  "unique": true,  "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 22, "name": "service_side",      "type": "TEXT",    "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 23, "name": "team_a_score",      "type": "INTEGER", "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 24, "name": "team_b_score",      "type": "INTEGER", "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 25, "name": "team_a_sets",       "type": "INTEGER", "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 26, "name": "team_b_sets",       "type": "INTEGER", "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 27, "name": "team_a_score_diff", "type": "INTEGER", "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 28, "name": "team_b_score_diff", "type": "INTEGER", "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 29, "name": "point_winner",      "type": "TEXT",    "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 30, "name": "game_id",           "type": "TEXT",    "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "table_serve",
+      "x": 920,
+      "y": 750,
+      "color": "#175e7a",
+      "comment": "",
+      "indices": [
+        { "id": 0, "name": "unique_serve", "unique": true, "fields": ["point_id", "player", "action"] }
+      ],
+      "fields": [
+        { "id": 31, "name": "serve_id",       "type": "INTEGER", "primary": true,  "unique": true,  "notNull": true,  "increment": true,  "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 32, "name": "point_id",       "type": "TEXT",    "primary": false, "unique": false, "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 33, "name": "paire_id",       "type": "TEXT",    "primary": false, "unique": false, "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 34, "name": "player",         "type": "TEXT",    "primary": false, "unique": false, "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 35, "name": "action",         "type": "TEXT",    "primary": false, "unique": false, "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 36, "name": "grade",          "type": "TEXT",    "primary": false, "unique": false, "notNull": true,  "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 37, "name": "previous_grade", "type": "TEXT",    "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 },
+        { "id": 38, "name": "point_won",      "type": "BOOLEAN", "primary": false, "unique": false, "notNull": false, "increment": false, "default": "", "check": "", "comment": "", "size": 0 }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "id": 0,
+      "name": "fk_game_serie",
+      "startTableId": 2,
+      "startFieldId": 10,
+      "endTableId": 1,
+      "endFieldId": 4,
+      "cardinality": "Many_to_one",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action"
+    },
+    {
+      "id": 1,
+      "name": "fk_game_team_a",
+      "startTableId": 2,
+      "startFieldId": 12,
+      "endTableId": 0,
+      "endFieldId": 0,
+      "cardinality": "Many_to_one",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action"
+    },
+    {
+      "id": 2,
+      "name": "fk_game_team_b",
+      "startTableId": 2,
+      "startFieldId": 13,
+      "endTableId": 0,
+      "endFieldId": 0,
+      "cardinality": "Many_to_one",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action"
+    },
+    {
+      "id": 3,
+      "name": "fk_point_game",
+      "startTableId": 3,
+      "startFieldId": 30,
+      "endTableId": 2,
+      "endFieldId": 9,
+      "cardinality": "Many_to_one",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action"
+    },
+    {
+      "id": 4,
+      "name": "fk_serve_point",
+      "startTableId": 4,
+      "startFieldId": 32,
+      "endTableId": 3,
+      "endFieldId": 21,
+      "cardinality": "Many_to_one",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action"
+    },
+    {
+      "id": 5,
+      "name": "fk_serve_player",
+      "startTableId": 4,
+      "startFieldId": 33,
+      "endTableId": 0,
+      "endFieldId": 0,
+      "cardinality": "Many_to_one",
+      "updateConstraint": "No action",
+      "deleteConstraint": "No action"
+    }
+  ],
+  "notes": [],
+  "subjectAreas": [],
+  "database": "sqlite"
+}
