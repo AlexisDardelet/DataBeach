@@ -1,0 +1,6 @@
+streamlit==1.39.0
+streamlit-option-menu
+firebase-admin
+pandas
+plotly
+python-dotenv

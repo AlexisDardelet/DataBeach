@@ -1,15 +1,11 @@
 import streamlit as st
-from streamlit_option_menu import option_menu
 import os
 import pandas as pd
 import sys
-import plotly.express as px
 import plotly.graph_objects as go
-import bokeh.plotting as bp
 
-# Local import
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'scripts'))
-from db_manager import DBManager
+from firestore_manager import FirestoreManager
 
 def serve_focus(
         paire_id:str) -> None:
@@ -17,9 +13,6 @@ def serve_focus(
     Args:
         paire_id (str): The ID of the team to display the serve focus for
     """
-    # Page configuration
-    st.set_page_config(layout="wide")
-
     # Colour dictionary for the grades
     grade_color_dict = {
         'undetermined': 'gray',
@@ -40,55 +33,28 @@ def serve_focus(
     col_barplot1, col_barplot2 = st.columns([1.4, 1])
     
     # Fetching the player names for the selected team
-    with DBManager() as db:
-        db.execute_query(f"""SELECT player_a, player_b
-                        FROM table_player
-                        WHERE paire_id = '{paire_id}'
-                        """)
-        name_results = db.cursor.fetchall()
-        player_a, player_b = str(name_results[0][0]), str(name_results[0][1])
+    with FirestoreManager() as fm:
+        player_a, player_b = fm.get_player_names(paire_id)
     # Filter button on 'player' above the barplot
     with filter_col2:
         selected_player = st.selectbox(
             label="Sélection d'un joueur :",
-            options=['Total paire',player_a, player_b],
-            width='stretch',
-            )
+            options=['Total paire', player_a, player_b],
+        )
 
-    # Fetching the data for the selected team
-    with DBManager() as db:
-        # Fetching the serve data
-        subquery = f"""
-            SELECT tp.point_id, tg.game_id, tp.team_a_score, tp.team_a_score_diff, tg.team_a, tg.team_b, tg.serie, tsr.serie_name, tpl.paire_name
-            FROM table_game AS tg
-            LEFT JOIN table_point AS tp ON tg.game_id = tp.game_id
-            LEFT JOIN table_serie AS tsr ON tg.serie = tsr.serie_id
-            LEFT JOIN table_player AS tpl ON tg.team_b = tpl.paire_id
-            WHERE tg.team_a = '{paire_id}'"""
+    # Fetching the serve data
+    with FirestoreManager() as fm:
+        player_filter = selected_player if selected_player != 'Total paire' else None
+        results_df = fm.get_serve_data_df(paire_id, player=player_filter)
 
-        if selected_player != 'Total paire':
-            db.execute_query(f"""SELECT ts.point_id, ts.player, ts.grade, ts.point_won, sub.game_id, sub.team_a_score, sub.team_a_score_diff, sub.team_b, sub.serie, sub.serie_name, sub.paire_name
-                            FROM table_serve AS ts
-                            LEFT JOIN ({subquery}) AS sub
-                            ON ts.point_id = sub.point_id
-                            WHERE ts.paire_id = '{paire_id}' AND ts.player = '{selected_player}'
-                            """)
-        else:
-            db.execute_query(f"""SELECT ts.point_id, ts.player, ts.grade, ts.point_won, sub.game_id, sub.team_a_score, sub.team_a_score_diff, sub.team_b, sub.serie, sub.serie_name, sub.paire_name
-                            FROM table_serve AS ts
-                            LEFT JOIN ({subquery}) AS sub
-                            ON ts.point_id = sub.point_id
-                            WHERE ts.paire_id = '{paire_id}'
-                            """)
-        results = db.cursor.fetchall()
-    results_df = pd.DataFrame(results, columns=[desc[0] for desc in db.cursor.description])
+    results_df['serie_name'] = results_df['serie_name'].fillna('Non renseigné')
+    results_df['paire_name'] = results_df['paire_name'].fillna('Inconnu')
 
     # Filter button on 'serie' above the barplot
     with filter_col1:
         unique_series_names_list = sorted(results_df['serie_name'].unique())
-        selected_serie = st.selectbox("Sélection d'une série :", 
-                                      unique_series_names_list, 
-                                      width='stretch'
+        selected_serie = st.selectbox("Sélection d'une série :",
+                                      unique_series_names_list,
                                       )
     filtered_results_df = results_df[results_df['serie_name'] == selected_serie]
 
@@ -224,7 +190,6 @@ def serve_focus(
         selected_opponent_paire_name = st.selectbox(
             label="Sélection d'une équipe adverse :",
             options=results_df['paire_name'].unique(),
-            width='stretch',
             )
 
         # Filtering the results_df based on the selected opponent team name
