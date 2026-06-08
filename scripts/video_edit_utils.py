@@ -422,7 +422,8 @@ def cv2_point_segment_cut(
     team1_name: str = "JOMR",
     team2_name: str = "adversaire",
     start_frame: int = None,
-    display_size: tuple = (960, 540)
+    display_size: tuple = (960, 540),
+    export_list_actions: bool = False
 ) -> pd.DataFrame:
     """
     Create a DataFrame containing the point segments extracted
@@ -949,7 +950,10 @@ def cv2_point_segment_cut(
                     idx, f'{team2_name}_score'
                 ] += 1
     
-    return df_points
+    if export_list_actions is True:
+        return df_points, list_actions
+    else:
+        return df_points
 
 # -------------------------------------------------------------------
 # Point indexer

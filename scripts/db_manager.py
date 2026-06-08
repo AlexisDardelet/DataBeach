@@ -37,7 +37,6 @@ class DBManager:
         self.recap_dict_score_dir = os.getenv("RECAP_DICT_SCORE_DIR")
         self.actions_graded_dir = os.getenv("ACTIONS_GRADED_DIR")
 
-
     def close(self):
         """Closes the database connection."""
         self.conn.close()
@@ -372,7 +371,38 @@ class DBManager:
 
         print(f"✅ Dropped {len(tables)} table(s): {[t[0] for t in tables]}")
 
-    # -----------------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+
+    def get_game_ids_by_paire_name(self, paire_name: str) -> list:
+        """Returns all game_ids where the team matches the given paire_name."""
+        self.cursor.execute(
+            """
+            SELECT g.game_id
+            FROM table_game g
+            JOIN table_player p ON g.team_a = p.paire_id OR g.team_b = p.paire_id
+            WHERE p.paire_name = ?
+            """,
+            (paire_name,)
+        )
+        return [row[0] for row in self.cursor.fetchall()]
+    
+    # ---------------------------------------------------------------------------
+
+    def get_serie_ids_by_paire_name(self, paire_name: str) -> list:
+        """Returns all serie_ids where the team matches the given paire_name."""
+        self.cursor.execute(
+            """
+            SELECT DISTINCT g.serie
+            FROM table_game g
+            JOIN table_player p ON g.team_a = p.paire_id OR g.team_b = p.paire_id
+            WHERE p.paire_name = ?
+            """,
+            (paire_name,)
+        )
+        return [row[0] for row in self.cursor.fetchall()]
+
+
+    # ----------------------------------------------------------------------------
 
     def execute_query(self, 
                       query: str, 
@@ -698,11 +728,8 @@ if __name__ == "__main__":
         # print(table_serve_df)
         # table_game_df = db.table_to_dataframe("table_game")
         # print(table_game_df.tail(15))
-
-
-
-
-
+        # serie_ids = db.get_serie_ids_by_paire_name("OFFREDI Jade - RANC Mathilde")
+        # print(serie_ids)
 
 
 

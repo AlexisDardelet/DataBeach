@@ -170,6 +170,7 @@ class GameEditor:
         team2_name: str,
         rewrite_videos: bool = False,
         # temp_indexed_df_point : pd.DataFrame = None,
+        export_list_actions: bool = False
     ) -> int:
         """
         Pipeline from the preprocessed video to
@@ -240,11 +241,26 @@ class GameEditor:
 
         # Read the video and extract start_frame and end_frame
         df_points = pd.DataFrame()  # Initialize an empty DataFrame
-        df_points = cv2_point_segment_cut(
-            video_path=self.video_path, 
-            team1_name=team1_name, 
-            team2_name=team2_name
-        )
+        ## [DEV DEBUG] : Exporting the list of actions for the annotation interface
+        if export_list_actions is True:
+            df_points, list_actions = cv2_point_segment_cut(
+                video_path=self.video_path, 
+                team1_name=team1_name, 
+                team2_name=team2_name,
+                export_list_actions=export_list_actions
+            )
+            # Export the list of actions to a CSV file
+            list_actions_path = os.path.join(
+                INDEXED_DF_POINTS_DIR,f"list_actions_{game_id}_DEBUG.csv"
+            )
+            pd.DataFrame(list_actions).to_csv(list_actions_path, index=False)
+        ## [PROD] : Standard pipeline without exporting the list of actions
+        else:
+            df_points = cv2_point_segment_cut(
+                video_path=self.video_path, 
+                team1_name=team1_name, 
+                team2_name=team2_name,
+            )
         # Index the points
         indexed_df_points = pd.DataFrame()  # Initialize an empty DataFrame
         indexed_df_points = point_indexeer(df_points)
@@ -329,8 +345,8 @@ class GameEditor:
 # -------------------------------------------------------------------
 
 if __name__ == "__main__":
-    game_id = "AleD-RonP_mar26_OLB_02"
-    video_path = r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\AleD-RonP_mar26_OLB_02_started_rotated.mp4'
+    game_id = "JOMR_mai26_BSD_01"
+    video_path = r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\JOMR_mai26_BSD_01_started_rotated.mp4'
 
     with DBManager() as db:
         team1_name, team2_name = db.teams_names_from_game_id(
@@ -346,5 +362,6 @@ if __name__ == "__main__":
     editor.game_to_segmented_points(
         team1_name=team1_name,
         team2_name=team2_name,
-        rewrite_videos=False
+        rewrite_videos=False,
+        export_list_actions=True
     )

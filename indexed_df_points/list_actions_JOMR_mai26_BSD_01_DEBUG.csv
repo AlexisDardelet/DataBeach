@@ -1,0 +1,89 @@
+service_side,start_frame,end_frame
+match start - service MarL_MarB,202,780
+service MarL_MarB,1109,1335
+service MarL_MarB,1703,2217
+service JOMR,2608,2737
+service JOMR,2972,3217
+service JOMR,3495,3725
+service MarL_MarB,3888,4206
+*SWITCH*,4376,4430
+service JOMR,4621,5031
+service JOMR,5354,5631
+service MarL_MarB,5947,6440
+service MarL_MarB,6884,7485
+service MarL_MarB,7925,8377
+service JOMR,8964,9185
+service JOMR,9473,9754
+*SWITCH*,9836,9895
+service JOMR,10154,10411
+service MarL_MarB,10826,11262
+service MarL_MarB,11719,11832
+service JOMR,12024,12573
+service MarL_MarB,12920,13272
+service JOMR,13622,13846
+service MarL_MarB,14097,14258
+*SWITCH*,15811,15861
+service MarL_MarB,16221,16569
+service MarL_MarB,17041,17299
+service JOMR,17683,17867
+service MarL_MarB,18162,18631
+service MarL_MarB,19028,19390
+service MarL_MarB,19694,20009
+service JOMR,20439,20803
+*SWITCH*,21044,21091
+service JOMR,21389,21752
+service MarL_MarB,22036,22339
+service MarL_MarB,22581,22952
+service JOMR,23379,23573
+service MarL_MarB,23870,24200
+service JOMR,24439,24657
+service JOMR,24976,25265
+*SWITCH*,25487,25646
+service MarL_MarB,26120,26426
+service MarL_MarB,28584,28966
+service JOMR,29330,29797
+end of set,0,0
+set start - service JOMR,31950,32442
+service MarL_MarB,32801,33513
+service MarL_MarB,33963,34283
+service MarL_MarB,34795,35103
+service JOMR,35377,35729
+service MarL_MarB,36132,36472
+service MarL_MarB,38634,38774
+*SWITCH*,38990,39033
+service JOMR,39253,39666
+service JOMR,39909,40121
+service JOMR,40380,40577
+service MarL_MarB,40816,41132
+service JOMR,41418,41745
+service JOMR,42164,42643
+service MarL_MarB,43132,43569
+*SWITCH*,43833,43889
+service MarL_MarB,44168,44321
+service JOMR,44535,44953
+service JOMR,45225,45845
+service JOMR,46721,47002
+service MarL_MarB,47297,47691
+service MarL_MarB,48143,48455
+service MarL_MarB,48932,49245
+*SWITCH*,50540,50603
+service JOMR,51351,51670
+service MarL_MarB,52114,52597
+service JOMR,52946,53170
+service JOMR,53423,53711
+service MarL_MarB,54076,54345
+service JOMR,54716,55161
+service JOMR,55424,56154
+*SWITCH*,56635,56688
+service MarL_MarB,57072,57591
+service MarL_MarB,58102,58371
+service JOMR,58791,59294
+service MarL_MarB,59697,60076
+service JOMR,60412,60632
+service MarL_MarB,60911,61131
+service MarL_MarB,61742,62084
+*SWITCH*,62301,62345
+service JOMR,62549,62833
+service MarL_MarB,63337,63588
+service JOMR,63877,64056
+service MarL_MarB,64945,65414

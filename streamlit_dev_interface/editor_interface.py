@@ -272,21 +272,79 @@ def editor_interface():
             )
             
         # Column set up for game-to-points workflow
-        col1, col2 = st.columns([1, 4])
-        col3, col4 = st.columns([1, 4])
+        col_toggle_dir = st.columns(1)[0] # default directory toggle
+        col_preprocessed_button, col_preprocessed_dir = st.columns([1, 4])
+        col_segmented_button, col_segmented_dir = st.columns([1, 4])
         col5, col6, col7 = st.columns([1, 1, 1])
 
-
-        # Select preprocessed folder containing ready-to-segment games
-        with col1:
-            if st.button(
-                label="🎬 Preprocessed folder",
-                use_container_width=True,
-                type="secondary",
-            ):
-                preprocessed_folder = select_folder()
-                if preprocessed_folder:
-                    st.session_state["preprocessed_folder"] = preprocessed_folder
+        # Toggle widget to use default folders for preprocessed games and segmented points
+        with col_toggle_dir:
+            st.toggle(label="Default folders",
+                      value=True,
+                      key="toggle_default_game_to_points_folders",
+                      )
+        ## Default folders for game-to-points workflow
+        if st.session_state.get("toggle_default_game_to_points_folders", True) is True:
+            with col_preprocessed_button:
+                st.markdown(
+                    """
+                        <style>
+                        .small-success {{
+                            font-size: 15px;
+                            padding: 10px;
+                            background-color: #1e5631;
+                            border-radius: 10px;
+                            color: white;
+                        }}
+                        </style>
+                        <div class="small-success">
+                        Preprocessed games :
+                        </div>
+                        """,
+                    unsafe_allow_html=True,
+                )
+            with col_segmented_button:
+                st.markdown(
+                    """
+                        <style>
+                        .small-success {{
+                            font-size: 15px;
+                            padding: 10px;
+                            background-color: #1e5631;
+                            border-radius: 10px;
+                            color: white;
+                        }}
+                        </style>
+                        <div class="small-success">
+                        Segmented points :
+                        </div>
+                        """,
+                    unsafe_allow_html=True,
+                )
+            st.session_state["preprocessed_folder"] = PREPROCESSED_VIDEO_DIR
+            st.session_state["segmented_folder"] = SEGMENTED_POINTS_DIR
+        ## Select folders for game-to-points workflow if toggle is off
+        else:
+            # Select preprocessed folder containing ready-to-segment games
+            with col_preprocessed_button:
+                if st.button(
+                    label="🎬 Preprocessed folder",
+                    use_container_width=True,
+                    type="secondary",
+                ):
+                    preprocessed_folder = select_folder()
+                    if preprocessed_folder:
+                        st.session_state["preprocessed_folder"] = preprocessed_folder
+            # Select output folder for segmented point videos
+            with col_segmented_button:
+                if st.button(
+                    label="✂️ Segmented folder",
+                    use_container_width=True,
+                    type="secondary",
+                ):
+                    segmented = select_folder()
+                    if segmented:
+                        st.session_state["segmented_folder"] = segmented
 
         # Extract and display list of available preprocessed game_ids
         if "preprocessed_folder" in st.session_state:
@@ -299,7 +357,9 @@ def editor_interface():
 
             st.session_state["preprocessed_game_ids"] = preprocessed_game_ids_list
 
-            with col2:
+        ## Display selected preprocessed folder and segmented folder paths
+        if "preprocessed_folder" in st.session_state:
+            with col_preprocessed_dir:
                 st.markdown(
                     f"""
                     <style>
@@ -317,22 +377,8 @@ def editor_interface():
                     """,
                     unsafe_allow_html=True
                 )
-
-        # Select output folder for segmented point videos
-        with col3:
-            if st.button(
-                label="✂️ Segmented folder",
-                use_container_width=True,
-                type="secondary",
-            ):
-                segmented = select_folder()
-                if segmented:
-                    st.session_state["segmented_folder"] = segmented
-
-        # Display selected segmented folder path
         if "segmented_folder" in st.session_state:
-
-            with col4:
+            with col_segmented_dir:
                 st.markdown(
                     f"""
                     <style>
