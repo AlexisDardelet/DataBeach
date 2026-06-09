@@ -421,7 +421,7 @@ def cv2_point_segment_cut(
     team2_name: str = "adversaire",
     start_frame: int = None,
     display_size: tuple = (960, 540),
-    export_list_actions: bool = False,
+    export_keys_log: bool = False,
 ) -> pd.DataFrame:
     """
     Create a DataFrame containing the point segments extracted
@@ -463,6 +463,7 @@ def cv2_point_segment_cut(
     last_action_color_index = 0
     score_color_index = 0
     help_color_index = 0
+    keys_log = []  # To store the log of keys pressed and associated actions
 
     # Map keys to actions
     key_action_map = {
@@ -640,6 +641,8 @@ def cv2_point_segment_cut(
                 play_speed = max(0.5, play_speed - 0.5)
                 continue
             elif key == ord("4") and len(temp_list) > 0:
+                # Saving into keys_log
+                keys_log.append(("*BACK TO LAST SWITCH*",frame_number))
                 # Find the last "switch" action
                 last_switch_index = int(-1)
                 for i in range(len(temp_list) - 1, -1, -1):
@@ -667,6 +670,9 @@ def cv2_point_segment_cut(
 
                 ## Match start and set start
                 if key == ord("0"):
+                    # Saving into keys_log
+                    keys_log.append(("set/match start",frame_number))
+
                     # Reset scores at set start
                     score_team1 = 0
                     score_team2 = 0
@@ -721,6 +727,7 @@ def cv2_point_segment_cut(
 
                 else:
                     # For other keys, just record the associated action
+                    keys_log.append((key_action_map[key],frame_number))
                     action_name = key_action_map[key]
 
                 if key == ord("5"):
@@ -728,6 +735,7 @@ def cv2_point_segment_cut(
                     # to be able to restore them if we go back to this switch with key '4'
                     switch_scores_team1 = int(score_team1)
                     switch_scores_team2 = int(score_team2)
+                    keys_log.append(("SWITCH",frame_number))
 
                 last_action = action_name
                 temp_list.append({"Frame": frame_number, "Action": action_name})
@@ -902,8 +910,8 @@ def cv2_point_segment_cut(
                 df_points.at[idx, f"{team2_name}_sets"] += 1
                 df_points.at[idx, f"{team2_name}_score"] += 1
 
-    if export_list_actions is True:
-        return df_points, list_actions
+    if export_keys_log is True:
+        return df_points, keys_log
     else:
         return df_points
 

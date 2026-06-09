@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 INDEXED_DF_POINTS_DIR = os.getenv("INDEXED_DF_POINTS_DIR")
 RECAP_DICT_SCORE_DIR = os.getenv("RECAP_DICT_SCORE_DIR")
+PREPROCESSED_VIDEOS_DIR = os.getenv("PRE_PROCESSED_VIDEOS_DIR")
 SEGMENTED_POINTS_DIR = os.getenv("SEGMENTED_POINTS_DIR")
 ALL_POSSESSION_DIR = os.getenv("ALL_POSSESSION_DIR")
 
@@ -171,7 +172,7 @@ class GameEditor:
         team2_name: str,
         rewrite_videos: bool = False,
         # temp_indexed_df_point : pd.DataFrame = None,
-        export_list_actions: bool = False,
+        export_keys_log: bool = False,
     ) -> int:
         """
         Pipeline from the preprocessed video to
@@ -242,12 +243,12 @@ class GameEditor:
         # Read the video and extract start_frame and end_frame
         df_points = pd.DataFrame()  # Initialize an empty DataFrame
         ## [DEV DEBUG] : Exporting the list of actions for the annotation interface
-        if export_list_actions is True:
+        if export_keys_log is True:
             df_points, list_actions = cv2_point_segment_cut(
                 video_path=self.video_path,
                 team1_name=team1_name,
                 team2_name=team2_name,
-                export_list_actions=export_list_actions,
+                export_keys_log=export_keys_log,
             )
             # Export the list of actions to a CSV file
             list_actions_path = os.path.join(
@@ -345,8 +346,11 @@ class GameEditor:
 # -------------------------------------------------------------------
 
 if __name__ == "__main__":
+    load_dotenv()
+    preprocessed_videos_dir = os.getenv("PREPROCESSED_VIDEO_DIR")
     game_id = "JOMR_mai26_BSD_01"
-    video_path = r"C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\JOMR_mai26_BSD_01_started_rotated.mp4"
+    video_path = rf"{preprocessed_videos_dir}\{game_id}_started_rotated.mp4"
+
 
     with DBManager() as db:
         team1_name, team2_name = db.teams_names_from_game_id(game_id=game_id)
@@ -355,11 +359,11 @@ if __name__ == "__main__":
 
     editor = GameEditor(
         video_path=video_path,
-        output_dir=r"C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\points_segmented",
+        output_dir=r"D:\Montages volley et beach\Jade&Math\(dev - game editor fix)",
     )
     editor.game_to_segmented_points(
         team1_name=team1_name,
         team2_name=team2_name,
         rewrite_videos=False,
-        export_list_actions=True,
+        export_keys_log=True,
     )
