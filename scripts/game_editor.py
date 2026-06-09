@@ -4,6 +4,7 @@ import sys
 import pandas as pd
 import json
 from dotenv import load_dotenv
+
 load_dotenv()
 INDEXED_DF_POINTS_DIR = os.getenv("INDEXED_DF_POINTS_DIR")
 RECAP_DICT_SCORE_DIR = os.getenv("RECAP_DICT_SCORE_DIR")
@@ -12,6 +13,7 @@ ALL_POSSESSION_DIR = os.getenv("ALL_POSSESSION_DIR")
 
 # Local imports
 from db_manager import DBManager
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "video_edit_utils"))
 from video_edit_utils import (
     montage_operations,
@@ -21,7 +23,7 @@ from video_edit_utils import (
     point_indexeer,
     score_checker,
     extract_segments_from_df_gpu,
-    all_possession_game
+    all_possession_game,
 )
 
 
@@ -31,6 +33,7 @@ class GameEditor:
     from the raw video to segmented clips of each point.
     It also returns dictionaries with information about the score.
     """
+
     # Initialisation of the class with the path to the video(s)
     # and the output directory for the edited videos
     def __init__(
@@ -141,7 +144,7 @@ class GameEditor:
                 start_frame=int(row["starting_game_frame"]),
                 end_frame=int(row["last_game_frame"]),
                 output_video=output_video,
-                mov_file=True if row["video_path"].lower().endswith(".mov") else False
+                mov_file=True if row["video_path"].lower().endswith(".mov") else False,
             )
 
         # Apply video_rotation() to each row of
@@ -160,8 +163,6 @@ class GameEditor:
                 # Delete the intermediate unrotated video
                 os.remove(started_path)
 
-
-
     # -----------------------------------------------------------------------------------
 
     def game_to_segmented_points(
@@ -170,7 +171,7 @@ class GameEditor:
         team2_name: str,
         rewrite_videos: bool = False,
         # temp_indexed_df_point : pd.DataFrame = None,
-        export_list_actions: bool = False
+        export_list_actions: bool = False,
     ) -> int:
         """
         Pipeline from the preprocessed video to
@@ -190,14 +191,13 @@ class GameEditor:
                 points videos will be stored.
         Returns :
             int: the number of segmented points to be created,
-                which corresponds to the value of last point_index 
+                which corresponds to the value of last point_index
                 in the indexed_df_points DataFrame.
         """
         # # If temp_indexed_df_point is provided, skip to the segment extraction step
         # if temp_indexed_df_point is not None:
         #     print("Using provided temp_indexed_df_point for segment extraction.")
         #     start_again_frame = int(temp_indexed_df_point['end_frame'].iloc[-2])
-
 
         # Validate that video_path is set
         if self.video_path is None:
@@ -244,21 +244,21 @@ class GameEditor:
         ## [DEV DEBUG] : Exporting the list of actions for the annotation interface
         if export_list_actions is True:
             df_points, list_actions = cv2_point_segment_cut(
-                video_path=self.video_path, 
-                team1_name=team1_name, 
+                video_path=self.video_path,
+                team1_name=team1_name,
                 team2_name=team2_name,
-                export_list_actions=export_list_actions
+                export_list_actions=export_list_actions,
             )
             # Export the list of actions to a CSV file
             list_actions_path = os.path.join(
-                INDEXED_DF_POINTS_DIR,f"list_actions_{game_id}_DEBUG.csv"
+                INDEXED_DF_POINTS_DIR, f"list_actions_{game_id}_DEBUG.csv"
             )
             pd.DataFrame(list_actions).to_csv(list_actions_path, index=False)
         ## [PROD] : Standard pipeline without exporting the list of actions
         else:
             df_points = cv2_point_segment_cut(
-                video_path=self.video_path, 
-                team1_name=team1_name, 
+                video_path=self.video_path,
+                team1_name=team1_name,
                 team2_name=team2_name,
             )
         # Index the points
@@ -312,7 +312,8 @@ class GameEditor:
 
         # Validate that the game has been segmented
         video_files = [
-            f for f in os.listdir(video_dir)
+            f
+            for f in os.listdir(video_dir)
             if f.startswith(f"{game_id}_p") and f.endswith(".mp4")
         ]
         # If no segmented point videos are found, print a message and return
@@ -329,9 +330,7 @@ class GameEditor:
             self.indexed_df_points_dir, f"indexed_df_points_{game_id}.csv"
         )
         with DBManager() as db:
-            team1_name, team2_name = db.teams_names_from_game_id(
-                game_id=game_id
-                )
+            team1_name, team2_name = db.teams_names_from_game_id(game_id=game_id)
         # Montage the full game
         all_possession_game(
             game_id=game_id,
@@ -339,29 +338,28 @@ class GameEditor:
             indexed_df_points_csv_path=indexed_df_points_csv_path,
             team1_name=team1_name,
             team2_name=team2_name,
-            output_dir=output_dir
+            output_dir=output_dir,
         )
+
 
 # -------------------------------------------------------------------
 
 if __name__ == "__main__":
     game_id = "JOMR_mai26_BSD_01"
-    video_path = r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\JOMR_mai26_BSD_01_started_rotated.mp4'
+    video_path = r"C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess\JOMR_mai26_BSD_01_started_rotated.mp4"
 
     with DBManager() as db:
-        team1_name, team2_name = db.teams_names_from_game_id(
-            game_id=game_id
-            )
+        team1_name, team2_name = db.teams_names_from_game_id(game_id=game_id)
 
     print(f"Processing game_id: {game_id} with teams {team1_name} vs {team2_name}")
 
     editor = GameEditor(
         video_path=video_path,
-        output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\points_segmented'
+        output_dir=r"C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\points_segmented",
     )
     editor.game_to_segmented_points(
         team1_name=team1_name,
         team2_name=team2_name,
         rewrite_videos=False,
-        export_list_actions=True
+        export_list_actions=True,
     )

@@ -11,11 +11,12 @@ INDEXED_DF_POINTS_DIR = os.getenv("INDEXED_DF_POINTS_DIR")
 
 # =============================================================
 
+
 def extract_transform_indexed_df_points_csv(
-        game_id: str,
-        team_a_name: str,
-        team_b_name: str,
-        ) -> pd.DataFrame:
+    game_id: str,
+    team_a_name: str,
+    team_b_name: str,
+) -> pd.DataFrame:
     """Extract and transform the indexed points data from a CSV file for a specific game_id.
 
     The CSV file should be located in the 'indexed_df_points' directory
@@ -40,13 +41,13 @@ def extract_transform_indexed_df_points_csv(
         f"indexed_df_points_{game_id}.csv",
     )
 
-    # Load the CSV file into a DataFrame 
+    # Load the CSV file into a DataFrame
     # (with 'point_index' column as string to preserve leading zeros)
     df_points_formatted = pd.DataFrame()
     df_points_formatted = pd.read_csv(
         filepath_or_buffer=csv_path,
         keep_default_na=True,
-        dtype={"point_index": "str"}, 
+        dtype={"point_index": "str"},
     )
 
     # Create the 'point_id' column based on 'game_id' and 'point_index'
@@ -59,9 +60,7 @@ def extract_transform_indexed_df_points_csv(
         axis=1,
     )
     # Move 'point_id' to the first column
-    df_points_formatted.insert(
-        0, "point_id", df_points_formatted.pop("point_id")
-    )  
+    df_points_formatted.insert(0, "point_id", df_points_formatted.pop("point_id"))
 
     # Columns dropped
     df_points_formatted.drop(
@@ -120,19 +119,14 @@ def extract_transform_indexed_df_points_csv(
 
     # Create a column 'point_winner' which indicates the winner
     # of the point based on the next row
-    df_points_formatted["point_winner"] = df_points_formatted["service_side"].shift(
-        -1
-    )
+    df_points_formatted["point_winner"] = df_points_formatted["service_side"].shift(-1)
     # Specific treatment for the last point of each set,
     # which has 'end of set' in the 'service_side' column of the next row
     for i, _ in enumerate(df_points_formatted.itertuples()):
         row_index = df_points_formatted.index[i]
         if i + 1 < len(df_points_formatted):
             next_row_index = df_points_formatted.index[i + 1]
-            if (
-                df_points_formatted.loc[next_row_index, "service_side"]
-                == "end of set"
-            ):
+            if df_points_formatted.loc[next_row_index, "service_side"] == "end of set":
                 set_winner = str()
                 # # DEV DEBUG - to be removed later
                 # service_side_val = df_points_formatted.loc[
@@ -142,7 +136,7 @@ def extract_transform_indexed_df_points_csv(
                 #     f"Row index: {row_index}, "
                 #     f"service_side: {service_side_val}"
                 # )
-                
+
                 if (
                     df_points_formatted.loc[row_index, "team_a_score"]
                     > df_points_formatted.loc[row_index, "team_b_score"]
@@ -164,22 +158,27 @@ def extract_transform_indexed_df_points_csv(
 
     return df_points_formatted
 
+
 # =============================================================
 
+
 def video_file_renamer(
-        rename_dict: dict,
-        output_dir: str,
-    ) -> None:
+    rename_dict: dict,
+    output_dir: str,
+) -> None:
     """Rename video files based on a provided mapping of old names to new names.
     The dict should have the format {old_name: game_id}"""
 
     # # Warning if any key in the rename_dict does not end with '.mp4' or '.mov'
     # if not all(key.endswith(('.mp4', '.mov')) for key in rename_dict.keys()):
     #     raise ValueError("All keys in the rename_dict should end with '.mp4' or '.mov'")
-    
+
     # Temp dict matching the format strings of GameEditor.preprocess()
-    temp_rename_dict = {key.replace('.mp4','_started_rotated.mp4'): value for key, value in rename_dict.items()}
-    
+    temp_rename_dict = {
+        key.replace(".mp4", "_started_rotated.mp4"): value
+        for key, value in rename_dict.items()
+    }
+
     # Renaming the video files in output_dir based on the temp_rename_dict mapping
     for new_name, game_id in temp_rename_dict.items():
         if new_name in os.listdir(output_dir):
@@ -188,15 +187,16 @@ def video_file_renamer(
             # print(f"Renaming from {old_path} to {new_path}")
             os.rename(old_path, new_path)
 
+
 # =============================================================
 
 test_dict = {
-    'Alex poule match 1.mp4': 'game_id_1',
-    'AleD-RonP_mar26_session_01.mp4': 'game_id_2',
+    "Alex poule match 1.mp4": "game_id_1",
+    "AleD-RonP_mar26_session_01.mp4": "game_id_2",
 }
 
 if __name__ == "__main__":
     video_file_renamer(
         rename_dict=test_dict,
-        output_dir=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess'
+        output_dir=r"C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\matchs preprocess",
     )

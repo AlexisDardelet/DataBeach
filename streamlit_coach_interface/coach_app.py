@@ -4,7 +4,9 @@ from streamlit_option_menu import option_menu
 import os
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'scripts'))
+sys.path.append(
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts")
+)
 from firestore_manager import FirestoreManager
 
 from coach_overview import coach_overview
@@ -17,7 +19,7 @@ with st.sidebar:
 
     # Select team dropdown menu
     with st.container(border=True):
-        
+
         # [FULL VERSION] Fetch teams from Firestore and populate the dropdown
         # with FirestoreManager() as fm:
         #     teams_list = fm.list_teams_with_players_names()
@@ -27,8 +29,12 @@ with st.sidebar:
             ("AleD_RonP", "Alexis & Ronan"),
         ]
 
-        selected_paire_name = st.selectbox("Select a team:", [team[1] for team in teams_list])
-        paire_id = next((team[0] for team in teams_list if team[1] == selected_paire_name), None)
+        selected_paire_name = st.selectbox(
+            "Select a team:", [team[1] for team in teams_list]
+        )
+        paire_id = next(
+            (team[0] for team in teams_list if team[1] == selected_paire_name), None
+        )
         st.session_state.update({"paire_id": paire_id})
 
         with FirestoreManager() as fm:

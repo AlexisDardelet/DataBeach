@@ -1,4 +1,5 @@
 """Video editing utilities for match segmentation and analysis."""
+
 import os
 import subprocess
 import sys
@@ -7,9 +8,11 @@ import pandas as pd
 
 # Environment variables
 from dotenv import load_dotenv
+
 load_dotenv()
 FFMPEG_PATH = os.getenv("FFMPEG_PATH")
 SEGMENTED_POINTS_DIR = os.getenv("SEGMENTED_POINTS_DIR")
+
 
 # -------------------------------------------------------------------
 # Core GPU extraction for a single played point (start-end frames)
@@ -19,7 +22,7 @@ def cut_point_gpu(
     start_frame: int,
     end_frame: int,
     output_video: str,
-    mov_file: bool = False
+    mov_file: bool = False,
 ):
     """
     Extract a frame-accurate segment using CUDA + NVENC via
@@ -31,7 +34,7 @@ def cut_point_gpu(
         start_frame: first frame of the segment to extract
         end_frame: last frame of the segment to extract
         output_video: path for the generated segment video
-        mov_file: if True, the video input file in .mov format, 
+        mov_file: if True, the video input file in .mov format,
             which requires a specific ffmpeg input option
     """
 
@@ -42,22 +45,27 @@ def cut_point_gpu(
     if mov_file is False:
         # Video filter to select frames between start_frame and
         # end_frame, and reset timestamps starting from 0
-        vf = (
-            f"select='between(n,{start_frame},{end_frame})',"
-            f"setpts=PTS-STARTPTS"
-        )
+        vf = f"select='between(n,{start_frame},{end_frame})'," f"setpts=PTS-STARTPTS"
         # ffmpeg command to extract the segment using the GPU
         cmd = [
-            ffmpeg_path, "-y",
-            "-hwaccel", "cuda",
-            "-i", video_path,
-            "-vf", vf,
+            ffmpeg_path,
+            "-y",
+            "-hwaccel",
+            "cuda",
+            "-i",
+            video_path,
+            "-vf",
+            vf,
             "-an",
-            "-c:v", "h264_nvenc",
-            "-preset", "p4",
-            "-rc", "constqp",
-            "-qp", "18",
-            output_video
+            "-c:v",
+            "h264_nvenc",
+            "-preset",
+            "p4",
+            "-rc",
+            "constqp",
+            "-qp",
+            "18",
+            output_video,
         ]
     else:
         # For .mov files, specific input option
@@ -68,27 +76,33 @@ def cut_point_gpu(
         )
         # ffmpeg command with specific input options for .mov files
         cmd = [
-            ffmpeg_path, "-y",
-            "-i", video_path,
-            "-vf", vf,
+            ffmpeg_path,
+            "-y",
+            "-i",
+            video_path,
+            "-vf",
+            vf,
             "-an",
-            "-c:v", "h264_nvenc",
-            "-preset", "p4",
-            "-rc", "constqp",
-            "-qp", "18",
-            output_video
+            "-c:v",
+            "h264_nvenc",
+            "-preset",
+            "p4",
+            "-rc",
+            "constqp",
+            "-qp",
+            "18",
+            output_video,
         ]
 
     # Run the ffmpeg command to extract the segment using the GPU
     subprocess.run(cmd, check=True)
 
+
 # -------------------------------------------------------------------
 # Video rotation (if needed) with ffmpeg + GPU
 # -------------------------------------------------------------------
 def video_rotation(
-    video_path: str,
-    rotation_state: int = 0,
-    output_dir: str = None
+    video_path: str, rotation_state: int = 0, output_dir: str = None
 ) -> None:
     """Apply a rotation to the video using ffmpeg.
 
@@ -104,7 +118,7 @@ def video_rotation(
         0: None,  # No rotation
         90: "transpose=1",  # Rotate right
         180: "transpose=1,transpose=1",  # 180-degree rotation
-        270: "transpose=2"  # Rotate left
+        270: "transpose=2",  # Rotate left
     }
 
     # Select the rotation to apply
@@ -112,18 +126,10 @@ def video_rotation(
 
     # Determine the output path
     if output_dir is None:
-        output_path = (
-            f'{os.path.splitext(video_path)[0]}'
-            f'_rotated.mp4'
-        )
+        output_path = f"{os.path.splitext(video_path)[0]}" f"_rotated.mp4"
     else:
-        base_name = os.path.splitext(
-            os.path.basename(video_path)
-        )[0]
-        output_path = os.path.join(
-            output_dir,
-            f'{base_name}_rotated.mp4'
-        )
+        base_name = os.path.splitext(os.path.basename(video_path))[0]
+        output_path = os.path.join(output_dir, f"{base_name}_rotated.mp4")
     # Path to the ffmpeg build compiled with NVENC support
     # for GPU-accelerated rotation
     ffmpeg_path = FFMPEG_PATH
@@ -132,24 +138,22 @@ def video_rotation(
     if filter_str is not None:
         command = [
             ffmpeg_path,
-            '-y',
-            '-i', video_path,
-            '-vf', filter_str,
-            '-c:a', 'copy',  # Copy the audio track without re-encoding
-            output_path
+            "-y",
+            "-i",
+            video_path,
+            "-vf",
+            filter_str,
+            "-c:a",
+            "copy",  # Copy the audio track without re-encoding
+            output_path,
         ]
     else:
         # If no rotation is needed, just copy the video
-        command = [
-            ffmpeg_path,
-            '-y',
-            '-i', video_path,
-            '-c', 'copy',
-            output_path
-        ]
+        command = [ffmpeg_path, "-y", "-i", video_path, "-c", "copy", output_path]
 
     # Run the ffmpeg command to apply the rotation
     subprocess.run(command, check=True)
+
 
 # -------------------------------------------------------------------
 # Record montage actions for video pre-processing via cv2
@@ -175,8 +179,7 @@ def montage_operations(
     # Ensure a video path has been provided before proceeding
     if video_path is None:
         raise ValueError(
-            "video_path must be set before calling "
-            "montage_operation()."
+            "video_path must be set before calling " "montage_operation()."
         )
 
     montage_actions = {}
@@ -203,10 +206,13 @@ def montage_operations(
             x, y = 30, 120
             for i, line in enumerate(help_lines):
                 cv2.putText(
-                    frame, line,
+                    frame,
+                    line,
                     (x, y + i * 25),
                     cv2.FONT_HERSHEY_SIMPLEX,
-                    0.7, (255, 255, 255), 2,
+                    0.7,
+                    (255, 255, 255),
+                    2,
                     cv2.LINE_AA,
                 )
             _orig_imshow(winname, frame)
@@ -217,13 +223,11 @@ def montage_operations(
     # last-frame default
     cap = cv2.VideoCapture(video_path)
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    last_game_frame = (
-        frame_count - 1 if frame_count > 0 else None
-    )
+    last_game_frame = frame_count - 1 if frame_count > 0 else None
     print(f"Last frame index: {last_game_frame}")
 
     # Resize the display window to the specified size
-    win_name = f'{video_path}'
+    win_name = f"{video_path}"
     cv2.namedWindow(win_name, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(win_name, display_size[0], display_size[1])
 
@@ -260,33 +264,32 @@ def montage_operations(
                 # Apply rotation based on the current
                 # rotation state
                 if rotation_state == 90:
-                    frame = cv2.rotate(
-                        frame, cv2.ROTATE_90_CLOCKWISE
-                    )
+                    frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
                 elif rotation_state == 180:
-                    frame = cv2.rotate(
-                        frame, cv2.ROTATE_180
-                    )
+                    frame = cv2.rotate(frame, cv2.ROTATE_180)
                 elif rotation_state == 270:
                     frame = cv2.rotate(
                         frame,
                         cv2.ROTATE_90_COUNTERCLOCKWISE,
                     )
-                
+
                 # Resize the frame to fit the display window
                 frame = cv2.resize(
                     frame,
                     display_size,
                     interpolation=cv2.INTER_AREA,
                 )
-                
+
                 # Overlay playback speed indicator on the frame
                 cv2.putText(
                     frame,
                     f"Playback speed: x{play_speed:.1f}",
                     (30, 50),
                     cv2.FONT_HERSHEY_SIMPLEX,
-                    1, (0, 255, 0), 2, cv2.LINE_AA,
+                    1,
+                    (0, 255, 0),
+                    2,
+                    cv2.LINE_AA,
                 )
 
                 frame_number += 1
@@ -294,28 +297,30 @@ def montage_operations(
             # Show a pause indicator when the video is paused
             if paused and ret:
                 cv2.putText(
-                    frame, "|| PAUSE ||",
+                    frame,
+                    "|| PAUSE ||",
                     (30, 80),
                     cv2.FONT_HERSHEY_SIMPLEX,
-                    1, (0, 0, 255), 2, cv2.LINE_AA,
+                    1,
+                    (0, 0, 255),
+                    2,
+                    cv2.LINE_AA,
                 )
 
             # Display the current frame (with help overlay
             # via patch)
             if ret:
-                cv2.imshow(
-                    f'{video_path}', frame
-                )
+                cv2.imshow(f"{video_path}", frame)
 
             # Handle keyboard input for playback control
             key = _wait_key_fast(30) & 0xFF
-            if key == ord('q'):
+            if key == ord("q"):
                 # Quit the playback loop
                 break
-            if key == ord(' '):
+            if key == ord(" "):
                 # Toggle pause/resume
                 paused = not paused
-            elif key == ord('0'):
+            elif key == ord("0"):
                 # Mark the current frame as the start
                 # of the match
                 starting_game_frame = frame_number
@@ -326,22 +331,18 @@ def montage_operations(
                     f"i.e. {start_time:.2f} seconds"
                 )
                 break
-            elif key == ord('+'):
+            elif key == ord("+"):
                 # Increase playback speed
                 play_speed += 0.5
-            elif key == ord('-'):
+            elif key == ord("-"):
                 # Decrease playback speed (minimum 0.5x)
                 play_speed = max(0.5, play_speed - 0.5)
-            elif key == ord('r'):
+            elif key == ord("r"):
                 # Rotate the video 90° clockwise
-                rotation_state = (
-                    rotation_state + 90
-                ) % 360
-            elif key == ord('l'):
+                rotation_state = (rotation_state + 90) % 360
+            elif key == ord("l"):
                 # Rotate the video 90° counter-clockwise
-                rotation_state = (
-                    rotation_state - 90
-                ) % 360
+                rotation_state = (rotation_state - 90) % 360
 
     finally:
         # Release resources and restore the original
@@ -352,21 +353,20 @@ def montage_operations(
 
     # Store and return the collected montage metadata
     montage_actions = {
-        'start_frame': starting_game_frame,
-        'last_frame': last_game_frame,
-        'rotation_state': rotation_state,
+        "start_frame": starting_game_frame,
+        "last_frame": last_game_frame,
+        "rotation_state": rotation_state,
     }
 
     return montage_actions
+
 
 # -------------------------------------------------------------------
 # Cut each played point into a segmented video, based on the
 # start-end frames from a pandas DataFrame
 # -------------------------------------------------------------------
 def extract_segments_from_df_gpu(
-    video_path: str,
-    actions_df: pd.DataFrame,
-    output_dir: str
+    video_path: str, actions_df: pd.DataFrame, output_dir: str
 ) -> None:
     """
     Cut the source video into segments defined by the start-end
@@ -383,26 +383,23 @@ def extract_segments_from_df_gpu(
     os.makedirs(output_dir, exist_ok=True)
 
     # Insert the game ID into the name of each extracted clip
-    game_id = str(os.path.splitext(
-        os.path.basename(video_path)
-    )[0])
+    game_id = str(os.path.splitext(os.path.basename(video_path))[0])
     # Removing '_started' etc. suffixes from the game_id
     if "_started" in game_id:
         game_id = game_id.split("_started", 1)[0] + "_started"
         game_id = game_id.replace("_started", "")
 
-    print(f'game_id: {game_id}')
+    print(f"game_id: {game_id}")
 
     # Build intervals: 1 row = time(Point) - following
     # time(Dead time)
     for row in actions_df.iterrows():
         # Only cut rows corresponding to played points
         # (not timeouts or other actions)
-        if row[1]['point_index'] != '999':
+        if row[1]["point_index"] != "999":
 
             output_video = os.path.join(
-                output_dir,
-                f"{game_id}_p{row[1]['point_index']}.mp4"
+                output_dir, f"{game_id}_p{row[1]['point_index']}.mp4"
             )
 
             cut_point_gpu(
@@ -411,6 +408,7 @@ def extract_segments_from_df_gpu(
                 end_frame=int(row[1]["end_frame"]),
                 output_video=output_video,
             )
+
 
 # -------------------------------------------------------------------
 # Create a DataFrame for cutting a match into played-point
@@ -423,7 +421,7 @@ def cv2_point_segment_cut(
     team2_name: str = "adversaire",
     start_frame: int = None,
     display_size: tuple = (960, 540),
-    export_list_actions: bool = False
+    export_list_actions: bool = False,
 ) -> pd.DataFrame:
     """
     Create a DataFrame containing the point segments extracted
@@ -452,13 +450,15 @@ def cv2_point_segment_cut(
     # Initialize variables
     temp_list = []
     last_action = None
-    color_map = dict({
-        'black': (0, 0, 0),
-        'green': (0, 255, 0),
-        'blue': (255, 0, 0),
-        'red': (0, 0, 255),
-        'white': (255, 255, 255)
-    })
+    color_map = dict(
+        {
+            "black": (0, 0, 0),
+            "green": (0, 255, 0),
+            "blue": (255, 0, 0),
+            "red": (0, 0, 255),
+            "white": (255, 255, 255),
+        }
+    )
     color_map_keys = list(color_map.keys())
     last_action_color_index = 0
     score_color_index = 0
@@ -466,12 +466,12 @@ def cv2_point_segment_cut(
 
     # Map keys to actions
     key_action_map = {
-        ord('0'): 'set start',
-        ord('1'): f'service {team1_name}',
-        ord('3'): f'service {team2_name}',
-        ord('2'): 'end of point',
-        ord('5'): '*SWITCH*',
-        ord('8'): 'Timeout',
+        ord("0"): "set start",
+        ord("1"): f"service {team1_name}",
+        ord("3"): f"service {team2_name}",
+        ord("2"): "end of point",
+        ord("5"): "*SWITCH*",
+        ord("8"): "Timeout",
     }
 
     # Display available keys as an overlay on the video
@@ -481,7 +481,7 @@ def cv2_point_segment_cut(
         f"3 : service {team2_name}",
         "5 : switch",
         "8 : timeout",
-        "4 : back to previous *SWITCH*"
+        "4 : back to previous *SWITCH*",
     ]
 
     # Initialize scores for overlay display
@@ -511,14 +511,12 @@ def cv2_point_segment_cut(
 
             # Display scores in the bottom-right corner
             h, w = frame.shape[:2]
-            score_text = (
-                f"{team1_name}: {score_team1}  "
-                f"{team2_name}: {score_team2}"
-            )
+            score_text = f"{team1_name}: {score_team1}  " f"{team2_name}: {score_team2}"
             text_size = cv2.getTextSize(
                 score_text,
                 cv2.FONT_HERSHEY_SIMPLEX,
-                0.7, 2,
+                0.7,
+                2,
             )[0]
             score_x = w - text_size[0] - 20
             score_y = h - 20
@@ -540,7 +538,7 @@ def cv2_point_segment_cut(
     cap = cv2.VideoCapture(video_path)
 
     # Resize the display window to the specified size
-    win_name = f'{video_path}'
+    win_name = f"{video_path}"
     cv2.namedWindow(win_name, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(win_name, display_size[0], display_size[1])
 
@@ -605,75 +603,74 @@ def cv2_point_segment_cut(
                     (30, 80),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     1,
-                    color_map['red'],
+                    color_map["red"],
                     2,
                     cv2.LINE_AA,
                 )
 
             # Display the current frame
             if ret:
-                cv2.imshow(f'{video_path}', frame)
+                cv2.imshow(f"{video_path}", frame)
 
             # Handle keyboard input
             key = _wait_key_fast(30) & 0xFF
-            if key == ord('h'):
+            if key == ord("h"):
                 help_color_index = (help_color_index + 1) % len(color_map_keys)
                 continue
-            if key == ord('g'):
-                last_action_color_index = (last_action_color_index + 1) % len(color_map_keys)
+            if key == ord("g"):
+                last_action_color_index = (last_action_color_index + 1) % len(
+                    color_map_keys
+                )
                 continue
-            if key == ord('j'):
+            if key == ord("j"):
                 score_color_index = (score_color_index + 1) % len(color_map_keys)
                 continue
-            if key == ord('q'):
+            if key == ord("q"):
                 # Quit
                 break
-            if key == ord(' '):
+            if key == ord(" "):
                 # Pause/resume
                 paused = not paused
-            elif key == ord('+'):
+            elif key == ord("+"):
                 # Increase speed
                 play_speed += 0.5
                 continue
-            elif key == ord('-'):
+            elif key == ord("-"):
                 # Decrease speed
                 play_speed = max(0.5, play_speed - 0.5)
                 continue
-            elif key == ord('4') and len(temp_list) > 0:
+            elif key == ord("4") and len(temp_list) > 0:
                 # Find the last "switch" action
                 last_switch_index = int(-1)
                 for i in range(len(temp_list) - 1, -1, -1):
-                    if temp_list[i]['Action'] == '*SWITCH*':
+                    if temp_list[i]["Action"] == "*SWITCH*":
                         last_switch_index = i
                         break
                 if last_switch_index != -1:
                     # Remove all actions after the last switch from temp_list
-                    temp_list = temp_list[:last_switch_index + 1]
+                    temp_list = temp_list[: last_switch_index + 1]
                     # Reset scores at last *SWITCH* and last action
                     score_team1 = switch_scores_team1
                     score_team2 = switch_scores_team2
-                    last_action = (
-                        temp_list[-1]['Action']
-                        if temp_list else None
-                    )
+                    last_action = temp_list[-1]["Action"] if temp_list else None
                     # Go back to the frame of the last switch action and pause playback
                     cap.set(
                         cv2.CAP_PROP_POS_FRAMES,
-                        temp_list[-1]['Frame'],
+                        temp_list[-1]["Frame"],
                     )
-                    frame_number = temp_list[-1]['Frame']
+                    frame_number = temp_list[-1]["Frame"]
                     paused = True
 
             elif key in key_action_map:
                 # Record the action associated with the key,
                 # along with the frame number
-                
+
                 ## Match start and set start
-                if key == ord('0'):
+                if key == ord("0"):
                     # Reset scores at set start
                     score_team1 = 0
                     score_team2 = 0
-                    
+
                     # Pause playback at set start
                     paused = True
 
@@ -681,11 +678,11 @@ def cv2_point_segment_cut(
                     if len(temp_list) == 0:
                         # "Set start" is actually "match start"
                         # if it is the first recorded action
-                        action_name = str('match start')
+                        action_name = str("match start")
                     else:
                         # "Set start" after the first one is a real new set
                         action_name = key_action_map[key]
-                
+
                     # Assign the team serving based on second key pressed after the set start or match start
                     # Display overlay asking user to define the serving team
                     if ret:
@@ -710,43 +707,39 @@ def cv2_point_segment_cut(
                             2,
                             cv2.LINE_AA,
                         )
-                        cv2.imshow(f'{video_path}', overlay_frame)
+                        cv2.imshow(f"{video_path}", overlay_frame)
 
                     # Wait for the user to press '1' or '3' to define the serving team
                     while True:
                         serve_key = cv2.waitKey(0) & 0xFF
-                        if serve_key == ord('1'):
-                            action_name = f'{action_name} - service {team1_name}'
+                        if serve_key == ord("1"):
+                            action_name = f"{action_name} - service {team1_name}"
                             break
-                        elif serve_key == ord('3'):
-                            action_name = f'{action_name} - service {team2_name}'
+                        elif serve_key == ord("3"):
+                            action_name = f"{action_name} - service {team2_name}"
                             break
 
                 else:
                     # For other keys, just record the associated action
                     action_name = key_action_map[key]
 
-                if key == ord('5'):
+                if key == ord("5"):
                     # Save the current scores at the time of the *SWITCH* action
                     # to be able to restore them if we go back to this switch with key '4'
                     switch_scores_team1 = int(score_team1)
                     switch_scores_team2 = int(score_team2)
 
                 last_action = action_name
-                temp_list.append({
-                    'Frame': frame_number,
-                    'Action': action_name
-                })
+                temp_list.append({"Frame": frame_number, "Action": action_name})
 
                 # Refresh display to update the score overlay
                 if ret:
-                    cv2.imshow(f'{video_path}', frame)
+                    cv2.imshow(f"{video_path}", frame)
                 # Add a point to the scores based on the action
-                if action_name == f'service {team1_name}':
+                if action_name == f"service {team1_name}":
                     score_team1 += 1
-                elif action_name == f'service {team2_name}':
+                elif action_name == f"service {team2_name}":
                     score_team2 += 1
-
 
     finally:
         # Release OpenCV resources
@@ -763,34 +756,41 @@ def cv2_point_segment_cut(
         action = temp_list[i]
 
         # If the action is not 'end of point', process it
-        if action['Action'] != 'end of point':
+        if action["Action"] != "end of point":
             # If it is a set start, create an 'end of set' item
             # in list_actions for later processing
-            if action['Action'] == f'set start - service {team1_name}' or action['Action'] == f'set start - service {team2_name}':
-                list_actions.append({
-                    'service_side': 'end of set',
-                    'start_frame': int(0),
-                    'end_frame': int(0)
-                })
+            if (
+                action["Action"] == f"set start - service {team1_name}"
+                or action["Action"] == f"set start - service {team2_name}"
+            ):
+                list_actions.append(
+                    {
+                        "service_side": "end of set",
+                        "start_frame": int(0),
+                        "end_frame": int(0),
+                    }
+                )
             # Then process the action normally
-            start_frame = action['Frame']
-            service_side = action['Action']
+            start_frame = action["Frame"]
+            service_side = action["Action"]
             # Look for the next 'end of point'
             end_frame = None
             j = i + 1
             while j < len(temp_list):
-                if temp_list[j]['Action'] == 'end of point':
-                    end_frame = temp_list[j]['Frame']
+                if temp_list[j]["Action"] == "end of point":
+                    end_frame = temp_list[j]["Frame"]
                     break
                 j += 1
 
             # Add to the list if an 'end of point' was found
             if end_frame is not None:
-                list_actions.append({
-                    'service_side': service_side,
-                    'start_frame': start_frame,
-                    'end_frame': end_frame
-                })
+                list_actions.append(
+                    {
+                        "service_side": service_side,
+                        "start_frame": start_frame,
+                        "end_frame": end_frame,
+                    }
+                )
 
         i += 1
 
@@ -798,162 +798,115 @@ def cv2_point_segment_cut(
     df_points = pd.DataFrame(list_actions)
 
     # Add columns for scores and sets, initialized to 0
-    df_points[f'{team1_name}_score'] = 0
-    df_points[f'{team2_name}_score'] = 0
-    df_points[f'{team1_name}_sets'] = 0
-    df_points[f'{team2_name}_sets'] = 0
+    df_points[f"{team1_name}_score"] = 0
+    df_points[f"{team2_name}_score"] = 0
+    df_points[f"{team1_name}_sets"] = 0
+    df_points[f"{team2_name}_sets"] = 0
 
     # Update scores based on the service side
     for idx, row in df_points.iterrows():
         if (
-            df_points['service_side'].iloc[idx] == f'set start - service {team1_name}'
-            or df_points['service_side'].iloc[idx] == f'set start - service {team2_name}'
-            or df_points['service_side'].iloc[idx] == f'match start - service {team1_name}'
-            or df_points['service_side'].iloc[idx] == f'match start - service {team2_name}'
+            df_points["service_side"].iloc[idx] == f"set start - service {team1_name}"
+            or df_points["service_side"].iloc[idx]
+            == f"set start - service {team2_name}"
+            or df_points["service_side"].iloc[idx]
+            == f"match start - service {team1_name}"
+            or df_points["service_side"].iloc[idx]
+            == f"match start - service {team2_name}"
         ):
             # First row: initialize according to the service
-            if row['service_side'] == (
-                f'service {team1_name}'
-            ):
-                df_points.at[
-                    idx, f'{team1_name}_score'
-                ] = 1
-                df_points.at[
-                    idx, f'{team2_name}_score'
-                ] = 0
-            elif row['service_side'] == (
-                f'service {team2_name}'
-            ):
-                df_points.at[
-                    idx, f'{team1_name}_score'
-                ] = 0
-                df_points.at[
-                    idx, f'{team2_name}_score'
-                ] = 1
+            if row["service_side"] == (f"service {team1_name}"):
+                df_points.at[idx, f"{team1_name}_score"] = 1
+                df_points.at[idx, f"{team2_name}_score"] = 0
+            elif row["service_side"] == (f"service {team2_name}"):
+                df_points.at[idx, f"{team1_name}_score"] = 0
+                df_points.at[idx, f"{team2_name}_score"] = 1
         else:
             # Subsequent rows: carry forward the previous score
             # and increment based on the service
-            df_points.at[idx, f'{team1_name}_score'] = (
-                df_points.at[idx - 1, f'{team1_name}_score']
-            )
-            df_points.at[idx, f'{team2_name}_score'] = (
-                df_points.at[idx - 1, f'{team2_name}_score']
-            )
+            df_points.at[idx, f"{team1_name}_score"] = df_points.at[
+                idx - 1, f"{team1_name}_score"
+            ]
+            df_points.at[idx, f"{team2_name}_score"] = df_points.at[
+                idx - 1, f"{team2_name}_score"
+            ]
 
-            if row['service_side'] == (
-                f'service {team1_name}'
-            ):
-                df_points.at[
-                    idx, f'{team1_name}_score'
-                ] += 1
-            elif row['service_side'] == (
-                f'service {team2_name}'
-            ):
-                df_points.at[
-                    idx, f'{team2_name}_score'
-                ] += 1
+            if row["service_side"] == (f"service {team1_name}"):
+                df_points.at[idx, f"{team1_name}_score"] += 1
+            elif row["service_side"] == (f"service {team2_name}"):
+                df_points.at[idx, f"{team2_name}_score"] += 1
 
     # Update set scores at the beginning of each new set
     for idx, row in df_points.iterrows():
         if (
-            row['service_side'] == f'set start - service {team1_name}'
-            or row['service_side'] == f'set start - service {team2_name}'
+            row["service_side"] == f"set start - service {team1_name}"
+            or row["service_side"] == f"set start - service {team2_name}"
         ) and idx > 0:
             # Compare the scores of the previous set
-            prev_score_team1 = df_points.at[
-                idx - 1, f'{team1_name}_score'
-            ]
-            prev_score_team2 = df_points.at[
-                idx - 1, f'{team2_name}_score'
-            ]
+            prev_score_team1 = df_points.at[idx - 1, f"{team1_name}_score"]
+            prev_score_team2 = df_points.at[idx - 1, f"{team2_name}_score"]
 
             # Carry forward the previous set counts
-            df_points.at[idx, f'{team1_name}_sets'] = (
-                df_points.at[idx - 1, f'{team1_name}_sets']
-            )
-            df_points.at[idx, f'{team2_name}_sets'] = (
-                df_points.at[idx - 1, f'{team2_name}_sets']
-            )
+            df_points.at[idx, f"{team1_name}_sets"] = df_points.at[
+                idx - 1, f"{team1_name}_sets"
+            ]
+            df_points.at[idx, f"{team2_name}_sets"] = df_points.at[
+                idx - 1, f"{team2_name}_sets"
+            ]
 
             # Award a set to the winner
             if prev_score_team1 > prev_score_team2:
-                df_points.at[
-                    idx, f'{team1_name}_sets'
-                ] += 1
+                df_points.at[idx, f"{team1_name}_sets"] += 1
             else:
-                df_points.at[
-                    idx, f'{team2_name}_sets'
-                ] += 1
+                df_points.at[idx, f"{team2_name}_sets"] += 1
         elif idx > 0:
             # For other rows, keep the set count unchanged
-            df_points.at[idx, f'{team1_name}_sets'] = (
-                df_points.at[idx - 1, f'{team1_name}_sets']
-            )
-            df_points.at[idx, f'{team2_name}_sets'] = (
-                df_points.at[idx - 1, f'{team2_name}_sets']
-            )
+            df_points.at[idx, f"{team1_name}_sets"] = df_points.at[
+                idx - 1, f"{team1_name}_sets"
+            ]
+            df_points.at[idx, f"{team2_name}_sets"] = df_points.at[
+                idx - 1, f"{team2_name}_sets"
+            ]
 
     # Add an 'end of set' row at the end of df_points for
     # easier downstream processing
     last_idx = len(df_points) - 1
     df_points.loc[len(df_points)] = {
-        'service_side': 'end of set',
-        'start_frame': int(0),
-        'end_frame': int(0),
-        f'{team1_name}_score': df_points.at[
-            last_idx, f'{team1_name}_score'
-        ],
-        f'{team2_name}_score': df_points.at[
-            last_idx, f'{team2_name}_score'
-        ],
-        f'{team1_name}_sets': df_points.at[
-            last_idx, f'{team1_name}_sets'
-        ],
-        f'{team2_name}_sets': df_points.at[
-            last_idx, f'{team2_name}_sets'
-        ],
+        "service_side": "end of set",
+        "start_frame": int(0),
+        "end_frame": int(0),
+        f"{team1_name}_score": df_points.at[last_idx, f"{team1_name}_score"],
+        f"{team2_name}_score": df_points.at[last_idx, f"{team2_name}_score"],
+        f"{team1_name}_sets": df_points.at[last_idx, f"{team1_name}_sets"],
+        f"{team2_name}_sets": df_points.at[last_idx, f"{team2_name}_sets"],
     }
 
     # For 'end of set' rows, update the set scores based on
     # the previous set's score
     for idx, row in df_points.iterrows():
-        if (
-            row['service_side'] == 'end of set'
-            and idx > 0
-        ):
+        if row["service_side"] == "end of set" and idx > 0:
             # The winner of the previous point/set is the one
             # with the highest score at the previous point
-            prev_score_team1 = df_points.at[
-                idx - 1, f'{team1_name}_score'
+            prev_score_team1 = df_points.at[idx - 1, f"{team1_name}_score"]
+            prev_score_team2 = df_points.at[idx - 1, f"{team2_name}_score"]
+            df_points.at[idx, f"{team1_name}_sets"] = df_points.at[
+                idx - 1, f"{team1_name}_sets"
             ]
-            prev_score_team2 = df_points.at[
-                idx - 1, f'{team2_name}_score'
+            df_points.at[idx, f"{team2_name}_sets"] = df_points.at[
+                idx - 1, f"{team2_name}_sets"
             ]
-            df_points.at[idx, f'{team1_name}_sets'] = (
-                df_points.at[idx - 1, f'{team1_name}_sets']
-            )
-            df_points.at[idx, f'{team2_name}_sets'] = (
-                df_points.at[idx - 1, f'{team2_name}_sets']
-            )
             if prev_score_team1 > prev_score_team2:
-                df_points.at[
-                    idx, f'{team1_name}_sets'
-                ] += 1
-                df_points.at[
-                    idx, f'{team1_name}_score'
-                ] += 1
+                df_points.at[idx, f"{team1_name}_sets"] += 1
+                df_points.at[idx, f"{team1_name}_score"] += 1
             elif prev_score_team2 > prev_score_team1:
-                df_points.at[
-                    idx, f'{team2_name}_sets'
-                ] += 1
-                df_points.at[
-                    idx, f'{team2_name}_score'
-                ] += 1
-    
+                df_points.at[idx, f"{team2_name}_sets"] += 1
+                df_points.at[idx, f"{team2_name}_score"] += 1
+
     if export_list_actions is True:
         return df_points, list_actions
     else:
         return df_points
+
 
 # -------------------------------------------------------------------
 # Point indexer
@@ -1013,7 +966,7 @@ def point_indexeer(
 
     # return df
 
-    if 'point_index' in df.columns:
+    if "point_index" in df.columns:
         print(
             "The 'point_index' column already exists in the "
             "DataFrame. Please remove or rename the existing "
@@ -1021,7 +974,7 @@ def point_indexeer(
         )
         return df
 
-    if not all(col in df.columns for col in ['service_side']):
+    if not all(col in df.columns for col in ["service_side"]):
         print(
             "Error: the DataFrame does not contain the "
             "'service_side' column. Please check the "
@@ -1032,24 +985,21 @@ def point_indexeer(
     # Create the point_indices list
     point_idx = int(0)
     point_indices = list([])
-    excluded = ('*SWITCH*', 'Timeout', 'end of set')
+    excluded = ("*SWITCH*", "Timeout", "end of set")
     for _, row in df.iterrows():
-        if row['service_side'] not in excluded:
+        if row["service_side"] not in excluded:
             point_idx += int(1)
         point_indices.append(
-            point_idx
-            if row['service_side'] not in excluded
-            else int(999)
+            point_idx if row["service_side"] not in excluded else int(999)
         )
 
     # Add the 'point_index' column to the DataFrame
-    df['point_index'] = pd.array(
-        point_indices, dtype=pd.StringDtype()
-    )
+    df["point_index"] = pd.array(point_indices, dtype=pd.StringDtype())
     # Zero-pad the 'point_index' values to 3 digits
-    df['point_index'] = df['point_index'].astype('string').str.zfill(3)
+    df["point_index"] = df["point_index"].astype("string").str.zfill(3)
 
     return df
+
 
 # -------------------------------------------------------------------
 # Score checker
@@ -1078,52 +1028,39 @@ def score_checker(
             final score.
     """
     recap_dict = {
-        'teams': (
-            df_points.columns[3].replace('_score', ''),
-            df_points.columns[4].replace('_score', ''),
+        "teams": (
+            df_points.columns[3].replace("_score", ""),
+            df_points.columns[4].replace("_score", ""),
         ),
-        'match_format': None,
-        'winner': None,
-        'final_score': None,
-        'score_by_set': [],
+        "match_format": None,
+        "winner": None,
+        "final_score": None,
+        "score_by_set": [],
     }
 
     # Remove 'Timeout' rows to avoid skewing calculations
-    df_points = df_points[
-        df_points['service_side'] != 'Timeout'
-    ].reset_index(drop=True)
+    df_points = df_points[df_points["service_side"] != "Timeout"].reset_index(drop=True)
 
     # Retrieve team names from the DataFrame columns
-    team1_name = df_points.columns[3].replace('_score', '')
-    team2_name = df_points.columns[4].replace('_score', '')
+    team1_name = df_points.columns[3].replace("_score", "")
+    team2_name = df_points.columns[4].replace("_score", "")
 
     # Initialize variables for score and match format
     score_switch_points = []
     for idx, row in df_points.iterrows():
-        if row['service_side'] == '*SWITCH*':
+        if row["service_side"] == "*SWITCH*":
             if idx + 1 < len(df_points):
                 score_sum = (
-                    df_points.at[
-                        idx + 1, f'{team1_name}_score'
-                    ]
-                    + df_points.at[
-                        idx + 1, f'{team2_name}_score'
-                    ]
+                    df_points.at[idx + 1, f"{team1_name}_score"]
+                    + df_points.at[idx + 1, f"{team2_name}_score"]
                 )
             else:
-                score_sum = (
-                    row[f'{team1_name}_score']
-                    + row[f'{team2_name}_score']
-                )
+                score_sum = row[f"{team1_name}_score"] + row[f"{team2_name}_score"]
             score_switch_points.append(score_sum)
 
     # Check for multiples of 5 or 7
-    multiples_of_5 = all(
-        score % 5 == 0 for score in score_switch_points
-    )
-    multiples_of_7 = all(
-        score % 7 == 0 for score in score_switch_points
-    )
+    multiples_of_5 = all(score % 5 == 0 for score in score_switch_points)
+    multiples_of_7 = all(score % 7 == 0 for score in score_switch_points)
     if multiples_of_5:
         match_format = "15 points per set"
     elif multiples_of_7:
@@ -1142,65 +1079,66 @@ def score_checker(
         match_format = "(to be checked manually)"
 
     # Retrieve the final score and per-set detail
-    recap_dict['match_format'] = match_format
-    final_score_team1 = df_points[
-        f'{team1_name}_sets'
-    ].iloc[-1]
-    final_score_team2 = df_points[
-        f'{team2_name}_sets'
-    ].iloc[-1]
-    recap_dict['final_score'] = (
-        f"{final_score_team1} - {final_score_team2}"
-    )
+    recap_dict["match_format"] = match_format
+    final_score_team1 = df_points[f"{team1_name}_sets"].iloc[-1]
+    final_score_team2 = df_points[f"{team2_name}_sets"].iloc[-1]
+    recap_dict["final_score"] = f"{final_score_team1} - {final_score_team2}"
 
     # Determine the winner
     if final_score_team1 > final_score_team2:
-        recap_dict['winner'] = team1_name
+        recap_dict["winner"] = team1_name
     else:
-        recap_dict['winner'] = team2_name
+        recap_dict["winner"] = team2_name
 
     # Per-set detail
     set_count = 0
     current_set_scores = []
     for idx, row in df_points.iterrows():
-        if row['service_side'] == 'end of set':
-            current_set_scores.append({
-                'set': set_count + 1,
-                'score': (
-                    f"{row[f'{team1_name}_score']}"
-                    f" - "
-                    f"{row[f'{team2_name}_score']}"
-                ),
-            })
+        if row["service_side"] == "end of set":
+            current_set_scores.append(
+                {
+                    "set": set_count + 1,
+                    "score": (
+                        f"{row[f'{team1_name}_score']}"
+                        f" - "
+                        f"{row[f'{team2_name}_score']}"
+                    ),
+                }
+            )
             set_count += 1
         elif idx == len(df_points) - 1:
             # Last row of the DataFrame
-            current_set_scores.append({
-                'set': set_count + 1,
-                'score': (
-                    f"{row[f'{team1_name}_score']}"
-                    f" - "
-                    f"{row[f'{team2_name}_score']}"
-                ),
-            })
+            current_set_scores.append(
+                {
+                    "set": set_count + 1,
+                    "score": (
+                        f"{row[f'{team1_name}_score']}"
+                        f" - "
+                        f"{row[f'{team2_name}_score']}"
+                    ),
+                }
+            )
 
-    recap_dict['score_by_set'] = current_set_scores
+    recap_dict["score_by_set"] = current_set_scores
 
     return recap_dict
+
 
 # -------------------------------------------------------------------
 # Basic action grader
 # -------------------------------------------------------------------
 def basic_action_grader(
-        video_path: str,
-        point_id: str,
-        paire_id: str,
-        player_a: str,
-        player_b: str,
-        action_to_grade: str ="serve" or "pass",
-        previous_grade: str = None,
-        play_speed: float = 1.0,
-        display_size: tuple = (1152, 648),
+    video_path: str,
+    point_id: str,
+    paire_id: str,
+    player_a: str,
+    player_b: str,
+    action_to_grade: str = "serve" or "pass",
+    previous_grade: str = None,
+    play_speed: float = 1.0,
+    display_size: tuple = (1152, 648),
+    init_keys_colors_index: int = 0,
+    init_grades_color_index: int = 0,
 ) -> dict:
     """
     Grade a specific action for a given player across a points of,
@@ -1220,8 +1158,11 @@ def basic_action_grader(
         play_speed (float, optional): Video playback speed
         display_size (tuple, optional): Size of the video display window
             (width, height). Defaults to (1152, 648).
+        init_keys_colors_index (int, optional): Initial index for the keys colors.
+        init_grades_color_index (int, optional): Initial index for the grades colors.
     Returns:
         dict: Dictionary containing the action graded for a player
+
     """
     # Initialize variables
     action_graded = dict()
@@ -1229,71 +1170,81 @@ def basic_action_grader(
     grade = str()
     video_loop_active = bool(True)
     quit_grading = bool(False)
-    color_map = dict({
-        'black': (0, 0, 0),
-        'green': (0, 255, 0),
-        'blue': (255, 0, 0),
-        'red': (0, 0, 255),
-        'white': (255, 255, 255),
-        'yellow': (0, 255, 255),
-    })
+    color_map = dict(
+        {
+            "black": (0, 0, 0),
+            "green": (0, 255, 0),
+            "blue": (255, 0, 0),
+            "red": (0, 0, 255),
+            "white": (255, 255, 255),
+            "yellow": (0, 255, 255),
+        }
+    )
     color_map_keys = list(color_map.keys())
-    keys_colors_index = 0
-    grades_color_index = 0
+    keys_colors_index = int(init_keys_colors_index)
+    grades_color_index = int(init_grades_color_index)
     scale_x = float(1.0)
     scale_y = float(1.0)
     font_scale = float(1.0)
 
     # Define the grading options for serve and pass
-    dict_grades_result=dict({
-        'serve': {
-            0: 'undetermined',
-            1: 'serve error',
-            2: 'excellent pass (++)',
-            3: 'good pass (+)',
-            4: 'average pass (0)',
-            5: 'bad pass (-)',
-            6: 'ace'
-        },
-        'pass': {
-            0: 'undetermined',
-            1: 'serve error',
-            2: 'excellent pass (++)',
-            3: 'good pass (+)',
-            4: 'average pass (0)',
-            5: 'bad pass (-)',
-            6: 'ace'
+    dict_grades_result = dict(
+        {
+            "serve": {
+                0: "undetermined",
+                1: "serve error",
+                2: "excellent pass (++)",
+                3: "good pass (+)",
+                4: "average pass (0)",
+                5: "bad pass (-)",
+                6: "ace",
+            },
+            "pass": {
+                0: "undetermined",
+                1: "serve error",
+                2: "excellent pass (++)",
+                3: "good pass (+)",
+                4: "average pass (0)",
+                5: "bad pass (-)",
+                6: "ace",
+            },
         }
-    })
+    )
 
     # Map keys to player selected and grade assigned
-    key_player_map = dict({
-        ord('7'): player_a,
-        ord('9'): player_b,
-    })
-    key_grade_result = dict({
-        ord('0'): dict_grades_result[action_to_grade][0],
-        ord('1'): dict_grades_result[action_to_grade][1],
-        ord('2'): dict_grades_result[action_to_grade][2],
-        ord('3'): dict_grades_result[action_to_grade][3],
-        ord('4'): dict_grades_result[action_to_grade][4],
-        ord('5'): dict_grades_result[action_to_grade][5],
-        ord('6'): dict_grades_result[action_to_grade][6],
-    })
+    key_player_map = dict(
+        {
+            ord("7"): player_a,
+            ord("9"): player_b,
+        }
+    )
+    key_grade_result = dict(
+        {
+            ord("0"): dict_grades_result[action_to_grade][0],
+            ord("1"): dict_grades_result[action_to_grade][1],
+            ord("2"): dict_grades_result[action_to_grade][2],
+            ord("3"): dict_grades_result[action_to_grade][3],
+            ord("4"): dict_grades_result[action_to_grade][4],
+            ord("5"): dict_grades_result[action_to_grade][5],
+            ord("6"): dict_grades_result[action_to_grade][6],
+        }
+    )
 
     # Display available keys as an overlay on the video
-    help_lines = list([
-        f"Grading {action_to_grade} for :",
-        f"{player_a} (7) and {player_b} (9)",
-        f"0 : {dict_grades_result[action_to_grade][0]}",
-        f"1 : {dict_grades_result[action_to_grade][1]}",
-        f"2 : {dict_grades_result[action_to_grade][2]}",
-        f"3 : {dict_grades_result[action_to_grade][3]}",
-        f"4 : {dict_grades_result[action_to_grade][4]}",
-        f"5 : {dict_grades_result[action_to_grade][5]}",
-        f"6 : {dict_grades_result[action_to_grade][6]}",
-    ])
-    
+    help_lines = list(
+        [
+            f"Grading {action_to_grade} for :",
+            f"{player_a} (7) and {player_b} (9)",
+            f"0 : {dict_grades_result[action_to_grade][0]}",
+            f"1 : {dict_grades_result[action_to_grade][1]}",
+            f"2 : {dict_grades_result[action_to_grade][2]}",
+            f"3 : {dict_grades_result[action_to_grade][3]}",
+            f"4 : {dict_grades_result[action_to_grade][4]}",
+            f"5 : {dict_grades_result[action_to_grade][5]}",
+            f"6 : {dict_grades_result[action_to_grade][6]}",
+        ]
+    )
+
     # Override cv2.imshow to add help overlay and scores
     _orig_imshow = cv2.imshow
 
@@ -1303,16 +1254,15 @@ def basic_action_grader(
             x, y = int(30 * scale_x), int(150 * scale_y)
             for i, line in enumerate(help_lines):
                 cv2.putText(
-                    img=frame, 
-                    text=line, 
+                    img=frame,
+                    text=line,
                     org=(x, y + i * int(25 * scale_y)),
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.7 * font_scale,
-                    color=color_map[color_map_keys[keys_colors_index]], 
-                    thickness=1, 
-                    lineType=cv2.LINE_AA
-                    )
-
+                    color=color_map[color_map_keys[keys_colors_index]],
+                    thickness=1,
+                    lineType=cv2.LINE_AA,
+                )
 
         _orig_imshow(winname, frame)
 
@@ -1327,11 +1277,10 @@ def basic_action_grader(
     font_scale = min(scale_x, scale_y)
 
     # Resize the display window to the specified size
-    win_name = f'{video_path}'
+    win_name = f"{video_path}"
     cv2.namedWindow(win_name, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(win_name, display_size[0], display_size[1])
     cv2.moveWindow(win_name, 0, 0)
-
 
     def _wait_key_fast(ms):
         # Reduce the delay proportionally to the speed
@@ -1377,8 +1326,8 @@ def basic_action_grader(
                     fontScale=1 * font_scale,
                     color=color_map[color_map_keys[grades_color_index]],
                     thickness=2,
-                    lineType=cv2.LINE_AA
-                    )
+                    lineType=cv2.LINE_AA,
+                )
                 # Grade overlay
                 cv2.putText(
                     img=frame,
@@ -1386,10 +1335,10 @@ def basic_action_grader(
                     org=(int(30 * scale_x), int(70 * scale_y)),
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=1 * font_scale,
-                    color=color_map[color_map_keys[grades_color_index]], 
-                    thickness=2, 
-                    lineType=cv2.LINE_AA
-                    )
+                    color=color_map[color_map_keys[grades_color_index]],
+                    thickness=2,
+                    lineType=cv2.LINE_AA,
+                )
             # Diplay the previous grade for this action if it exists
             if previous_grade and ret:
                 # Previous grade overlay
@@ -1397,46 +1346,46 @@ def basic_action_grader(
                     img=frame,
                     text=f"previous grade: {previous_grade}",
                     org=(int(30 * scale_x), int(100 * scale_y)),
-                    fontFace=cv2.FONT_HERSHEY_SIMPLEX, 
+                    fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=1 * font_scale,
-                    color=color_map[color_map_keys[grades_color_index]], 
-                    thickness=1, 
-                    lineType=cv2.LINE_AA
-                    )
+                    color=color_map[color_map_keys[grades_color_index]],
+                    thickness=1,
+                    lineType=cv2.LINE_AA,
+                )
 
             # Display the current frame
             if ret:
-                cv2.imshow(f'{video_path}', frame)
+                cv2.imshow(f"{video_path}", frame)
 
             # Keyboard player input
             key = _wait_key_fast(30) & 0xFF
-            if key == ord('q'):
+            if key == ord("q"):
                 # Stop the whole grading process and exit
                 quit_grading = True
                 break
-            if key == ord('h'):
+            if key == ord("h"):
                 # Change the color of the keys display
                 keys_colors_index = (keys_colors_index + 1) % len(color_map_keys)
                 continue
-            if key == ord('g'):
+            if key == ord("g"):
                 # Change the color of the grade display
                 grades_color_index = (grades_color_index + 1) % len(color_map_keys)
                 continue
-            if key == ord('8') and player_to_grade and grade:
+            if key == ord("8") and player_to_grade and grade:
                 # Confirm the grade and exit
                 video_loop_active = False
-            elif key == ord('\r'):
+            elif key == ord("\r"):
                 # Enter key: restart playback from beginning
                 cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
                 paused = False
-            if key == ord(' '):
+            if key == ord(" "):
                 # Pause/resume
                 paused = not paused
-            elif key == ord('+'):
+            elif key == ord("+"):
                 # Increase speed
                 play_speed += 0.5
                 continue
-            elif key == ord('-'):
+            elif key == ord("-"):
                 # Decrease speed
                 play_speed = max(0.5, play_speed - 0.5)
                 continue
@@ -1444,55 +1393,58 @@ def basic_action_grader(
             elif key in key_player_map:
                 player_to_grade = key_player_map[key]
             elif key in key_grade_result and player_to_grade:
-                grade = key_grade_result[key]   
+                grade = key_grade_result[key]
 
                 # Pause to confirm the grade
                 paused = True
 
                 # Store the graded action in the dictionary
                 action_graded = {
-                    'point_id': point_id,
-                    'paire_id': paire_id,
-                    'player': player_to_grade,
-                    'action': action_to_grade,
-                    'grade': grade
+                    "point_id": point_id,
+                    "paire_id": paire_id,
+                    "player": player_to_grade,
+                    "action": action_to_grade,
+                    "grade": grade,
                 }
-            
+
     finally:
         # Release OpenCV resources
         cap.release()
         cv2.destroyAllWindows()
         cv2.imshow = _orig_imshow
 
-    return action_graded, quit_grading
+    return action_graded, quit_grading, keys_colors_index, grades_color_index
+
 
 # -------------------------------------------------------------------
 # All possession game
 # -------------------------------------------------------------------
 
+
 def all_possession_game(
-        game_id: str,
-        indexed_df_points_csv_path: str,
-        video_dir: str,
-        team1_name: str,
-        team2_name: str,
-        output_dir: str,
-    ) -> None:
+    game_id: str,
+    indexed_df_points_csv_path: str,
+    video_dir: str,
+    team1_name: str,
+    team2_name: str,
+    output_dir: str,
+) -> None:
     """
     Do a montage of all the possessions of a game, based on the extracted
-    points segments. If a CSV path is provided, it reads the indexed points 
+    points segments. If a CSV path is provided, it reads the indexed points
     DataFrame from the CSV file and displays the score on the video output.
     """
 
     # Get all .mp4 files in the video directory
-    video_paths_list = list([
-        os.path.join(video_dir, f) for f in os.listdir(video_dir)
-        if f.endswith('.mp4') and game_id in f
-    ])
-    # # [DEV DEBUG]
-    # print(video_paths_list)
+    video_paths_list = list(
+        [
+            os.path.join(video_dir, f)
+            for f in os.listdir(video_dir)
+            if f.endswith(".mp4") and game_id in f
+        ]
+    )
 
-    # Error message if no .mp4 files found in the directory 
+    # Error message if no .mp4 files found in the directory
     if len(video_paths_list) == 0:
         print(f"No .mp4 files matching {game_id} files found in {video_dir}")
         return
@@ -1505,10 +1457,10 @@ def all_possession_game(
     cap.release()
 
     # Create VideoWriter for the output montage
-    output_video_name = f'all_possessions_montage_{team1_name}_vs_{team2_name}.mp4'
+    output_video_name = f"all_possessions_montage_{team1_name}_vs_{team2_name}.mp4"
     output_path = os.path.join(output_dir, output_video_name)
 
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     out = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height))
 
     # Load the indexed points DataFrame from the CSV file
@@ -1516,20 +1468,24 @@ def all_possession_game(
     print(f"Loading indexed points DataFrame from: {indexed_df_points_csv_path}")
     indexed_df_points = pd.read_csv(indexed_df_points_csv_path)
     # Retrieve team names from the DataFrame columns
-    team1_id = indexed_df_points.columns[3].replace('_score', '')
-    team2_id = indexed_df_points.columns[4].replace('_score', '')
+    team1_id = indexed_df_points.columns[3].replace("_score", "")
+    team2_id = indexed_df_points.columns[4].replace("_score", "")
 
     # Ensure the DataFrame is sorted by point_index
-    indexed_df_points = indexed_df_points.sort_values(by='point_index').reset_index(drop=True)
+    indexed_df_points = indexed_df_points.sort_values(by="point_index").reset_index(
+        drop=True
+    )
     # Create a list of scores for each point index
-    score_list = list(zip(
-        indexed_df_points[f'{team1_id}_score'],
-        indexed_df_points[f'{team2_id}_score'],
-        indexed_df_points[f'{team1_id}_sets'],
-        indexed_df_points[f'{team2_id}_sets']
-    ))
+    score_list = list(
+        zip(
+            indexed_df_points[f"{team1_id}_score"],
+            indexed_df_points[f"{team2_id}_score"],
+            indexed_df_points[f"{team1_id}_sets"],
+            indexed_df_points[f"{team2_id}_sets"],
+        )
+    )
 
-    # Concatenate all videos, with the score overlay 
+    # Concatenate all videos, with the score overlay
     for i, video_file in enumerate(video_paths_list):
         cap = cv2.VideoCapture(video_file)
         score = score_list[i] if i < len(score_list) else (0, 0)
@@ -1539,7 +1495,7 @@ def all_possession_game(
                 break
             # Overlay score on the frame
             score_text = f"""{team1_id}: {score[0]} - {team2_id}: {score[1]}"""
-            set_text = f'Sets: {team1_id} {score[2]} - {team2_id} {score[3]}'
+            set_text = f"Sets: {team1_id} {score[2]} - {team2_id} {score[3]}"
 
             cv2.putText(
                 frame,
@@ -1575,13 +1531,13 @@ def all_possession_game(
 
 if __name__ == "__main__":
     test_dict = basic_action_grader(
-        video_path=r'C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\points_segmented\JOMR_mar26_VSG_01_p072.mp4',
-        point_id='test_point_id',
-        paire_id='test_paire_id',
-        player_a='test_player_a',
-        player_b='test_player_b',
-        action_to_grade='serve',
-        previous_grade='good pass (+)',
+        video_path=r"C:\Users\habib\Desktop\Montages volley et beach\Jade&Math\points_segmented\JOMR_mar26_VSG_01_p072.mp4",
+        point_id="test_point_id",
+        paire_id="test_paire_id",
+        player_a="test_player_a",
+        player_b="test_player_b",
+        action_to_grade="serve",
+        previous_grade="good pass (+)",
         play_speed=1.0,
     )
     print(test_dict)

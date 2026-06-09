@@ -1,4 +1,5 @@
 """Database manager module for DataBeach SQLite operations."""
+
 import json
 import sqlite3
 import csv
@@ -16,6 +17,7 @@ from etl_utils import extract_transform_indexed_df_points_csv
 # Environment variables and constants
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+
 class DBManager:
     """Manages all operations related to the SQLite database."""
 
@@ -31,7 +33,7 @@ class DBManager:
         self.conn.execute("PRAGMA foreign_keys = ON")
         self.cursor = self.conn.cursor()
         print(f"✅ Connection established: {self.DB_PATH}")
-        
+
         # Directories for CSV and JSON files
         self.indexed_df_points_dir = os.getenv("INDEXED_DF_POINTS_DIR")
         self.recap_dict_score_dir = os.getenv("RECAP_DICT_SCORE_DIR")
@@ -49,7 +51,7 @@ class DBManager:
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Automatically closes the connection at the end of the 'with' block."""
         self.close()
-    
+
     # ============================================================
     # TABLE CREATION
     # Initial version: table_player, table_serie, table_game
@@ -59,8 +61,7 @@ class DBManager:
         """Creates the 3 tables if they do not already exist."""
 
         # 1. table_player (no FK)
-        self.cursor.execute(
-            """
+        self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS table_player (
                 paire_id   TEXT PRIMARY KEY,
                 player_a   TEXT NOT NULL,
@@ -68,12 +69,10 @@ class DBManager:
                 genre      TEXT NOT NULL,
                 paire_name TEXT GENERATED ALWAYS AS (player_a || ' - ' || player_b) STORED
             )
-        """
-        )
+        """)
 
         # 2. table_serie (no FK)
-        self.cursor.execute(
-            """
+        self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS table_serie (
                 serie_id   TEXT PRIMARY KEY,
                 club       TEXT NOT NULL,
@@ -82,12 +81,10 @@ class DBManager:
                 date       DATE NOT NULL,
                 serie_name TEXT
             )
-        """
-        )
+        """)
 
         # 3. table_game (FK to table_player x2 and table_serie)
-        self.cursor.execute(
-            """
+        self.cursor.execute("""
             CREATE TABLE IF NOT EXISTS table_game (
             game_id        TEXT PRIMARY KEY,
             serie          TEXT NOT NULL,
@@ -105,8 +102,7 @@ class DBManager:
             FOREIGN KEY (team_a) REFERENCES table_player(paire_id),
             FOREIGN KEY (team_b) REFERENCES table_player(paire_id)
             )
-        """
-        )
+        """)
 
         self.conn.commit()
         print("✅ Tables created.")
@@ -163,7 +159,7 @@ class DBManager:
 
     def load_all_initial_csv(self):
         """Imports the 3 CSV files in the correct order (parents before children)."""
-        initial_table_list = ['table_game','table_player','table_serie']
+        initial_table_list = ["table_game", "table_player", "table_serie"]
         for table_name in initial_table_list:
             self.cursor.execute(f"DROP TABLE IF EXISTS {table_name}")
         self.create_initial_tables()
@@ -173,15 +169,14 @@ class DBManager:
 
     # -----------------------------------------------------------
 
-    def create_simple_actions_table(self,
-        action_name: str):
-        """Creates a new table for the specified action 
+    def create_simple_actions_table(self, action_name: str):
+        """Creates a new table for the specified action
         (e.g. serve, pass) with the appropriate schema.
         Arguments:
-            action_name (str): The name of the action 
+            action_name (str): The name of the action
             for which to create the table (e.g. 'serve', 'pass')
-        """  
-        try :
+        """
+        try:
             self.cursor.execute(f"SELECT * FROM table_{action_name}")
         except sqlite3.OperationalError:
             pass
@@ -207,14 +202,13 @@ class DBManager:
         """
         self.execute_query(create_table_query)
         print(f"✅ Table 'table_{action_name}' has been created")
-    
+
     # ============================================================
     # FREQUENT QUERIES METHODS
     # ============================================================
 
     def teams_names_from_game_id(
-        self, 
-        game_id : str
+        self, game_id: str
     ) -> tuple[str, str] | tuple[None, None]:
         """Retrieves the team names from the game_id."""
         query = "SELECT team_a, team_b FROM table_game WHERE game_id = ?"
@@ -231,12 +225,12 @@ class DBManager:
 
     # ------------------------------------------------------------------------
 
-    def list_teams_with_players_names(self
-                                      ) -> list[str]:
+    def list_teams_with_players_names(self) -> list[str]:
         """Retrieves the names of all teams with their players.
-         Returns:
-            list[str]: A list of tuples containing player_a and player_b names for each team."""
-        
+        Returns:
+           list[str]: A list of tuples containing player_a and player_b names for each team.
+        """
+
         query = """
             SELECT paire_id, player_a, player_b
             FROM table_player
@@ -248,12 +242,18 @@ class DBManager:
         # print('[DEV] Teams with players:')
         # print([(row[0],str(f'{row[1]} - {row[2]}')) for row in results])
 
-        return [(row[0],str(f'{row[1]} - {row[2]}')) for row in results]
+        return [(row[0], str(f"{row[1]} - {row[2]}")) for row in results]
 
     # -----------------------------------------------------------------------
 
     def new_beach_serie(
-        self, serie_id: str, club: str, serie_type: str, genre: str, date: str, serie_name: str = None
+        self,
+        serie_id: str,
+        club: str,
+        serie_type: str,
+        genre: str,
+        date: str,
+        serie_name: str = None,
     ) -> None:
         """Inserts a new beach series into table_serie."""
         # Check if the serie_id already exists
@@ -317,9 +317,7 @@ class DBManager:
                 (paire_id, player_a, player_b, genre)
                 VALUES (?, ?, ?, ?)
             """
-            self.execute_query(
-                query, (paire_id, name_joueur_a, name_joueur_b, genre)
-            )
+            self.execute_query(query, (paire_id, name_joueur_a, name_joueur_b, genre))
             print(
                 f"✅ New team added: {paire_id} - "
                 f"{name_joueur_a} & {name_joueur_b} - {genre}"
@@ -382,10 +380,10 @@ class DBManager:
             JOIN table_player p ON g.team_a = p.paire_id OR g.team_b = p.paire_id
             WHERE p.paire_name = ?
             """,
-            (paire_name,)
+            (paire_name,),
         )
         return [row[0] for row in self.cursor.fetchall()]
-    
+
     # ---------------------------------------------------------------------------
 
     def get_serie_ids_by_paire_name(self, paire_name: str) -> list:
@@ -397,17 +395,13 @@ class DBManager:
             JOIN table_player p ON g.team_a = p.paire_id OR g.team_b = p.paire_id
             WHERE p.paire_name = ?
             """,
-            (paire_name,)
+            (paire_name,),
         )
         return [row[0] for row in self.cursor.fetchall()]
 
-
     # ----------------------------------------------------------------------------
 
-    def execute_query(self, 
-                      query: str, 
-                      params=None,
-                      print_query: bool = False) -> None:
+    def execute_query(self, query: str, params=None, print_query: bool = False) -> None:
         """Executes an SQL query with or without parameters."""
         if params is None:
             params = []
@@ -425,10 +419,8 @@ class DBManager:
     # ETL METHODS
     # ====================================================================
 
-    def load_indexed_df_points_csv_to_db(
-            self,
-            game_id: str) -> pd.DataFrame:
-        """From a given game_id, extract, transform and load the corresponding 
+    def load_indexed_df_points_csv_to_db(self, game_id: str) -> pd.DataFrame:
+        """From a given game_id, extract, transform and load the corresponding
         indexed points CSV file into the table_point in the database.
 
         Arguments:
@@ -445,9 +437,7 @@ class DBManager:
         # Extract and transform the indexed points data from the corresponding CSV file
         df_points_formatted = pd.DataFrame()
         df_points_formatted = extract_transform_indexed_df_points_csv(
-            game_id=game_id,
-            team_a_name=team_a_name,
-            team_b_name=team_b_name
+            game_id=game_id, team_a_name=team_a_name, team_b_name=team_b_name
         )
 
         # Create a new table_point with the appropriate schema
@@ -500,20 +490,20 @@ class DBManager:
 
     # ---------------------------------------------------------------------------
 
-    def update_grade_to_previous_grade(
-            self,
-            action_name: str
-            ) -> None:
-        """ Saves the current grade of each action in a table into previous_grade
+    def update_grade_to_previous_grade(self, action_name: str) -> None:
+        """Saves the current grade of each action in a table into previous_grade
         It is useful in the dev phase and/or when grading correction are needed.
         It ouput a json file of the whole table updated for backup and traceability purposes.
-        Args : 
-        action_name (str): the name of the action for which to update the previous_grade column"""
+        Args :
+        action_name (str): the name of the action for which to update the previous_grade column
+        """
 
         # DEV - to be updated with further actions
-        action_list_available = ['serve', 'pass']
+        action_list_available = ["serve", "pass"]
         if action_name not in action_list_available:
-            print(f"⚠️  Action '{action_name}' not recognized : need to be one of {action_list_available}.")
+            print(
+                f"⚠️  Action '{action_name}' not recognized : need to be one of {action_list_available}."
+            )
             return
 
         # Query to update the previous_grade column with the current grade
@@ -524,7 +514,7 @@ class DBManager:
 
         # # DEV - output the whole table to a json file for backup and traceability purposes
         # # Query to retrieve the updated table data
-        # output_query = f"""SELECT point_id, paire_id, player, action, grade, previous_grade, point_won 
+        # output_query = f"""SELECT point_id, paire_id, player, action, grade, previous_grade, point_won
         # FROM table_{action_name}"""
         # self.cursor.execute(output_query)
         # rows = self.cursor.fetchall()
@@ -553,8 +543,7 @@ class DBManager:
     # ---------------------------------------------------------------------------
 
     def load_all_indexed_df_points_csv_to_db(
-            self,
-            indexed_df_points_dir: str = None
+        self, indexed_df_points_dir: str = None
     ) -> None:
         """Load the indexed points DataFrames for a list of game_ids
         and insert them into the database.
@@ -570,8 +559,10 @@ class DBManager:
         # If no directory is provided, use the default 'indexed_df_points' directory
         if indexed_df_points_dir is None:
             indexed_df_points_dir = self.indexed_df_points_dir
-        print(f"📂 Looking for indexed points CSV files in '{indexed_df_points_dir}'...")
-        
+        print(
+            f"📂 Looking for indexed points CSV files in '{indexed_df_points_dir}'..."
+        )
+
         # # DEV DEBUG - to be removed later
         # print(f"📋 [DEV] 📂 Looking for indexed points CSV files in '{indexed_df_points_dir}'...")
 
@@ -593,16 +584,13 @@ class DBManager:
 
     # ---------------------------------------------------------------------------
 
-
-    def load_json_actions(self,
-        action_name: str,
-        action_graded_dir: str = None,
-        rewrite_db: bool = False
-        ) -> None: 
+    def load_json_actions(
+        self, action_name: str, action_graded_dir: str = None, rewrite_db: bool = False
+    ) -> None:
         """Load the actions from the JSON files in the recap_dict_score directory
         and insert them into the corresponding action tables in the database.
         Arguments:
-            action_name (str): The name of the action for 
+            action_name (str): The name of the action for
             which to load the data (e.g. 'serve', 'pass')
         """
         # If no directory is provided, use the default 'recap_dict_score' directory
@@ -613,11 +601,13 @@ class DBManager:
         # # Create the action table if it doesn't exist
         self.create_simple_actions_table(action_name)
 
-        # Get a list of files in action_graded_dir that match the pattern 
+        # Get a list of files in action_graded_dir that match the pattern
         # 'list_grades_{action_name}_{game_id}.json'
         json_files = []
         for filename in os.listdir(action_graded_dir):
-            if filename.startswith(f"list_grades_{action_name}_") and filename.endswith(".json"):
+            if filename.startswith(f"list_grades_{action_name}_") and filename.endswith(
+                ".json"
+            ):
                 json_files.append(filename)
 
         for json_file in json_files:
@@ -639,7 +629,9 @@ class DBManager:
                     action_grade["player"],
                     action_grade["action"],
                     action_grade["grade"],
-                    action_grade.get("previous_grade")  # Use .get() to avoid KeyError if not present
+                    action_grade.get(
+                        "previous_grade"
+                    ),  # Use .get() to avoid KeyError if not present
                 )
                 for action_grade in actions_grades_list
             ]
@@ -653,10 +645,10 @@ class DBManager:
                 )
             except sqlite3.Error as e:
                 print(f"❌ Error inserting grades: {e}")
-        
+
         ## ONLY FOR SERVE ACTION
         # After inserting/updating the grades, update the point_won column in the serve
-        if action_name == 'serve':
+        if action_name == "serve":
             point_won_query = """
             UPDATE table_serve
             SET point_won = CASE
@@ -679,7 +671,7 @@ class DBManager:
 
     def false_aces_corrector(self) -> None:
         """
-        In table_serve, corrects the false aces and false direct 
+        In table_serve, corrects the false aces and false direct
         serve errors in the table_serve based on point_won
         """
 
@@ -701,16 +693,13 @@ class DBManager:
 
     # -----------------------------------------------------------------------
 
-    def reset_database(self,
-                       action_name_list: list
-                       )-> None:
+    def reset_database(self, action_name_list: list) -> None:
         """Drops all tables and reloads the .csv and .json files"""
         self.drop_all_tables()
         self.load_all_initial_csv()
         self.load_all_indexed_df_points_csv_to_db()
         for action_name in action_name_list:
-            self.load_json_actions(action_name=action_name, 
-                                   rewrite_db=True)
+            self.load_json_actions(action_name=action_name, rewrite_db=True)
         print("✅ Database reset complete.")
 
 
@@ -722,17 +711,11 @@ class DBManager:
 if __name__ == "__main__":
 
     with DBManager() as db:
-        db.reset_database(action_name_list=['serve','pass'])
-        db.update_grade_to_previous_grade(action_name='serve')
+        db.reset_database(action_name_list=["serve", "pass"])
+        db.update_grade_to_previous_grade(action_name="serve")
         # table_serve_df = db.table_to_dataframe("table_serve")
         # print(table_serve_df)
         # table_game_df = db.table_to_dataframe("table_game")
         # print(table_game_df.tail(15))
         # serie_ids = db.get_serie_ids_by_paire_name("OFFREDI Jade - RANC Mathilde")
         # print(serie_ids)
-
-
-
-
-
-

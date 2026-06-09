@@ -14,7 +14,9 @@ from action_grading_interface import action_grading_interface
 # Pages import
 
 # Local import
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'scripts'))
+sys.path.append(
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scripts")
+)
 from db_manager import DBManager
 from game_editor import GameEditor
 from video_grader import VideoGrader
@@ -30,7 +32,7 @@ from video_edit_utils import *
 st.set_page_config(layout="wide")
 
 teams_list = [
-    ('JOMR', 'OFFREDI Jade - RANC Mathilde'),
+    ("JOMR", "OFFREDI Jade - RANC Mathilde"),
 ]
 
 # Sidebar menu for navigation
@@ -50,20 +52,20 @@ with st.sidebar:
                 """SELECT game_id 
                 FROM table_game
                 WHERE team_a = ? OR team_b = ?""",
-                (paire_id, paire_id)
-                )
+                (paire_id, paire_id),
+            )
             results = db.cursor.fetchall()
             st.session_state.update({"game_ids": [result[0] for result in results]})
             # Fetching serie_ids
             series_ids = db.get_serie_ids_by_paire_name(paire_name)
             st.session_state.update({"serie_ids": series_ids})
 
-        # Menu options for the dev view    
+        # Menu options for the dev view
         selected = option_menu(
             menu_title="Dev pages",
             options=[
-            "Game editor",
-            "Action grading",
+                "Game editor",
+                "Action grading",
             ],
             menu_icon="cast",
             default_index=0,
@@ -75,10 +77,12 @@ if selected == "Game editor":
     # Move the selectbox to the sidebar
     with st.sidebar:
         editor_mode = st.selectbox(
-            "Select the editor mode:", 
+            "Select the editor mode:",
             ["Pre-processing", "Game-to-points", "All possessions"],
-            on_change=lambda: st.session_state.update({"editor_mode": st.session_state.editor_mode_select}),
-            key="editor_mode_select"
+            on_change=lambda: st.session_state.update(
+                {"editor_mode": st.session_state.editor_mode_select}
+            ),
+            key="editor_mode_select",
         )
 elif selected == "Action grading":
     action_grading_interface()

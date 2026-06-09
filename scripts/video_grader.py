@@ -9,6 +9,7 @@ import datetime
 # Local imports
 sys.path.append(os.path.join(os.path.dirname(__file__), "db_manager"))
 from db_manager import DBManager
+
 sys.path.append(os.path.join(os.path.dirname(__file__), "video_edit_utils"))
 from video_edit_utils import basic_action_grader
 
@@ -25,11 +26,12 @@ class VideoGrader:
     Its powered by cv2 package, and it uses the DBManager class to load the
     specific points for the method used, and to save the results in the database.
     """
+
     def __init__(
         self,
         paire_id: str,
         action: str = None,
-        ) -> None:
+    ) -> None:
         """
         Initializes the VideoGrader class.
         Args:
@@ -40,7 +42,7 @@ class VideoGrader:
         self.segmented_points_dir = SEGMENTED_POINTS_DIR
         self.paire_id = paire_id
         self.action = action
-    
+
     # ==============================================================================
 
     def service_passing_grading(
@@ -68,13 +70,9 @@ class VideoGrader:
         """
         # Validate the input parameters
         if game_id is None and serie_id is None:
-            raise ValueError(
-                "At least one of game_id or serie_id must be provided."
-            )
+            raise ValueError("At least one of game_id or serie_id must be provided.")
         if serve_or_pass not in ["serve", "pass"]:
-            raise ValueError(
-                "serve_or_pass must be either 'serve' or 'pass'."
-            )
+            raise ValueError("serve_or_pass must be either 'serve' or 'pass'.")
         if game_id is not None and serie_id is not None:
             raise ValueError(
                 "Only one of game_id or serie_id should be provided, not both."
@@ -147,7 +145,7 @@ class VideoGrader:
             for point_id, previous_grade in results:
                 previous_grades_dict[point_id] = previous_grade
 
-        print(f'previous_grades_dict: {previous_grades_dict}')
+        print(f"previous_grades_dict: {previous_grades_dict}")
 
         # Fetching the player names in table_player for the game_id or serie_id provided
         with DBManager() as db:
@@ -169,7 +167,11 @@ class VideoGrader:
         with DBManager() as db:
             db.create_simple_actions_table(serve_or_pass)
 
-        # Looping through the points to grade and applying the basic_action_grader
+        ## Looping through the points to grade and applying the basic_action_grader
+        # Initiating the color indices for the keys and grades colors in the grading interface
+        keys_colors_index = int(0)
+        grades_color_index = int(0)
+        # For looping through the points to grade and applying the basic_action_grader
         for point_id in points_ids:
             if quit_grading:
                 break
@@ -182,7 +184,12 @@ class VideoGrader:
             print(f"Grading point_id: {point_id} with video path: {video_path}")
 
             # Grading the action in the video and storing the results in a list
-            action_grades, quit_grading = basic_action_grader(
+            (
+                action_grades,
+                quit_grading,
+                next_keys_colors_index,
+                next_grades_color_index,
+            ) = basic_action_grader(
                 video_path=video_path,
                 point_id=point_id,
                 paire_id=self.paire_id,
@@ -190,28 +197,28 @@ class VideoGrader:
                 player_b=player_b,
                 action_to_grade=serve_or_pass,
                 previous_grade=previous_grades_dict.get(point_id, None),
+                init_keys_colors_index=keys_colors_index,
+                init_grades_color_index=grades_color_index,
             )
             # Appending the grades for the current action to the main list
             actions_grades_list.append(action_grades)
+            # Update the color indices for the next iteration
+            keys_colors_index = int(next_keys_colors_index)
+            grades_color_index = int(next_grades_color_index)
 
         if not quit_grading:
             # Saving the list in a JSON file, dated with the current date and time
             # for history and traceability purposes, and to be able to reuse it later if needed
-            datetime_str = str(
-                datetime.datetime.now().strftime("%Y-%m-%d")
-            )
-            actions_graded_dir = os.path.join(os.path.dirname(
-                os.path.dirname(__file__)
-            ),
+            datetime_str = str(datetime.datetime.now().strftime("%Y-%m-%d"))
+            actions_graded_dir = os.path.join(
+                os.path.dirname(os.path.dirname(__file__)),
                 "actions_graded",
             )
             # Ensure the actions_graded directory exists
             os.makedirs(actions_graded_dir, exist_ok=True)
             # Build the JSON file path
             game_or_serie_id = str(game_id if game_id is not None else serie_id)
-            json_filename = (
-                f"list_grades_{serve_or_pass}_{game_or_serie_id}_{self.paire_id}_graded_at_{datetime_str}.json"
-            )
+            json_filename = f"list_grades_{serve_or_pass}_{game_or_serie_id}_{self.paire_id}_graded_at_{datetime_str}.json"
             json_filepath = os.path.join(actions_graded_dir, json_filename)
             # Write the grades list to the JSON file
             with open(json_filepath, "w") as f:
@@ -226,7 +233,7 @@ class VideoGrader:
         #             INSERT INTO table_{serve_or_pass} (
         #                 point_id, paire_id, player, action, grade
         #             ) VALUES (?, ?, ?, ?, ?)
-        #             ON CONFLICT(point_id, player, action, grade) 
+        #             ON CONFLICT(point_id, player, action, grade)
         #             DO {"UPDATE SET action=excluded.action, grade=excluded.grade, player=excluded.player" if rewrite_db else "NOTHING"}
         #             """
         #         )
@@ -272,10 +279,11 @@ class VideoGrader:
     # Missing games to grade for serve and pass
     # -------------------------------------------------------------------------
 
-    def missing_games_to_grade(self,
-                               action_to_grade: str,
-                               ) -> list:
-        """ For a specified action, gives the games that are still to be graded
+    def missing_games_to_grade(
+        self,
+        action_to_grade: str,
+    ) -> list:
+        """For a specified action, gives the games that are still to be graded
         according to the content of the database.
         [DEVELOPMENT IN PROGRESS] So far, only available for 'serve' and 'pass'
 
@@ -284,14 +292,13 @@ class VideoGrader:
         Returns:
             list: A list of game_ids that are missing grades for the specified action.
         """
-        if action_to_grade not in ['serve', 'pass']:
+        if action_to_grade not in ["serve", "pass"]:
             raise ValueError("action_to_grade must be either 'serve' or 'pass'")
-        
 
         with DBManager() as db:
             # Point_ids
             sub_subquery = str(f"SELECT point_id FROM table_{action_to_grade}")
-            
+
             subquery = str(f"""
                 SELECT tp.game_id
                 FROM table_point AS tp
@@ -300,30 +307,31 @@ class VideoGrader:
                 GROUP BY tp.game_id
                 """)
 
-            db.execute_query(
-                f"""SELECT game_id 
+            db.execute_query(f"""SELECT game_id 
                 FROM table_game
 
                 WHERE game_id NOT IN ({subquery})
-                """
-            )
+                """)
             result = db.cursor.fetchall()
         missing_serve_game_ids_list = [row[0] for row in result]
 
-        print(f"""[DEV] {len(missing_serve_game_ids_list)} games missing {action_to_grade} grades: 
-              {missing_serve_game_ids_list}""")
+        print(
+            f"""[DEV] {len(missing_serve_game_ids_list)} games missing {action_to_grade} grades: 
+              {missing_serve_game_ids_list}"""
+        )
 
         return missing_serve_game_ids_list
 
+
 #######################################################################################
-# Main script for testing the VideoGrader class 
+# Main script for testing the VideoGrader class
 
 
 if __name__ == "__main__":
-    grader = VideoGrader(paire_id='JOMR')
+    grader = VideoGrader(paire_id="JOMR")
     grader.service_passing_grading(
-        serie_id='BSD_S1-1500_F_mai26',
-        serve_or_pass='serve',
+        serie_id="BSD_S1-1500_F_mai26",
+        serve_or_pass="serve",
         rewrite_db=True,
-        )
+    )
     # games_to_grade_list = grader.missing_games_to_grade(action_to_grade='serve')

@@ -1,4 +1,5 @@
 """One-time patch: update Firestore 'series' documents with serie_name from SQLite."""
+
 import os
 import sqlite3
 from dotenv import load_dotenv
@@ -22,7 +23,7 @@ cursor.execute("SELECT serie_id, serie_name FROM table_serie")
 rows = cursor.fetchall()
 conn.close()
 
-col = db.collection('series')
+col = db.collection("series")
 updated = 0
 for r in rows:
     serie_id = r["serie_id"]
