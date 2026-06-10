@@ -330,8 +330,8 @@ class VideoGrader:
 if __name__ == "__main__":
     grader = VideoGrader(paire_id="JOMR")
     grader.service_passing_grading(
-        serie_id="MON_S2-1000_F_mar26",
-        serve_or_pass="pass",
+        serie_id="MBV_S2-750_F_avr26",
+        serve_or_pass="serve",
         rewrite_db=False,
     )
     # games_to_grade_list = grader.missing_games_to_grade(action_to_grade='pass')

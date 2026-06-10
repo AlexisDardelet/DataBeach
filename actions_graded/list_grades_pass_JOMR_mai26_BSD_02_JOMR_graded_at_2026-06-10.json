@@ -1,0 +1,366 @@
+[
+  {
+    "point_id": "JOMR_mai26_BSD_02_p002",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p003",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "average pass (0)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p005",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p008",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p010",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p011",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "bad pass (-)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p013",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "pass",
+    "grade": "average pass (0)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p014",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p015",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "average pass (0)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p017",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p018",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "average pass (0)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p020",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "excellent pass (++)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p021",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "excellent pass (++)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p023",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "average pass (0)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p025",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "pass",
+    "grade": "bad pass (-)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p026",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "average pass (0)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p027",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "bad pass (-)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p029",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "excellent pass (++)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p032",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "average pass (0)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p033",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "pass",
+    "grade": "excellent pass (++)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p034",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "average pass (0)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p035",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p036",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "excellent pass (++)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p037",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "average pass (0)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p038",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p040",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p042",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p043",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "excellent pass (++)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p048",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "pass",
+    "grade": "average pass (0)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p050",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p054",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "excellent pass (++)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p055",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p058",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "average pass (0)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p063",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p065",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "bad pass (-)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p067",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "pass",
+    "grade": "excellent pass (++)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p070",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p071",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "bad pass (-)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p076",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p077",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p078",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p079",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "pass",
+    "grade": "average pass (0)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p080",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "pass",
+    "grade": "ace"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p081",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "pass",
+    "grade": "average pass (0)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p082",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "average pass (0)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p084",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p085",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p086",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p089",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p092",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "good pass (+)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p094",
+    "paire_id": "JOMR",
+    "player": "RANC Mathilde",
+    "action": "pass",
+    "grade": "average pass (0)"
+  },
+  {
+    "point_id": "JOMR_mai26_BSD_02_p095",
+    "paire_id": "JOMR",
+    "player": "OFFREDI Jade",
+    "action": "pass",
+    "grade": "good pass (+)"
+  }
+]
