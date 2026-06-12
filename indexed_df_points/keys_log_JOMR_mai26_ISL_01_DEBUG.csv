@@ -1,0 +1,26 @@
+0,1
+set/match start,425
+end of point,686
+service MaeG_MarB,951
+end of point,1354
+service MaeG_MarB,1692
+end of point,2014
+service JOMR,2620
+end of point,3067
+service MaeG_MarB,3317
+end of point,3521
+*SWITCH*,4234
+SWITCH,4234
+end of point,4370
+service MaeG_MarB,4647
+end of point,5032
+service MaeG_MarB,5330
+end of point,5568
+*BACK TO LAST SWITCH*,5603
+*SWITCH*,3865
+SWITCH,3865
+end of point,3888
+service MaeG_MarB,4293
+end of point,4687
+service MaeG_MarB,5005
+end of point,5285

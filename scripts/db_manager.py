@@ -711,7 +711,7 @@ class DBManager:
 if __name__ == "__main__":
 
     with DBManager() as db:
-        # db.reset_database(action_name_list=["serve", "pass"])
+        db.reset_database(action_name_list=["serve", "pass"])
         # db.update_grade_to_previous_grade(action_name="serve")
         table_pass_df = db.table_to_dataframe("table_pass")
         print(table_pass_df.tail())

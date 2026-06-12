@@ -1,5 +1,0 @@
-service_side,start_frame,end_frame,JOMR_score,MarL_MarB_score,JOMR_sets,MarL_MarB_sets,point_index
-match start - service MarL_MarB,278,759,0,0,0,0,001
-service MarL_MarB,1092,1410,0,1,0,0,002
-service MarL_MarB,1731,2200,0,2,0,0,003
-end of set,0,0,0,3,0,1,999

@@ -11,6 +11,7 @@ RECAP_DICT_SCORE_DIR = os.getenv("RECAP_DICT_SCORE_DIR")
 PREPROCESSED_VIDEOS_DIR = os.getenv("PRE_PROCESSED_VIDEOS_DIR")
 SEGMENTED_POINTS_DIR = os.getenv("SEGMENTED_POINTS_DIR")
 ALL_POSSESSION_DIR = os.getenv("ALL_POSSESSION_DIR")
+ROOT_VIDEO_DIR = os.getenv("ROOT_VIDEO_DIR")
 
 # Local imports
 from db_manager import DBManager
@@ -251,10 +252,10 @@ class GameEditor:
                 export_keys_log=export_keys_log,
             )
             # Export the list of actions to a CSV file
-            list_actions_path = os.path.join(
-                INDEXED_DF_POINTS_DIR, f"list_actions_{game_id}_DEBUG.csv"
-            )
-            pd.DataFrame(list_actions).to_csv(list_actions_path, index=False)
+            keys_log_csv_filename = str(os.path.join(
+                INDEXED_DF_POINTS_DIR, f"keys_log_{game_id}_DEBUG.csv"
+            ))
+            pd.DataFrame(list_actions).to_csv(keys_log_csv_filename, index=False)
         ## [PROD] : Standard pipeline without exporting the list of actions
         else:
             df_points = cv2_point_segment_cut(
@@ -270,12 +271,21 @@ class GameEditor:
         recap_dict_score = score_checker(indexed_df_points)
 
         # Save the indexing and score to CSV and JSON files
-        indexed_df_points.to_csv(
-            path_or_buf=os.path.join(
-                self.indexed_df_points_dir, f"indexed_df_points_{game_id}.csv"
-            ),
-            index=False,
-        )
+        if export_keys_log is True: ## [DEV DEBUG]
+            indexed_df_points.to_csv(
+                path_or_buf=os.path.join(
+                    self.indexed_df_points_dir, f"indexed_df_points_{game_id}_DEBUG.csv"
+                ),
+                index=False,
+            )
+        else: ## [PROD]
+            indexed_df_points.to_csv(
+                path_or_buf=os.path.join(
+                    self.indexed_df_points_dir, f"indexed_df_points_{game_id}.csv"
+                ),
+                index=False,
+            )
+
         with open(
             os.path.join(self.recap_dict_score_dir, f"recap_dict_score_{game_id}.json"),
             "w",
@@ -348,7 +358,7 @@ class GameEditor:
 if __name__ == "__main__":
     load_dotenv()
     preprocessed_videos_dir = os.getenv("PREPROCESSED_VIDEO_DIR")
-    game_id = "JOMR_mai26_BSD_01"
+    game_id = "JOMR_mai26_ISL_01"
     video_path = rf"{preprocessed_videos_dir}\{game_id}_started_rotated.mp4"
 
 
@@ -359,7 +369,7 @@ if __name__ == "__main__":
 
     editor = GameEditor(
         video_path=video_path,
-        output_dir=r"D:\Montages volley et beach\Jade&Math\(dev - game editor fix)",
+        output_dir=rf"{ROOT_VIDEO_DIR}\(dev - game editor fix)",
     )
     editor.game_to_segmented_points(
         team1_name=team1_name,
