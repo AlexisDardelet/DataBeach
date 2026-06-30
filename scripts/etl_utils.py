@@ -1,3 +1,7 @@
+# DataBeach — © 2025 Alexis Dardelet
+# Licensed under PolyForm Noncommercial 1.0.0
+# https://polyformproject.org/licenses/noncommercial/1.0.0
+
 # This module contains utility functions for the ETL process of loading
 # volleyball match data into a database. It includes functions for loading
 # indexed points data from CSV files, which are expected to be preprocessed

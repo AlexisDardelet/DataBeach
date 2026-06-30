@@ -8,11 +8,12 @@ cookies_alexis.txt
 # ========================
 
 data-beach-fd370-19b4b14934f2.json
+*firebase-adminsdk*.json
 
 # ========================
 # Base de données SQLite
 # ========================
-.db
+*.db
 *.sqlite
 *.sqlite3
 

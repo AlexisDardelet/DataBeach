@@ -1,3 +1,7 @@
+# DataBeach — © 2025 Alexis Dardelet
+# Licensed under PolyForm Noncommercial 1.0.0
+# https://polyformproject.org/licenses/noncommercial/1.0.0
+
 """One-time patch: update Firestore 'series' documents with serie_name from SQLite."""
 
 import os

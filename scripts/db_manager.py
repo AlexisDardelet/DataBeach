@@ -1,3 +1,7 @@
+# DataBeach — © 2025 Alexis Dardelet
+# Licensed under PolyForm Noncommercial 1.0.0
+# https://polyformproject.org/licenses/noncommercial/1.0.0
+
 """Database manager module for DataBeach SQLite operations."""
 
 import json
@@ -646,7 +650,7 @@ class DBManager:
             except sqlite3.Error as e:
                 print(f"❌ Error inserting grades: {e}")
 
-        ## ONLY FOR SERVE ACTION
+        ## ONLY FOR SERVE ACTION AND PASS ACTION
         # After inserting/updating the grades, update the point_won column in the serve
         if action_name == "serve":
             point_won_query = """
@@ -656,6 +660,19 @@ class DBManager:
                     SELECT tp.point_winner
                     FROM table_point AS tp
                     WHERE tp.point_id = table_serve.point_id
+                ) THEN 1
+                ELSE 0
+            END
+            """
+            self.execute_query(point_won_query)
+        if action_name == "pass":
+            point_won_query = """
+            UPDATE table_pass
+            SET point_won = CASE
+                WHEN paire_id = (
+                    SELECT tp.point_winner
+                    FROM table_point AS tp
+                    WHERE tp.point_id = table_pass.point_id
                 ) THEN 1
                 ELSE 0
             END
@@ -671,10 +688,10 @@ class DBManager:
 
     def false_aces_corrector(self) -> None:
         """
-        In table_serve, corrects the false aces and false direct
+        In table_serve and table_pass, corrects the false aces and false direct
         serve errors in the table_serve based on point_won
         """
-
+        ## table_serve correction
         # Correct false 'ace' grades where point_won is 0
         false_aces_query = str("""
         UPDATE table_serve
@@ -690,6 +707,15 @@ class DBManager:
         WHERE grade = 'serve error' AND point_won = 1
         """)
         self.execute_query(false_errors_query)
+
+        # ## table_pass correction
+        # # Correct false 'ace' grades where point_won is 0
+        # false_aces_query = str("""
+        # UPDATE table_pass
+        # SET grade = 'pass error'
+        # WHERE grade = 'perfect' AND point_won = 0
+        # """)
+        # self.execute_query(false_perfect_query)
 
     # -----------------------------------------------------------------------
 

@@ -1,3 +1,7 @@
+# DataBeach — © 2025 Alexis Dardelet
+# Licensed under PolyForm Noncommercial 1.0.0
+# https://polyformproject.org/licenses/noncommercial/1.0.0
+
 # Packages imports
 import os
 import sys
