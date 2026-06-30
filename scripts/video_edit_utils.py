@@ -13,14 +13,6 @@ load_dotenv()
 FFMPEG_PATH = os.getenv("FFMPEG_PATH")
 SEGMENTED_POINTS_DIR = os.getenv("SEGMENTED_POINTS_DIR")
 
-# Local helper for the point-segmentation undo ("back to last *SWITCH*").
-# scripts/ is on sys.path for every entry point; fall back defensively.
-try:
-    from segment_undo import rewind_seek_target
-except ModuleNotFoundError:  # pragma: no cover - defensive for unusual sys.path
-    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-    from segment_undo import rewind_seek_target
-
 
 # -------------------------------------------------------------------
 # Core GPU extraction for a single played point (start-end frames)
@@ -664,28 +656,12 @@ def cv2_point_segment_cut(
                     score_team1 = switch_scores_team1
                     score_team2 = switch_scores_team2
                     last_action = temp_list[-1]["Action"] if temp_list else None
-                    # Rewind so playback resumes exactly on the last *SWITCH*
-                    # frame. 'Frame' stores frame_number, which is incremented
-                    # AFTER each cap.read(), so the switch frame lives at the
-                    # 0-based position Frame - 1. Seeking straight to Frame
-                    # landed one frame past the switch and left frame_number
-                    # out of sync with the capture, shifting every action
-                    # recorded after a rewind by one index.
+                    # Go back to the frame of the last switch action and pause playback
                     cap.set(
                         cv2.CAP_PROP_POS_FRAMES,
-                        rewind_seek_target(temp_list[-1]["Frame"]),
+                        temp_list[-1]["Frame"],
                     )
-                    # Re-read now so the paused frame shows the switch frame
-                    # (not a stale one) and resync frame_number with the real
-                    # capture position.
-                    ret, frame = cap.read()
-                    if ret:
-                        frame = cv2.resize(
-                            frame,
-                            display_size,
-                            interpolation=cv2.INTER_AREA,
-                        )
-                    frame_number = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+                    frame_number = temp_list[-1]["Frame"]
                     paused = True
 
             elif key in key_action_map:
